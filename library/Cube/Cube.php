@@ -6,7 +6,7 @@ abstract class Cube
 {
     protected $chosenFacts;
 
-    protected $dimensions;
+    protected $dimensions = array();
 
     abstract public function fetchAll();
 
