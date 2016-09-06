@@ -2,6 +2,7 @@
 
 namespace Icinga\Module\Cube\Ido;
 
+use Icinga\Module\Cube\Cube;
 use Icinga\Module\Cube\Dimension;
 
 class CustomVarDimension implements Dimension
@@ -28,13 +29,14 @@ class CustomVarDimension implements Dimension
         return $name;
     }
 
-    public function addToQuery($query)
+    public function addToCube(Cube $cube)
     {
         $name = $this->varname;
+        $dbName = $cube->getDbName();
         $alias = 'c_' . $this->safeVarname($name);
-        return $query->joinLeft(
-            array($alias => $this->dbName . '.icinga_customvariablestatus'),
-            $this->db->quoteInto($alias . '.varname = ?', $name)
+        return $cube->innerQuery()->joinLeft(
+            array($alias => $dbName . '.icinga_customvariablestatus'),
+            $cube->db()->quoteInto($alias . '.varname = ?', $name)
             . ' AND ' . $alias . '.object_id = o.object_id',
             array()
         )->group($alias . '.varvalue');

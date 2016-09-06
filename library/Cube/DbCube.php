@@ -16,6 +16,8 @@ abstract class DbCube extends Cube
 
     protected $fullQuery;
 
+    protected $dbName;
+
     abstract public function prepareInnerQuery();
 
     public function setConnection($connection)
@@ -30,14 +32,37 @@ abstract class DbCube extends Cube
         return $this->db()->fetchAll($this->fullQuery());
     }
 
+    public function setDbName($name)
+    {
+        $this->dbName = $name;
+        return $this;
+    }
+
+    public function getDbName()
+    {
+        return $this->dbName;
+    }
+
     // Used to get rid of NULL values
-    protected function innerQuery()
+    public function innerQuery()
     {
         if ($this->innerQuery === null) {
             $this->innerQuery = $this->prepareInnerQuery();
+
         }
 
         return $this->innerQuery;
+    }
+
+    protected function finalizeInnerQuery()
+    {
+        $columns = array();
+        foreach ($this->dimensions as $name => $dimension) {
+            $dimension->addToCube($this);
+            $columns[$name] = $dimension->getColumnExpression();
+        }
+
+        $this->innerQuery()->columns($columns + $this->factColumns);
     }
 
     protected function fullQuery()
@@ -82,7 +107,7 @@ abstract class DbCube extends Cube
         return $select;
     }
 
-    protected function db()
+    public function db()
     {
         return $this->db;
     }
@@ -93,6 +118,7 @@ abstract class DbCube extends Cube
         $alias = 'sub';
 
         $dimensions = $this->listDimensions();
+        $this->finalizeInnerQuery();
         foreach ($dimensions as $dimension) {
             $columns[$dimension] = $alias . '.' . $dimension;
         }

@@ -8,5 +8,5 @@ interface Dimension
 
     public function getColumnExpression();
 
-    public function addToQuery($query);
+    public function addToCube(Cube $cube);
 }

@@ -49,27 +49,13 @@ class IdoCube extends DbCube
             array()
         );
 
-        $columns = array();
-        foreach ($this->dimensions as $name => $dimension) {
-            $dimension->addToQuery($select);
-            $columns[$name] = $dimension->getColumnExpression();
-        }
-
-        $select->columns($columns + $this->factColumns);
-
         return $select;
     }
 
-    protected function db()
+    public function db()
     {
         $this->requireBackend();
         return parent::db();
-    }
-
-    public function setDbName($name)
-    {
-        $this->dbName = $name;
-        return $this;
     }
 
     protected function requireBackend()
