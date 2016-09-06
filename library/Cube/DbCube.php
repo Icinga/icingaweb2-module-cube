@@ -18,9 +18,16 @@ abstract class DbCube extends Cube
 
     abstract public function prepareInnerQuery();
 
+    public function setConnection($connection)
+    {
+        $this->connection = $connection;
+        $this->db = $connection->getDbAdapter();
+        return $this;
+    }
+
     public function fetchAll()
     {
-        return $this->db->fetchAll($this->fullQuery());
+        return $this->db()->fetchAll($this->fullQuery());
     }
 
     // Used to get rid of NULL values
@@ -62,7 +69,7 @@ abstract class DbCube extends Cube
             $columns[$col] = $alias . '.' . $col;
         }
 
-        $select = $this->db->select()->from(
+        $select = $this->db()->select()->from(
             array($alias => $this->rollupQuery()),
             $columns
         );
@@ -73,6 +80,11 @@ abstract class DbCube extends Cube
         }
 
         return $select;
+    }
+
+    protected function db()
+    {
+        return $this->db;
     }
 
     // Do the rollup
@@ -89,7 +101,7 @@ abstract class DbCube extends Cube
             $columns[$fact] = 'SUM(' . $fact . ')';
         }
 
-        $select = $this->db->select()->from(
+        $select = $this->db()->select()->from(
             array($alias => $this->innerQuery()),
             $columns
         )->group('(' . implode('), (', $dimensions) . ') WITH ROLLUP');

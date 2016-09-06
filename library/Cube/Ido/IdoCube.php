@@ -19,9 +19,7 @@ class IdoCube extends DbCube
 
     public function setBackend(MonitoringBackend $backend)
     {
-        $this->connection = $backend->getResource();
-        $this->db = $connection->getDbAdapter();
-        return $this;
+        return $this->setConnection($backend->getResource());
     }
 
     public function chooseFacts($facts)
@@ -38,9 +36,7 @@ class IdoCube extends DbCube
 
     public function prepareInnerQuery()
     {
-        $this->requireBackend();
-
-        $select = $this->db->select()->from(
+        $select = $this->db()->select()->from(
             array('o' => $this->dbName . '.icinga_objects'),
             array()
         )->join(
@@ -64,6 +60,12 @@ class IdoCube extends DbCube
         return $select;
     }
 
+    protected function db()
+    {
+        $this->requireBackend();
+        return parent::db();
+    }
+
     public function setDbName($name)
     {
         $this->dbName = $name;
@@ -72,7 +74,7 @@ class IdoCube extends DbCube
 
     protected function requireBackend()
     {
-        if ($this->backend === null) {
+        if ($this->db === null) {
             $this->setBackend(MonitoringBackend::instance());
         }
     }
