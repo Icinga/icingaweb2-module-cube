@@ -1,0 +1,88 @@
+/* BEGIN Cube */
+
+div.cube {
+  div.cube-dimension0 > .header {
+    font-size: 1.2em;
+    font-weight: bold;
+    border-bottom: 1px solid black;
+  }
+
+  div.cube-dimension1 {
+    clear: both;
+    border-left: 0.5em solid transparent;
+  }
+
+  div.cube-dimension1 > .header, div.cube-dimension2 {
+    display: inline-block;
+    width: 10em;
+    height: 10em;
+    margin: 0;
+    padding: 0.5em;
+    margin-right: 0.3em;
+    margin-top: 0.3em;
+    overflow: hidden;
+    border: 1px solid white;
+  }
+
+  div.cube-dimension1 > .header {
+    float: left;
+    font-weight: bold;
+    line-height: 9em;
+    text-align: center;
+    padding-left: 0;
+  }
+
+  div.cube-dimension2 {
+    > .header {
+      text-align: center;
+      color: white;
+    }
+
+    background: @color-ok;
+  }
+
+  .body span.sum {
+    font-size: 3em;
+    display: block;
+    text-align: center;
+    color: white;
+  }
+
+  span.critical {
+    color: white;
+    font-size: 3em;
+  }
+
+  span.critical {
+    background: @color-critical;
+    display: block;
+    text-align: center;
+  }
+
+  span.critical.handled {
+    text-align: center;
+    display: block;
+    background: @color-critical-handled;
+  }
+
+  div.cube-dimension0.critical > .header {
+    color: @color-critical;
+    border-color: @color-critical;
+  }
+
+  div.cube-dimension1.critical {
+    border-left-color: @color-critical;
+
+    &.handled {
+      border-left-color: @color-critical-handled;
+    }
+  }
+
+  div.cube-dimension2.critical {
+    span.sum {
+      font-size: 1em;
+    }
+  }
+}
+
+/* END Cube */
