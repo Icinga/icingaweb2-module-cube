@@ -3,9 +3,9 @@
 namespace Icinga\Module\Cube\Controllers;
 
 use Icinga\Web\Controller;
+use Icinga\Module\Cube\Ido\CustomVarDimension;
 use Icinga\Module\Cube\Ido\IdoCube;
 use Icinga\Module\Cube\CubeRenderer;
-use Icinga\Module\Cube\CustomVarDimension;
 
 
 class IndexController extends Controller
