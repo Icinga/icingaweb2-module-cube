@@ -21,6 +21,21 @@ abstract class Cube
         return $this;
     }
 
+    public function listAdditionalDimensions()
+    {
+        $list = array();
+
+        foreach ($this->listAvailableDimensions() as $dimension) {
+            if (! array_key_exists($dimension, $this->dimensions)) {
+                $list[] = $dimension;
+            }
+        }
+
+        return $list;
+    }
+
+    abstract public function listAvailableDimensions();
+
     public function moveDimensionUp($name)
     {
         $last = $found = null;

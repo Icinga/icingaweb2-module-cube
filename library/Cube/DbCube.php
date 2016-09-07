@@ -18,6 +18,8 @@ abstract class DbCube extends Cube
 
     protected $dbName;
 
+    protected $factColumns = array();
+
     abstract public function prepareInnerQuery();
 
     public function setConnection($connection)

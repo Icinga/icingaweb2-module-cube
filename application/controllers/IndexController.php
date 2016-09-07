@@ -3,10 +3,8 @@
 namespace Icinga\Module\Cube\Controllers;
 
 use Icinga\Module\Cube\CubeRenderer;
-use Icinga\Module\Cube\Ido\CustomVarDimension;
-use Icinga\Module\Cube\Ido\IdoCube;
+use Icinga\Module\Cube\Ido\IdoHostStatusCube;
 use Icinga\Module\Cube\Web\Controller;
-
 
 class IndexController extends Controller
 {
@@ -18,14 +16,14 @@ class IndexController extends Controller
         ))->activate('cube');
 
         // Hint: order matters, we are shifting!
-        $cube = new IdoCube();
+        $cube = new IdoHostStatusCube();
         $showSettings = $this->params->shift('showSettings');
 
        $cube->chooseFacts(array('hosts_cnt', 'hosts_nok', 'hosts_unhandled_nok'));
         $vars = preg_split('/,/', $this->params->shift('dimensions'), -1, PREG_SPLIT_NO_EMPTY);
 
         foreach ($vars as $var) {
-            $cube->addDimension(new CustomVarDimension($var));
+            $cube->addDimensionByName($var);
         }
 
         foreach ($this->params->toArray() as $param) {
