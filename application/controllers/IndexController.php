@@ -12,8 +12,6 @@ class IndexController extends Controller
 {
     public function indexAction()
     {
-        $this->setAutoRefreshInterval(15);
-
         $this->getTabs()->add('cube', array(
             'label' => $this->translate('Cube'),
             'url'   => $this->getRequest()->getUrl()
@@ -33,6 +31,8 @@ class IndexController extends Controller
             $this->view->form = $this->loadForm('AddDimension')
                  ->setCube($cube)
                 ->handleRequest();
+        } else {
+            $this->setAutoRefreshInterval(15);
         }
 
         foreach ($this->params->toArray() as $param) {
