@@ -44,7 +44,7 @@ class IndexController extends Controller
         }
 
         if ($showSettings) {
-            $this->view->form = $this->loadForm('AddDimension')
+            $this->view->form = $this->loadForm('Dimensions')
                  ->setCube($cube)
                 ->handleRequest();
         } else {

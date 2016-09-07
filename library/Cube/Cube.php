@@ -21,6 +21,73 @@ abstract class Cube
         return $this;
     }
 
+    public function moveDimensionUp($name)
+    {
+        $last = $found = null;
+        $positions = array_keys($this->dimensions);
+
+        while (list($k, $v) = each($positions)) {
+            if ($v === $name) {
+                $found = $k;
+                break;
+            }
+
+            $last = $k;
+        }
+
+        if ($found !== null) {
+            $this->flipPositions($positions, $last, $found);
+        }
+
+        $this->reorderDimensions($positions);
+        return $this;
+    }
+
+    public function moveDimensionDown($name)
+    {
+        $next = $found = null;
+        $positions = array_keys($this->dimensions);
+
+        while (list($k, $v) = each($positions)) {
+            if ($found !== null) {
+                $next = $k;
+                break;
+            }
+
+            if ($v === $name) {
+                $found = $k;
+            }
+        }
+
+        if ($next !== null) {
+            $this->flipPositions($positions, $next, $found);
+        }
+
+        $this->reorderDimensions($positions);
+        return $this;
+    }
+
+    protected function flipPositions(& $array, $pos1, $pos2)
+    {
+        list(
+            $array[$pos1],
+            $array[$pos2]
+        ) = array(
+            $array[$pos2],
+            $array[$pos1]
+        );
+    }
+
+    protected function reOrderDimensions($positions)
+    {
+        $dimensions = array();
+        foreach ($positions as $pos => $key) {
+            $dimensions[$key] = $this->dimensions[$key];
+        }
+
+        $this->dimensions = $dimensions;
+    }
+
     public function addDimension(Dimension $dimension)
     {
         $name = $dimension->getName();
