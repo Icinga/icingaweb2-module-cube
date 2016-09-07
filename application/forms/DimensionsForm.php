@@ -105,24 +105,21 @@ class DimensionsForm extends Form
                 $dimension = substr($name, 16);
                 $cube->removeDimension($dimension);
                 $url->setParam('dimensions', implode(',', $cube->listDimensions()));
-                $this->setSuccessUrl($url);
-                $this->redirectOnSuccess($this->translate('Dimension has been removed'));
+                $this->redirectAndExit($url);
             }
 
             if (substr($name, 0, 16) === 'moveDimensionUp_' && $el->getValue()) {
                 $dimension = substr($name, 16);
                 $cube->moveDimensionUp($dimension);
                 $url->setParam('dimensions', implode(',', $cube->listDimensions()));
-                $this->setSuccessUrl($url);
-                $this->redirectOnSuccess($this->translate('Dimension moved upwards'));
+                $this->redirectAndExit($url);
             }
 
             if (substr($name, 0, 18) === 'moveDimensionDown_' && $el->getValue()) {
                 $dimension = substr($name, 18);
                 $cube->moveDimensionDown($dimension);
                 $url->setParam('dimensions', implode(',', $cube->listDimensions()));
-                $this->setSuccessUrl($url);
-                $this->redirectOnSuccess($this->translate('Dimension moved downwards'));
+                $this->redirectAndExit($url);
             }
         }
 
