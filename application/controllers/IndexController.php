@@ -44,7 +44,7 @@ class IndexController extends Controller
             implode(' -> ', $cube->listDimensions())
         );
 
-        if (! empty($cube->listDimensions())) {
+        if (count($cube->listDimensions()) > 0) {
             $this->view->cube = new CubeRenderer($cube);
         }
     }
