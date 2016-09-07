@@ -14,6 +14,13 @@ abstract class Cube
 
     abstract public function fetchAll();
 
+    public function removeDimension($name)
+    {
+        unset($this->dimensions[$name]);
+        unset($this->slices[$name]);
+        return $this;
+    }
+
     public function addDimension(Dimension $dimension)
     {
         $name = $dimension->getName();

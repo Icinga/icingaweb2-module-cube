@@ -19,20 +19,13 @@ class IndexController extends Controller
 
         // Hint: order matters, we are shifting!
         $cube = new IdoCube();
+        $showSettings = $this->params->shift('showSettings');
 
        $cube->chooseFacts(array('hosts_cnt', 'hosts_nok', 'hosts_unhandled_nok'));
         $vars = preg_split('/,/', $this->params->shift('dimensions'), -1, PREG_SPLIT_NO_EMPTY);
 
         foreach ($vars as $var) {
             $cube->addDimension(new CustomVarDimension($var));
-        }
-
-        if ($this->params->shift('showSettings')) {
-            $this->view->form = $this->loadForm('AddDimension')
-                 ->setCube($cube)
-                ->handleRequest();
-        } else {
-            $this->setAutoRefreshInterval(15);
         }
 
         foreach ($this->params->toArray() as $param) {
@@ -46,6 +39,16 @@ class IndexController extends Controller
 
         if (count($cube->listDimensions()) > 0) {
             $this->view->cube = new CubeRenderer($cube);
+        } else {
+            $showSettings = true;
+        }
+
+        if ($showSettings) {
+            $this->view->form = $this->loadForm('AddDimension')
+                 ->setCube($cube)
+                ->handleRequest();
+        } else {
+            $this->setAutoRefreshInterval(15);
         }
     }
 }

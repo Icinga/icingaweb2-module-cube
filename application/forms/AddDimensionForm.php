@@ -17,13 +17,19 @@ class AddDimensionForm extends Form
 
     public function setup()
     {
+        $cube = $this->cube;
+
         $dimensions = array_diff(
-            $this->cube->listAdditionalDimensions(),
-            $this->cube->listDimensions()
+            $cube->listAdditionalDimensions(),
+            $cube->listDimensions()
         );
 
         if (! empty($dimensions)) {
             $dimensions = array_combine($dimensions, $dimensions);
+        }
+
+        foreach ($cube->listDimensions() as $dimension) {
+            $this->addDimensionButtons($dimension);
         }
 
         $this->addElement('select', 'addDimension', array(
@@ -33,12 +39,37 @@ class AddDimensionForm extends Form
         ));
     }
 
+    protected function addDimensionButtons($dimension)
+    {
+        $this->addElement('submit', 'removeDimension_' . $dimension, array(
+            'label' => sprintf($this->translate('Remove %s'), $dimension)
+        ));
+    }
+
     public function onRequest()
     {
         parent::onRequest();
+        if (! $this->hasBeenSent()) {
+            return;
+        }
+
+        $url = $this->getSuccessUrl();
+        $post = $this->getRequest()->getPost();
+        $this->populate($post);
+        $cube = $this->cube;
+
+        foreach ($this->getElements() as $el) {
+            $name = $el->getName();
+            if (substr($name, 0, 16) === 'removeDimension_' && $el->getValue()) {
+                $dimension = substr($name, 16);
+                $cube->removeDimension($dimension);
+                $url->setParam('dimensions', implode(',', $cube->listDimensions()));
+                $this->setSuccessUrl($url);
+                $this->redirectOnSuccess($this->translate('Dimension has been removed'));
+            }
+        }
 
         if ($dimension = $this->getSentValue('addDimension')) {
-            $url = $this->getSuccessUrl();
             $dimensions = $url->getParam('dimensions');
             if (empty($dimensions)) {
                 $dimensions = $dimension;
