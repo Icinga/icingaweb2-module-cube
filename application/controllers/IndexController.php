@@ -19,7 +19,7 @@ class IndexController extends Controller
         $cube = new IdoHostStatusCube();
         $showSettings = $this->params->shift('showSettings');
 
-       $cube->chooseFacts(array('hosts_cnt', 'hosts_nok', 'hosts_unhandled_nok'));
+        $cube->chooseFacts(array('hosts_cnt', 'hosts_nok', 'hosts_unhandled_nok'));
         $vars = preg_split('/,/', $this->params->shift('dimensions'), -1, PREG_SPLIT_NO_EMPTY);
 
         foreach ($vars as $var) {

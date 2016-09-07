@@ -36,6 +36,25 @@ abstract class Cube
 
     abstract public function listAvailableDimensions();
 
+    public function getDimensionAfter($name)
+    {
+        $found = false;
+        $after = null;
+
+        foreach ($this->listDimensions() as $d) {
+            if ($found) {
+                $after = $d;
+                break;
+            }
+
+            if ($d === $name) {
+                $found = true;
+            }
+        }
+
+        return $after;
+    }
+
     public function moveDimensionUp($name)
     {
         $last = $found = null;

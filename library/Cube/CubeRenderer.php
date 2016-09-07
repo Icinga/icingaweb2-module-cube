@@ -224,8 +224,8 @@ class CubeRenderer
             $this->started = true;
         }
 
-        if ($this->isOuterDimension($name)) {
-            $sum = ' <span class="sum">(' . $this->summaries->$name->hosts_cnt . ')</span>';
+        if ($next = $this->cube->getDimensionAfter($name)) {
+            $sum = ' <span class="sum">(' . $this->summaries->$next->hosts_cnt . ')</span>';
         } else {
             $sum = '';
         }
