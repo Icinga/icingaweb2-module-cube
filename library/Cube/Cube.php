@@ -2,11 +2,15 @@
 
 namespace Icinga\Module\Cube;
 
+use Icinga\Exception\IcingaException;
+
 abstract class Cube
 {
     protected $chosenFacts;
 
     protected $dimensions = array();
+
+    protected $slices = array();
 
     abstract public function fetchAll();
 
@@ -14,6 +18,42 @@ abstract class Cube
     {
         $this->dimensions[$dimension->getName()] = $dimension;
         return $this;
+    }
+
+    public function slice($key, $value)
+    {
+        if ($this->hasDimension($key)) {
+            $this->slices[$key] = $value;
+        } else {
+            throw new IcingaException('Got no such dimension: "%s"', $key);
+        }
+
+        return $this;
+    }
+
+    public function hasDimension($name)
+    {
+        return array_key_exists($name, $this->dimensions);
+    }
+
+    public function hasSlice($name)
+    {
+        return array_key_exists($name, $this->slices);
+    }
+
+    public function listSlices()
+    {
+        return array_keys($this->slices);
+    }
+
+    public function hasFact($name)
+    {
+        return array_key_exists($name, $this->chosenFacts);
+    }
+
+    public function getDimension($name)
+    {
+        return $this->dimensions[$name];
     }
 
     public function listFacts()
@@ -29,7 +69,7 @@ abstract class Cube
 
     public function listDimensions()
     {
-        return array_keys($this->dimensions);
+        return array_values(array_diff(array_keys($this->dimensions), $this->listSlices()));
     }
 
     public function listColumns()

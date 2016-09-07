@@ -29,7 +29,8 @@ abstract class DbCube extends Cube
 
     public function fetchAll()
     {
-        return $this->db()->fetchAll($this->fullQuery());
+        $query = $this->fullQuery();
+        return $this->db()->fetchAll($query);
     }
 
     public function setDbName($name)
@@ -65,13 +66,21 @@ abstract class DbCube extends Cube
 
     protected function finalizeInnerQuery()
     {
+        $query = $this->innerQuery();
         $columns = array();
         foreach ($this->dimensions as $name => $dimension) {
             $dimension->addToCube($this);
-            $columns[$name] = $dimension->getColumnExpression();
+            if ($this->hasSlice($name)) {
+                $query->where(
+                    $dimension->getColumnExpression() . ' = ?',
+                    $this->slices[$name]
+                );
+            } else {
+                $columns[$name] = $dimension->getColumnExpression();
+            }
         }
 
-        $this->innerQuery()->columns($columns + $this->factColumns);
+        $query->columns($columns + $this->factColumns);
     }
 
     protected function fullQuery()
@@ -97,6 +106,7 @@ abstract class DbCube extends Cube
     {
         $alias = 'rollup';
         $cols = $this->listColumns();
+
         $columns = array();
 
         foreach ($cols as $col) {
