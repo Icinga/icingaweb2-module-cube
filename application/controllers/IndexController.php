@@ -2,10 +2,10 @@
 
 namespace Icinga\Module\Cube\Controllers;
 
-use Icinga\Web\Controller;
+use Icinga\Module\Cube\CubeRenderer;
 use Icinga\Module\Cube\Ido\CustomVarDimension;
 use Icinga\Module\Cube\Ido\IdoCube;
-use Icinga\Module\Cube\CubeRenderer;
+use Icinga\Module\Cube\Web\Controller;
 
 
 class IndexController extends Controller
@@ -19,16 +19,20 @@ class IndexController extends Controller
             'url'   => $this->getRequest()->getUrl()
         ))->activate('cube');
 
-        if ($this->params->shift('showSettings')) {
-            $this->view->form = 'as';
-        }
-
+        // Hint: order matters, we are shifting!
         $cube = new IdoCube();
-        $cube->chooseFacts(array('hosts_cnt', 'hosts_nok', 'hosts_unhandled_nok'));
+
+       $cube->chooseFacts(array('hosts_cnt', 'hosts_nok', 'hosts_unhandled_nok'));
         $vars = preg_split('/,/', $this->params->shift('dimensions'), -1, PREG_SPLIT_NO_EMPTY);
 
         foreach ($vars as $var) {
             $cube->addDimension(new CustomVarDimension($var));
+        }
+
+        if ($this->params->shift('showSettings')) {
+            $this->view->form = $this->loadForm('AddDimension')
+                 ->setCube($cube)
+                ->handleRequest();
         }
 
         foreach ($this->params->toArray() as $param) {
@@ -40,6 +44,8 @@ class IndexController extends Controller
             implode(' -> ', $cube->listDimensions())
         );
 
-        $this->view->cube = new CubeRenderer($cube);
+        if (! empty($cube->listDimensions())) {
+            $this->view->cube = new CubeRenderer($cube);
+        }
     }
 }

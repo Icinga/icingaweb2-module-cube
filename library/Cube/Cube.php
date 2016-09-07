@@ -16,7 +16,12 @@ abstract class Cube
 
     public function addDimension(Dimension $dimension)
     {
-        $this->dimensions[$dimension->getName()] = $dimension;
+        $name = $dimension->getName();
+        if (array_key_exists($name, $this->dimensions)) {
+            throw new IcingaException('Cannot add dimension "%s" twice', $name);
+        }
+
+        $this->dimensions[$name] = $dimension;
         return $this;
     }
 

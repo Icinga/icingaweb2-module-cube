@@ -15,6 +15,34 @@ class IdoCube extends DbCube
         'hosts_unhandled_nok' => 'SUM(CASE WHEN hs.current_state != 0 AND hs.problem_has_been_acknowledged = 0 AND hs.scheduled_downtime_depth = 0 THEN 1 ELSE 0 END) AS hosts_unhandled_nok',
     );
 
+    public function listAdditionalDimensions()
+    {
+        $list = array();
+
+        foreach ($this->listAvailableDimensions() as $dimension) {
+            if (! array_key_exists($dimension, $this->dimensions)) {
+                $list[] = $dimension;
+            }
+        }
+
+        return $list;
+    }
+
+    public function listAvailableDimensions()
+    {
+        $select = $this->db()->select()->from(
+            array('cv' => $this->tableName('icinga_customvariablestatus')),
+            array('varname' => 'cv.varname')
+        )->join(
+            array('o' => $this->tableName('icinga_objects')),
+            'cv.object_id = o.object_id AND o.is_active = 1 AND o.objecttype_id = 1',
+            array()
+        )->where('cv.is_json = 0')
+        ->group('cv.varname');
+
+        return $this->db()->fetchCol($select);
+    }
+
     public function setBackend(MonitoringBackend $backend)
     {
         return $this->setConnection($backend->getResource());
