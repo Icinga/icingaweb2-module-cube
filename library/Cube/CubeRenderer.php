@@ -57,6 +57,17 @@ class CubeRenderer
     protected function initializeDimensions()
     {
         $this->dimensions = $this->cube->listDimensions();
+
+        $min = 3;
+        $cnt = count($this->dimensions);
+        if ($cnt < $min) {
+            $diff = $min - $cnt;
+            $dimensions = $this->dimensions;
+            $this->dimensions = array();
+            foreach ($dimensions as $key => $dimension) {
+                $this->dimensions[$key + $diff] = $dimension;
+            }
+        }
         $this->reversedDimensions = array_reverse($this->dimensions);
         $this->dimensionLevels = array_flip($this->dimensions);
         return $this;
@@ -221,11 +232,28 @@ class CubeRenderer
 
         return
             $indent . '<div class="' . $this->getDimensionClasses($name, $row) . '">' . "\n"
-            . $indent . '  <div class="header">'
+            . $indent . '  <div class="header"><a href="'
+            . $this->getDetailsUrl($name, $row)
+            . '">'
             . $this->view->escape($row->$name)
             . $sum
-            . '</div>' . "\n"
+            . '</a><a class="icon-filter" href="'
+            . $this->getSliceUrl($name, $row)
+            . '"></a></div>' . "\n"
             . $indent . '  <div class="body">' . "\n";
+    }
+
+    protected function getDetailsUrl($name, $row)
+    {
+        return $this->view->url()
+            ->setParam('newslice', $name)
+            ->setParam('newval', $row->$name);
+    }
+
+    protected function getSliceUrl($name, $row)
+    {
+        return $this->view->url()
+            ->setParam($name, $row->$name);
     }
 
     protected function isOuterDimension($name)

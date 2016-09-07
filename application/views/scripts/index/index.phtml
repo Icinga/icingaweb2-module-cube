@@ -2,9 +2,17 @@
 <?php if (! $this->compact): ?>
 <?= $this->tabs ?>
 <h1><?= $this->escape($this->title) ?></h1>
+<?php if ($this->form): ?>
+<?= $this->qlink('Hide settings', $this->url()->without('showSettings'), null, array('class' => 'icon-wrench')) ?>
+<?php else: ?>
+<?= $this->qlink('Show settings', $this->url()->with('showSettings', true), null, array('class' => 'icon-wrench')) ?>
+<?php endif ?>
 <?php endif ?>
 </div>
 
 <div class="content">
+<?php if ($this->form): ?>
+<?= $this->form ?>
+<?php endif ?>
 <?= $cube->render($this) ?>
 </div>
