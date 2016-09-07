@@ -9,6 +9,8 @@ class CustomVarDimension implements Dimension
 {
     protected $varname;
 
+    protected $wantNull = false;
+
     public function __construct($varname)
     {
         $this->varname = $varname;
@@ -21,7 +23,11 @@ class CustomVarDimension implements Dimension
 
     public function getColumnExpression()
     {
-        return 'COALESCE(c_' . $this->varname . ".varvalue, '-')";
+        if ($this->wantNull) {
+            return 'COALESCE(c_' . $this->varname . ".varvalue, '-')";
+        } else {
+            return 'c_' . $this->varname . '.varvalue';
+        }
     }
 
     protected function safeVarname($name)
