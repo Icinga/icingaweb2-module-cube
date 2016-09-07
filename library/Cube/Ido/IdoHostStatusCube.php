@@ -10,6 +10,11 @@ class IdoHostStatusCube extends IdoCube
         'hosts_unhandled_nok' => 'SUM(CASE WHEN hs.current_state != 0 AND hs.problem_has_been_acknowledged = 0 AND hs.scheduled_downtime_depth = 0 THEN 1 ELSE 0 END) AS hosts_unhandled_nok',
     );
 
+    public function getRenderer()
+    {
+        return new IdoHostStatusCubeRenderer($this);
+    }
+
     public function addDimensionByName($name)
     {
         return $this->addDimension(new CustomVarDimension($name));

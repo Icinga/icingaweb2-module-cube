@@ -2,7 +2,6 @@
 
 namespace Icinga\Module\Cube\Controllers;
 
-use Icinga\Module\Cube\CubeRenderer;
 use Icinga\Module\Cube\Ido\IdoHostStatusCube;
 use Icinga\Module\Cube\Web\Controller;
 
@@ -36,7 +35,7 @@ class IndexController extends Controller
         );
 
         if (count($cube->listDimensions()) > 0) {
-            $this->view->cube = new CubeRenderer($cube);
+            $this->view->cube = $cube;
         } else {
             $showSettings = true;
         }

@@ -8,7 +8,7 @@ FactRenderer
 SummaryHelper
 */
 
-class CubeRenderer
+abstract class CubeRenderer
 {
     protected $view;
 
@@ -32,6 +32,8 @@ class CubeRenderer
     {
         $this->cube = $cube;
     }
+
+    abstract public function renderFacts($facts);
 
     protected function initialize()
     {
@@ -68,6 +70,7 @@ class CubeRenderer
                 $this->dimensions[$key + $diff] = $dimension;
             }
         }
+
         $this->reversedDimensions = array_reverse($this->dimensions);
         $this->dimensionLevels = array_flip($this->dimensions);
         return $this;
@@ -224,30 +227,31 @@ class CubeRenderer
             $this->started = true;
         }
 
-        if ($next = $this->cube->getDimensionAfter($name)) {
-            $sum = ' <span class="sum">(' . $this->summaries->$next->hosts_cnt . ')</span>';
-        } else {
-            $sum = '';
-        }
-
         return
-            $indent . '<div class="' . $this->getDimensionClasses($name, $row) . '">' . "\n"
+            $indent . '<div class="'
+            . $this->getDimensionClassString($name, $row)
+            . '">' . "\n"
             . $indent . '  <div class="header"><a href="'
             . $this->getDetailsUrl($name, $row)
-            . '">'
-            . $this->view->escape($row->$name)
-            . $sum
+            . '" data-base-target="_next">'
+            . $this->renderDimensionLabel($name, $row)
             . '</a><a class="icon-filter" href="'
             . $this->getSliceUrl($name, $row)
             . '"></a></div>' . "\n"
             . $indent . '  <div class="body">' . "\n";
     }
 
+    protected function renderDimensionLabel($name, $row)
+    {
+        return $this->view->escape($row->$name);
+    }
+
     protected function getDetailsUrl($name, $row)
     {
-        return $this->view->url()
-            ->setParam('newslice', $name)
-            ->setParam('newval', $row->$name);
+        return $this->view->url(
+            'cube/dimension',
+            array($name => $row->$name)
+        );
     }
 
     protected function getSliceUrl($name, $row)
@@ -261,52 +265,19 @@ class CubeRenderer
         return $this->reversedDimensions[0] !== $name;
     }
 
-    protected function getDimensionClasses($name, $row, $stringify = true)
+    protected function getDimensionClassString($name, $row)
     {
-        $classes = array(
-            'cube-dimension' . $this->getLevel($name)
-        );
+        return implode(' ', $this->getDimensionClasses($name, $row));
+    }
 
-        $sums = $this->summaries->$name;
-        $sums = $row;
-        if ($sums->hosts_nok > 0) {
-            $classes[] = 'critical';
-            if ((int) $sums->hosts_unhandled_nok === 0) {
-                $classes[] = 'handled';
-            }
-        }
-
-        if ($stringify) {
-            return implode(' ', $classes);
-        } else {
-            return $classes;
-        }
+    protected function getDimensionClasses($name, $row)
+    {
+        return array('cube-dimension' . $this->getLevel($name));
     }
 
     protected function getLevel($name)
     {
         return $this->dimensionLevels[$name];
-    }
-
-    protected function renderFacts($object)
-    {
-        $indent = str_repeat('    ', 3);
-        $htm = '';
-        if ($object->hosts_nok > 0 && $object->hosts_unhandled_nok !== $object->hosts_nok) {
-            $htm .= $indent . '<span class="critical handled">'
-                  . ($object->hosts_nok - $object->hosts_unhandled_nok)
-                  . "</span>\n";
-        }
-
-        if ($object->hosts_unhandled_nok > 0) {
-            $htm .= $indent . '<span class="critical">'
-                  . $object->hosts_unhandled_nok
-                  . "</span>\n";
-        }
-
-        $htm .= $indent . '<span class="sum">' . $object->hosts_cnt . "</span>\n";
-
-        return $htm;
     }
 
     protected function beginContainer()
@@ -317,5 +288,10 @@ class CubeRenderer
     protected function endContainer()
     {
         return '</div>' . "\n";
+    }
+
+    public function __destruct()
+    {
+        unset($this->cube);
     }
 }

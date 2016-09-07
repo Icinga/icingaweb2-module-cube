@@ -12,6 +12,8 @@ abstract class Cube
 
     protected $slices = array();
 
+    protected $renderer;
+
     abstract public function fetchAll();
 
     public function removeDimension($name)
@@ -19,6 +21,11 @@ abstract class Cube
         unset($this->dimensions[$name]);
         unset($this->slices[$name]);
         return $this;
+    }
+
+    public function getRenderer()
+    {
+        throw new IcingaException('Got no cube renderer');
     }
 
     public function listAdditionalDimensions()
@@ -188,5 +195,14 @@ abstract class Cube
     public function listColumns()
     {
         return array_merge($this->listDimensions(), $this->listFacts());
+    }
+
+    public function render($view, CubeRenderer $renderer = null)
+    {
+        if ($renderer === null) {
+            $renderer = $this->getRenderer();
+        }
+
+        return $renderer->render($view);
     }
 }
