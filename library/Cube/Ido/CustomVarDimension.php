@@ -32,10 +32,9 @@ class CustomVarDimension implements Dimension
     public function addToCube(Cube $cube)
     {
         $name = $this->varname;
-        $dbName = $cube->getDbName();
         $alias = 'c_' . $this->safeVarname($name);
         return $cube->innerQuery()->joinLeft(
-            array($alias => $dbName . '.icinga_customvariablestatus'),
+            array($alias => $cube->tableName('icinga_customvariablestatus')),
             $cube->db()->quoteInto($alias . '.varname = ?', $name)
             . ' AND ' . $alias . '.object_id = o.object_id',
             array()

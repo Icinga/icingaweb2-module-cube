@@ -38,6 +38,15 @@ abstract class DbCube extends Cube
         return $this;
     }
 
+    public function tableName($name)
+    {
+        if ($this->dbName === null) {
+            return $name;
+        } else {
+            return $this->dbName . '.' . $name;
+        }
+    }
+
     public function getDbName()
     {
         return $this->dbName;

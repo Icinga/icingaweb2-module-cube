@@ -9,8 +9,6 @@ class IdoCube extends DbCube
 {
     protected $factColumns;
 
-    protected $dbName = 'icinga2';
-
     protected $availableFacts = array(
         'hosts_cnt'           => 'COUNT(*)',
         'hosts_nok'           => 'SUM(CASE WHEN hs.current_state = 0 THEN 0 ELSE 1 END)',
@@ -37,14 +35,14 @@ class IdoCube extends DbCube
     public function prepareInnerQuery()
     {
         $select = $this->db()->select()->from(
-            array('o' => $this->dbName . '.icinga_objects'),
+            array('o' => $this->tableName('icinga_objects')),
             array()
         )->join(
-            array('h' => $this->dbName . '.icinga_hosts'),
+            array('h' => $this->tableName('icinga_hosts')),
             'o.object_id = h.host_object_id AND o.is_active = 1',
             array()
         )->joinLeft(
-            array('hs' => $this->dbName . '.icinga_hoststatus'),
+            array('hs' => $this->tableName('icinga_hoststatus')),
             'hs.host_object_id = h.host_object_id',
             array()
         );
