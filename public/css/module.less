@@ -39,29 +39,29 @@ div.cube {
     }
 
     background: @color-ok;
-  }
 
-  .body span.sum {
-    font-size: 3em;
-    display: block;
-    text-align: center;
-    color: white;
+    > .body {
+      text-align: center;
+
+      span.sum {
+        font-size: 3em;
+        display: block;
+        text-align: center;
+        color: white;
+      }
+    }
   }
 
   span.critical {
-    color: white;
-    font-size: 3em;
-  }
-
-  span.critical {
+    display: inline;
+    border-radius: 0.1em;
+    padding: 0.05em 0.2em;
     background: @color-critical;
-    display: block;
-    text-align: center;
+    color: white;
+    font-size: 3em;
   }
 
   span.critical.handled {
-    text-align: center;
-    display: block;
     background: @color-critical-handled;
   }
 
