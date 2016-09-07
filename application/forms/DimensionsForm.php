@@ -28,10 +28,6 @@ class DimensionsForm extends Form
             $dimensions = array_combine($dimensions, $dimensions);
         }
 
-        foreach ($cube->listDimensions() as $pos => $dimension) {
-            $this->addDimensionButtons($dimension, $pos);
-        }
-
         $this->addElement('select', 'addDimension', array(
             'multiOptions' => array(
                 null => $this->translate('+ Add a dimension')
@@ -40,10 +36,16 @@ class DimensionsForm extends Form
             'class'        => 'autosubmit'
         ));
 
+        $dimensions = $cube->listDimensions();
+        $cnt = count($dimensions);
+        foreach ($dimensions as $pos => $dimension) {
+            $this->addDimensionButtons($dimension, $pos, $cnt);
+        }
+
         $this->setSubmitLabel(false);
     }
 
-    protected function addDimensionButtons($dimension, $pos)
+    protected function addDimensionButtons($dimension, $pos, $total)
     {
         $this->addHtml(
             '<span>' . $this->getView()->escape($dimension) . '</span>',
@@ -60,14 +62,18 @@ class DimensionsForm extends Form
             'decorators' => array('ViewHelper'),
         ));
 
-        if ($pos === 0) {
-            $this->getElement('moveDimensionUp_' . $dimension)->disabled = 'disablled';
-        }
-
         $this->addElement('submit', 'moveDimensionDown_' . $dimension, array(
             'label' => sprintf($this->translate('^'), $dimension),
             'decorators' => array('ViewHelper')
         ));
+
+        if ($pos === 0) {
+            $this->getElement('moveDimensionUp_' . $dimension)->disabled = 'disabled';
+        }
+
+        if ($pos + 1 === $total) {
+            $this->getElement('moveDimensionDown_' . $dimension)->disabled = 'disabled';
+        }
 
         $this->addSimpleDisplayGroup(
             array(
