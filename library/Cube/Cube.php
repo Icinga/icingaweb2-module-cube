@@ -179,6 +179,11 @@ abstract class Cube
         return array_keys($this->slices);
     }
 
+    public function getSlices()
+    {
+        return $this->slices;
+    }
+
     public function hasFact($name)
     {
         return array_key_exists($name, $this->chosenFacts);
@@ -202,7 +207,9 @@ abstract class Cube
 
     public function listDimensions()
     {
-        return array_values(array_diff(array_keys($this->dimensions), $this->listSlices()));
+        return array_values(
+            array_diff(array_keys($this->dimensions), $this->listSlices())
+        );
     }
 
     public function listColumns()
