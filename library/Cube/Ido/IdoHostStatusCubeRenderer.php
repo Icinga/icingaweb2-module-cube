@@ -17,19 +17,6 @@ class IdoHostStatusCubeRenderer extends CubeRenderer
         return $htm;
     }
 
-    protected function getDetailsUrl($name, $row)
-    {
-        $vars = array();
-        foreach ($this->cube->listDimensionsUpTo($name) as $d) {
-            $vars['_host_' . $d] = $row->$d;
-        }
-
-        return $this->view->url(
-            'monitoring/list/hosts',
-            $vars
-        );
-    }
-
     protected function getDimensionClasses($name, $row)
     {
         $classes = parent::getDimensionClasses($name, $row);
