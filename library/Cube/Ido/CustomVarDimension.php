@@ -16,6 +16,12 @@ class CustomVarDimension implements Dimension
         $this->varname = $varname;
     }
 
+    public function wantNull($wantNull = true)
+    {
+        $this->wantNull = $wantNull;
+        return $this;
+    }
+
     public function getName()
     {
         return $this->varname;
@@ -39,7 +45,7 @@ class CustomVarDimension implements Dimension
     {
         $name = $this->varname;
         $alias = 'c_' . $this->safeVarname($name);
-        return $cube->innerQuery()->joinLeft(
+        $cube->innerQuery()->joinLeft(
             array($alias => $cube->tableName('icinga_customvariablestatus')),
             $cube->db()->quoteInto($alias . '.varname = ?', $name)
             . ' AND ' . $alias . '.object_id = o.object_id',
