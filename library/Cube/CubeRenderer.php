@@ -226,6 +226,7 @@ abstract class CubeRenderer
         if (! $this->started) {
             $this->started = true;
         }
+        $view = $this->view;
 
         return
             $indent . '<div class="'
@@ -233,11 +234,12 @@ abstract class CubeRenderer
             . '">' . "\n"
             . $indent . '  <div class="header"><a href="'
             . $this->getDetailsUrl($name, $row)
+            . '" title="' . $view->escape('Show more details') . '"'
             . '" data-base-target="_next">'
             . $this->renderDimensionLabel($name, $row)
             . '</a><a class="icon-filter" href="'
             . $this->getSliceUrl($name, $row)
-            . '"></a></div>' . "\n"
+            . '" title="' . $view->escape('Slice this cube') . '"></a></div>' . "\n"
             . $indent . '  <div class="body">' . "\n";
     }
 
