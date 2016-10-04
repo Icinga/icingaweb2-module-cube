@@ -3,6 +3,7 @@
 namespace Icinga\Module\Cube\Controllers;
 
 use Icinga\Module\Cube\Ido\IdoHostStatusCube;
+use Icinga\Module\Cube\Hook\ActionLinksHook;
 use Icinga\Module\Cube\Web\Controller;
 
 class IndexController extends Controller
@@ -15,19 +16,8 @@ class IndexController extends Controller
         ))->activate('cube');
 
         // Hint: order matters, we are shifting!
-        $cube = new IdoHostStatusCube();
         $showSettings = $this->params->shift('showSettings');
-
-        $cube->chooseFacts(array('hosts_cnt', 'hosts_nok', 'hosts_unhandled_nok'));
-        $vars = preg_split('/,/', $this->params->shift('dimensions'), -1, PREG_SPLIT_NO_EMPTY);
-
-        foreach ($vars as $var) {
-            $cube->addDimensionByName($var);
-        }
-
-        foreach ($this->params->toArray() as $param) {
-            $cube->slice($param[0], $param[1]);
-        }
+        $cube = $this->cubeFromParams($this->params);
 
         $this->view->title = sprintf(
             $this->translate('Cube: %s'),
@@ -47,5 +37,38 @@ class IndexController extends Controller
         } else {
             $this->setAutoRefreshInterval(15);
         }
+    }
+
+    public function detailsAction()
+    {
+        $this->view->title = $this->translate('Links for this Cube');
+        $this->getTabs()->add('details', array(
+            'label' => $this->translate('Cube details'),
+            'url'   => $this->getRequest()->getUrl()
+        ))->activate('details');
+        $cube = $this->cubeFromParams($this->params);
+        $this->view->links = ActionLinksHook::getAllHtml($this->view, $cube);
+    }
+
+    protected function cubeFromParams()
+    {
+        $cube = new IdoHostStatusCube();
+
+        $cube->chooseFacts(array('hosts_cnt', 'hosts_nok', 'hosts_unhandled_nok'));
+        $dimensions = $this->params->shift('dimensions');
+        $wantNull = $this->params->shift('wantNull');
+        $vars = preg_split('/,/', $dimensions, -1, PREG_SPLIT_NO_EMPTY);
+        foreach ($vars as $var) {
+            $cube->addDimensionByName($var);
+            if ($wantNull) {
+                $cube->getDimension($var)->wantNull();
+            }
+        }
+
+        foreach ($this->params->toArray() as $param) {
+            $cube->slice($param[0], $param[1]);
+        }
+
+        return $cube;
     }
 }
