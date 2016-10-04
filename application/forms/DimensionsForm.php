@@ -42,7 +42,33 @@ class DimensionsForm extends Form
             $this->addDimensionButtons($dimension, $pos, $cnt);
         }
 
+        foreach ($cube->getSlices() as $key => $value) {
+            $this->addSlice($key, $value);
+        }
+
         $this->setSubmitLabel(false);
+    }
+
+    protected function addSlice($key, $value)
+    {
+        $this->addHtml(
+            '<span>' . $this->getView()->escape(sprintf('%s = %s', $key, $value)) . '</span>',
+            array('name' => 'slice_' . $key)
+        );
+
+        $this->addElement('submit', 'removeSlice_' . $key, array(
+            'label' => $this->translate('x'),
+            'decorators' => array('ViewHelper')
+        ));
+
+        $this->addSimpleDisplayGroup(
+            array(
+                'slice_' . $key,
+                'removeSlice_' . $key,
+            ),
+            $key,
+            array('class' => 'dimensions')
+        );
     }
 
     protected function addDimensionButtons($dimension, $pos, $total)
@@ -98,29 +124,53 @@ class DimensionsForm extends Form
         $post = $this->getRequest()->getPost();
         $this->populate($post);
         $cube = $this->cube;
+        $dimension = null;
 
         foreach ($this->getElements() as $el) {
+            if (! $el->getValue()) {
+                // Skip unpressed buttons
+                continue;
+            }
             $name = $el->getName();
-            if (substr($name, 0, 16) === 'removeDimension_' && $el->getValue()) {
-                $dimension = substr($name, 16);
-                $cube->removeDimension($dimension);
-                $url->setParam('dimensions', implode(',', $cube->listDimensions()));
-                $this->redirectAndExit($url);
+            $pos = strpos($name, '_');
+
+            if ($pos === false || $pos === 0) {
+                continue;
             }
 
-            if (substr($name, 0, 16) === 'moveDimensionUp_' && $el->getValue()) {
-                $dimension = substr($name, 16);
-                $cube->moveDimensionUp($dimension);
-                $url->setParam('dimensions', implode(',', $cube->listDimensions()));
-                $this->redirectAndExit($url);
-            }
+            $action = substr($name, 0, $pos);
+            $name = substr($name, $pos + 1);
 
-            if (substr($name, 0, 18) === 'moveDimensionDown_' && $el->getValue()) {
-                $dimension = substr($name, 18);
-                $cube->moveDimensionDown($dimension);
-                $url->setParam('dimensions', implode(',', $cube->listDimensions()));
-                $this->redirectAndExit($url);
+            switch ($action) {
+                case 'removeSlice':
+                    $dimension = $name;
+                    $url->getParams()->remove($dimension);
+                    break 2;
+
+                case 'removeDimension':
+                    $dimension = $name;
+                    $cube->removeDimension($dimension);
+                    break 2;
+
+                case 'moveDimensionUp':
+                    $dimension = $name;
+                    $cube->moveDimensionUp($dimension);
+                    break 2;
+
+                case 'moveDimensionDown':
+                    $dimension = $name;
+                    $cube->moveDimensionDown($dimension);
+                    break 2;
+                default:
             }
+        }
+
+        if ($dimension) {
+            $dimensions = array_merge($cube->listDimensions(), $cube->listSlices());
+            if ($action !== 'removeSlice') {
+                $url->setParam('dimensions', implode(',', $dimensions));
+            }
+            $this->redirectAndExit($url);
         }
 
         if ($dimension = $this->getSentValue('addDimension')) {
