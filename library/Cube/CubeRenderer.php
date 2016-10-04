@@ -250,9 +250,27 @@ abstract class CubeRenderer
 
     protected function getDetailsUrl($name, $row)
     {
+        $cube = $this->cube;
+
+        $params = array(
+            'dimensions' => implode(
+                ',',
+                array_merge($cube->listDimensions(), $cube->listSlices())
+            )
+        );
+
+        foreach ($this->cube->listDimensionsUpTo($name) as $dimensionName) {
+            $params[$dimensionName] = $row->$dimensionName;
+        }
+
+        foreach ($this->cube->getSlices() as $key => $val) {
+            $params[$key] = $val;
+        }
+
         return $this->view->url(
-            'cube/dimension',
-            array($name => $row->$name)
+            'cube/index/details',
+            // 'cube',
+            $params
         );
     }
 
