@@ -9,6 +9,8 @@ abstract class IdoCube extends DbCube
 {
     protected $availableFacts = array();
 
+    protected $idoVersion;
+
     public function setBackend(MonitoringBackend $backend)
     {
         return $this->setConnection($backend->getResource());
@@ -30,6 +32,18 @@ abstract class IdoCube extends DbCube
     {
         $this->requireBackend();
         return parent::db();
+    }
+
+    protected function getIdoVersion()
+    {
+        if ($this->idoVersion === null) {
+            $db = $this->db();
+            $this->idoVersion = $db->fetchOne(
+                $db->select()->from('icinga_dbversion', 'version')
+            );
+        }
+
+        return $this->idoVersion;
     }
 
     protected function requireBackend()

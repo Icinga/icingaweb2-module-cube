@@ -29,8 +29,11 @@ class IdoHostStatusCube extends IdoCube
             array('o' => $this->tableName('icinga_objects')),
             'cv.object_id = o.object_id AND o.is_active = 1 AND o.objecttype_id = 1',
             array()
-        )->where('cv.is_json = 0')
-        ->group('cv.varname');
+        )->group('cv.varname');
+
+        if (version_compare($this->getIdoVersion(), '1.12.0', '>=')) {
+            $select->where('cv.is_json = 0');
+        }
 
         return $this->db()->fetchCol($select);
     }
