@@ -50,19 +50,23 @@ class IndexController extends Controller
         $this->view->links = ActionLinksHook::getAllHtml($this->view, $cube);
     }
 
-    protected function cubeFromParams()
+    protected function cubeFromParams($params)
     {
         $cube = new IdoHostStatusCube();
 
         $cube->chooseFacts(array('hosts_cnt', 'hosts_nok', 'hosts_unhandled_nok'));
-        $dimensions = $this->params->shift('dimensions');
-        $wantNull = $this->params->shift('wantNull');
+        $dimensions = $params->shift('dimensions');
+        $wantNull = $params->shift('wantNull');
         $vars = preg_split('/,/', $dimensions, -1, PREG_SPLIT_NO_EMPTY);
         foreach ($vars as $var) {
             $cube->addDimensionByName($var);
             if ($wantNull) {
                 $cube->getDimension($var)->wantNull();
             }
+        }
+
+        foreach (array('renderLayout', 'showFullscreen', 'showCompact') as $p) {
+            $params->shift($p);
         }
 
         foreach ($this->params->toArray() as $param) {
