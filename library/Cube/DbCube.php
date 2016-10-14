@@ -66,7 +66,7 @@ abstract class DbCube extends Cube
         return $this->innerQuery;
     }
 
-    protected function finalizeInnerQuery()
+    public function finalizeInnerQuery()
     {
         $query = $this->innerQuery();
         $columns = array();
