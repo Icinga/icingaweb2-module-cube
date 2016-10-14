@@ -12,18 +12,18 @@ abstract class ActionLinksHook
 
     final public static function getAllHtml(View $view, Cube $cube)
     {
-        $htm = '';
+        $htm = [];
 
         foreach (Hook::all('Cube/ActionLinks') as $links) {
-            $htm .= $links->getHtml($view, $cube);
+            $htm[] = $links->getHtml($view, $cube);
         }
 
-        if ($htm === '') {
-            $htm = $view->translate(
+        if (empty($htm)) {
+            $htm[] = $view->translate(
                 'No action links have been provided for this cube'
             );
         }
 
-        return $htm;
+        return implode('<br />', $htm);
     }
 }
