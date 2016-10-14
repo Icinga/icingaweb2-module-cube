@@ -245,7 +245,12 @@ abstract class CubeRenderer
 
     protected function renderDimensionLabel($name, $row)
     {
-        return $this->view->escape($row->$name);
+        $caption = $row->$name;
+        if (empty($caption)) {
+            $caption = '_';
+        }
+
+        return $this->view->escape($caption);
     }
 
     protected function getDetailsUrl($name, $row)
