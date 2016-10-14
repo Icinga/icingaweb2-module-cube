@@ -24,7 +24,7 @@ class CustomVarDimension implements Dimension
 
     public function getName()
     {
-        return $this->varname;
+        return strtolower($this->varname);
     }
 
     public function getColumnExpression()
