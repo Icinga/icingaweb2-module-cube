@@ -45,9 +45,18 @@ div.cube {
     > .header {
       text-align: center;
       color: white;
+      margin-bottom: 1em;
     }
 
     background: @color-ok;
+
+    &.critical {
+      background: @color-critical;
+    }
+
+    &.ok {
+      background: @color-ok;
+    }
 
     > .body {
       text-align: center;
@@ -61,13 +70,29 @@ div.cube {
     }
   }
 
-  span.critical {
+  span.critical, span.ok {
     display: inline;
     border-radius: 0.1em;
     padding: 0.05em 0.2em;
-    background: @color-critical;
     color: white;
     font-size: 3em;
+  }
+
+  span.ok {
+    background: @color-ok;
+  }
+
+  .others {
+    display: block;
+    span {
+      font-size: 1.5em;
+      padding-left: 0.5em;
+      padding-right: 0.5em;
+    }
+  }
+
+  span.critical {
+    background: @color-critical;
   }
 
   span.critical.handled {

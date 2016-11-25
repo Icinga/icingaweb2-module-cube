@@ -42,21 +42,49 @@ class IdoHostStatusCubeRenderer extends CubeRenderer
     public function renderFacts($facts)
     {
         $indent = str_repeat('    ', 3);
-        $htm = '';
-        if ($facts->hosts_nok > 0 && $facts->hosts_unhandled_nok !== $facts->hosts_nok) {
-            $htm .= $indent . '<span class="critical handled">'
-                  . ($facts->hosts_nok - $facts->hosts_unhandled_nok)
-                  . "</span>\n";
-        }
+        $parts = array();
 
         if ($facts->hosts_unhandled_nok > 0) {
-            $htm .= $indent . '<span class="critical">'
-                  . $facts->hosts_unhandled_nok
-                  . "</span>\n";
+            $parts['critical'] = $facts->hosts_unhandled_nok;
         }
 
-        $htm .= $indent . '<span class="sum">' . $facts->hosts_cnt . "</span>\n";
+        if ($facts->hosts_nok > 0 && $facts->hosts_nok > $facts->hosts_unhandled_nok) {
+            $parts['critical handled'] = $facts->hosts_nok - $facts->hosts_unhandled_nok;
+        }
 
-        return $htm;
+        if ($facts->hosts_cnt > $facts->hosts_nok) {
+            $parts['ok'] = $facts->hosts_cnt - $facts->hosts_nok;
+        }
+
+        $main = '';
+        $sub = '';
+        foreach ($parts as $class => $count) {
+            if ($main === '') {
+                $main = $this->makeBadgeHtml($class, $count);
+            } else {
+                $sub .= $this->makeBadgeHtml($class, $count);
+            }
+        }
+        if ($sub !== '') {
+            $sub = $indent
+                . '<span class="others">'
+                . "\n    "
+                . $sub
+                . $indent
+                . "</span>\n";
+        }
+
+        return $main . $sub;
+    }
+
+    protected function makeBadgeHtml($class, $count)
+    {
+        $indent = str_repeat('    ', 3);
+        return sprintf(
+            '%s<span class="%s">%s</span>',
+            $indent,
+            $class,
+            $count
+        ) . "\n";
     }
 }
