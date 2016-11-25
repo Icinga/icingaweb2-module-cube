@@ -21,7 +21,7 @@ class IndexController extends Controller
 
         $this->view->title = sprintf(
             $this->translate('Cube: %s'),
-            implode(' -> ', $cube->listDimensions())
+            $cube->getPathLabel()
         );
 
         if (count($cube->listDimensions()) > 0) {
@@ -35,18 +35,19 @@ class IndexController extends Controller
                  ->setCube($cube)
                 ->handleRequest();
         } else {
-            $this->setAutoRefreshInterval(15);
+            $this->setAutorefreshInterval(15);
         }
     }
 
     public function detailsAction()
     {
-        $this->view->title = $this->translate('Links for this Cube');
         $this->getTabs()->add('details', array(
             'label' => $this->translate('Cube details'),
             'url'   => $this->getRequest()->getUrl()
         ))->activate('details');
         $cube = $this->cubeFromParams($this->params);
+
+        $this->view->title = $cube->getSlicesLabel();
         $this->view->links = ActionLinksHook::getAllHtml($this->view, $cube);
     }
 

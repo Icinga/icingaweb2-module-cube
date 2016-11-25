@@ -28,6 +28,45 @@ abstract class Cube
         throw new IcingaException('Got no cube renderer');
     }
 
+    public function getPathLabel()
+    {
+        $dimensions = $this->getDimensionsLabel();
+        $slices     = $this->getSlicesLabel();
+        $parts = array();
+        if ($dimensions !== null) {
+            $parts[] = $dimensions;
+        }
+
+        if ($slices !== null) {
+            $parts[] = $slices;
+        }
+    }
+
+    public function getDimensionsLabel()
+    {
+        $dimensions = $this->listDimensions();
+        if (empty($dimensions)) {
+            return null;
+        }
+
+        return implode(' -> ', $dimensions);
+    }
+
+    public function getSlicesLabel()
+    {
+        $parts = array();
+
+        $slices = $this->getSlices();
+        if (empty($slices)) {
+            return null;
+        }
+        foreach ($slices as $key => $value) {
+            $parts[] = sprintf('%s = %s', $key, $value);
+        }
+
+        return implode(', ', $parts);
+    }
+
     public function listAdditionalDimensions()
     {
         $list = array();
