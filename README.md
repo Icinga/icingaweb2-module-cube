@@ -45,7 +45,7 @@ For Developers
 
 Our main intention when developing the Cube was too provide a modular small
 framework allowing you to drill into data provided from various sources. So it
-provides hooks for 
+provides hooks for custom Cubes, related Renderers or just custom action links.
 
 For DBAs
 --------
