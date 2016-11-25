@@ -10,6 +10,8 @@ use Icinga\Module\Cube\Dimension;
  *
  * This provides dimenstions for custom variables available in the IDO
  *
+ * TODO: create safe aliases for special characters
+ *
  * @package Icinga\Module\Cube\Ido
  */
 class CustomVarDimension implements Dimension
@@ -34,12 +36,21 @@ class CustomVarDimension implements Dimension
         $this->varName = $varName;
     }
 
+    /**
+     * Define whether null values should be shown
+     *
+     * @param bool $wantNull
+     * @return $this
+     */
     public function wantNull($wantNull = true)
     {
         $this->wantNull = $wantNull;
         return $this;
     }
 
+    /**
+     * @return string
+     */
     public function getName()
     {
         return strtolower($this->varName);

@@ -3,11 +3,14 @@
 namespace Icinga\Module\Cube;
 
 use Icinga\Exception\IcingaException;
+use Icinga\Web\View;
 
 abstract class Cube
 {
+    /** @var array Fact names */
     protected $chosenFacts;
 
+    /** @var Dimension[] */
     protected $dimensions = array();
 
     protected $slices = array();
@@ -23,6 +26,10 @@ abstract class Cube
         return $this;
     }
 
+    /**
+     * @return CubeRenderer
+     * @throws IcingaException
+     */
     public function getRenderer()
     {
         throw new IcingaException('Got no cube renderer');
@@ -132,7 +139,7 @@ abstract class Cube
             $this->flipPositions($positions, $last, $found);
         }
 
-        $this->reorderDimensions($positions);
+        $this->reOrderDimensions($positions);
         return $this;
     }
 
@@ -156,7 +163,7 @@ abstract class Cube
             $this->flipPositions($positions, $next, $found);
         }
 
-        $this->reorderDimensions($positions);
+        $this->reOrderDimensions($positions);
         return $this;
     }
 
@@ -233,12 +240,23 @@ abstract class Cube
         return $this->dimensions[$name];
     }
 
+    /**
+     * Return a list of chosen facts
+     *
+     * @return array
+     */
     public function listFacts()
     {
         return $this->chosenFacts;
     }
 
-    public function chooseFacts($facts)
+    /**
+     * Choose a list of facts
+     *
+     * @param array $facts
+     * @return $this
+     */
+    public function chooseFacts(array $facts)
     {
         $this->chosenFacts = $facts;
         return $this;
@@ -256,7 +274,12 @@ abstract class Cube
         return array_merge($this->listDimensions(), $this->listFacts());
     }
 
-    public function render($view, CubeRenderer $renderer = null)
+    /**
+     * @param View $view
+     * @param CubeRenderer $renderer
+     * @return string
+     */
+    public function render(View $view, CubeRenderer $renderer = null)
     {
         if ($renderer === null) {
             $renderer = $this->getRenderer();

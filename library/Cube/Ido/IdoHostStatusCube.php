@@ -4,22 +4,44 @@ namespace Icinga\Module\Cube\Ido;
 
 class IdoHostStatusCube extends IdoCube
 {
-    protected $availableFacts = array(
-        'hosts_cnt'           => 'COUNT(*)',
-        'hosts_nok'           => 'SUM(CASE WHEN hs.current_state = 0 THEN 0 ELSE 1 END)',
-        'hosts_unhandled_nok' => 'SUM(CASE WHEN hs.current_state != 0 AND hs.problem_has_been_acknowledged = 0 AND hs.scheduled_downtime_depth = 0 THEN 1 ELSE 0 END) AS hosts_unhandled_nok',
-    );
-
     public function getRenderer()
     {
         return new IdoHostStatusCubeRenderer($this);
     }
 
+    /**
+     * @inheritdoc
+     */
+    public function getAvailableFactColumns()
+    {
+        return array(
+            'hosts_cnt'           => 'COUNT(*)',
+            'hosts_nok'           => 'SUM(CASE WHEN hs.current_state = 0 THEN 0 ELSE 1 END)',
+            'hosts_unhandled_nok' => 'SUM(CASE WHEN hs.current_state != 0'
+                . ' AND hs.problem_has_been_acknowledged = 0 AND hs.scheduled_downtime_depth = 0'
+                . ' THEN 1 ELSE 0 END)',
+        );
+    }
+
+    /**
+     * Add a specific named dimension
+     *
+     * Right now this are just custom vars, we might support group memberships
+     * or other properties in future
+     *
+     * @param string $name
+     * @return $this
+     */
     public function addDimensionByName($name)
     {
         return $this->addDimension(new CustomVarDimension($name));
     }
 
+    /**
+     * This returns a list of all available Dimensions
+     *
+     * @return array
+     */
     public function listAvailableDimensions()
     {
         $select = $this->db()->select()->from(

@@ -3,45 +3,106 @@
 namespace Icinga\Module\Cube;
 
 use Icinga\Data\Db\DbConnection;
-use Zend_Db_Select;
 
 abstract class DbCube extends Cube
 {
+    /** @var DbConnection */
     protected $connection;
 
+    /** @var \Zend_Db_Adapter_Abstract */
     protected $db;
 
+    /** @var \Zend_Db_Select The inner query fetching all required data */
     protected $innerQuery;
 
+    /** @var \Zend_Db_Select The rollup query, creating grouped sums over innerQuery */
     protected $rollupQuery;
 
+    /** @var \Zend_Db_Select The outer query, orders respecting NULL values, rollup first */
     protected $fullQuery;
 
+    /** @var string Database name. Allows to eventually join over multiple dbs  */
     protected $dbName;
 
+    /** @var array Key/value array containing our chosen facts and the corresponding SQL expression */
     protected $factColumns = array();
 
+    /**
+     * A DbCube must provide a list of all available columns
+     *
+     * This is a key/value array with the key being the fact name / column alias
+     * and
+     *
+     * @return array
+     */
+    abstract public function getAvailableFactColumns();
+
+    /**
+     * @return \Zend_Db_Select
+     */
     abstract public function prepareInnerQuery();
 
-    public function setConnection($connection)
+    /**
+     * Set a database connection
+     *
+     * @param DbConnection $connection
+     * @return $this
+     */
+    public function setConnection(DbConnection $connection)
     {
         $this->connection = $connection;
         $this->db = $connection->getDbAdapter();
         return $this;
     }
 
+    /**
+     * Prepare the query and fetch all data
+     *
+     * @return array
+     */
     public function fetchAll()
     {
         $query = $this->fullQuery();
         return $this->db()->fetchAll($query);
     }
 
+    /**
+     * Choose a one or more facts
+     *
+     * This also initializes a fact column lookup array
+     *
+     * @param  array $facts
+     * @return $this
+     */
+    public function chooseFacts(array $facts)
+    {
+        parent::chooseFacts($facts);
+
+        $this->factColumns = array();
+        $columns = $this->getAvailableFactColumns();
+        foreach ($this->chosenFacts as $name) {
+            $this->factColumns[$name] = $columns[$name];
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param $name
+     * @return $this
+     */
     public function setDbName($name)
     {
         $this->dbName = $name;
         return $this;
     }
 
+    /**
+     * Gives back the table name, eventually prefixed with a defined DB name
+     *
+     * @param string $name
+     * @return string
+     */
     public function tableName($name)
     {
         if ($this->dbName === null) {
@@ -51,6 +112,11 @@ abstract class DbCube extends Cube
         }
     }
 
+    /**
+     * Returns an eventually defined DB name
+     *
+     * @return string|null
+     */
     public function getDbName()
     {
         return $this->dbName;
@@ -61,7 +127,7 @@ abstract class DbCube extends Cube
      *
      * Hint: mostly used to get rid of NULL values
      *
-     * @return Zend_Db_Select
+     * @return \Zend_Db_Select
      */
     public function innerQuery()
     {
@@ -73,6 +139,15 @@ abstract class DbCube extends Cube
         return $this->innerQuery;
     }
 
+    /**
+     * We first prepare the queries and to finalize it later on
+     *
+     * This way dimensions can be added one by one, they will be allowed to
+     * optionally join additional tables or apply other modifications late
+     * in the process
+     *
+     * @return void
+     */
     public function finalizeInnerQuery()
     {
         $query = $this->innerQuery();
@@ -92,6 +167,11 @@ abstract class DbCube extends Cube
         $query->columns($columns + $this->factColumns);
     }
 
+    /**
+     * Lazy-load our full query
+     *
+     * @return \Zend_Db_Select
+     */
     protected function fullQuery()
     {
         if ($this->fullQuery === null) {
@@ -101,6 +181,11 @@ abstract class DbCube extends Cube
         return $this->fullQuery;
     }
 
+    /**
+     * Lazy-load our full query
+     *
+     * @return \Zend_Db_Select
+     */
     protected function rollupQuery()
     {
         if ($this->rollupQuery === null) {
@@ -110,7 +195,14 @@ abstract class DbCube extends Cube
         return $this->rollupQuery;
     }
 
-    // Sorting
+    /**
+     * The full query wraps the rollup query in a sub-query to work around
+     * MySQL limitations. This is required to not get into trouble when ordering,
+     * especially combined with the need to keep control over (eventually desired)
+     * NULL value fact colums
+     *
+     * @return \Zend_Db_Select
+     */
     protected function prepareFullQuery()
     {
         $alias = 'rollup';
@@ -135,12 +227,25 @@ abstract class DbCube extends Cube
         return $select;
     }
 
+    /**
+     * Provide access to our DB
+     *
+     * @return \Zend_Db_Adapter_Abstract
+     */
     public function db()
     {
         return $this->db;
     }
 
-    // Do the rollup
+    /**
+     * This prepares the rollup query
+     *
+     * Inner query is wrapped in a subquery, summaries for all facts are
+     * fetched. Rollup considers all defined dimensions and expects them
+     * to exist as columns in the innerQuery
+     *
+     * @return \Zend_Db_Select
+     */
     protected function prepareRollupQuery()
     {
         $alias = 'sub';

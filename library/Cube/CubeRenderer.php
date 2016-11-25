@@ -1,15 +1,19 @@
 <?php
 
 namespace Icinga\Module\Cube;
-/*
-DimensionRenderer
-FactRenderer
-
-SummaryHelper
-*/
 
 use Icinga\Web\View;
 
+/**
+ * CubeRenderer base class
+ *
+ * Every Cube Renderer must extend this class.
+ *
+ * TODO: Should we introduce DimensionRenderer, FactRenderer and SummaryHelper
+ *       instead?
+ *
+ * @package Icinga\Module\Cube
+ */
 abstract class CubeRenderer
 {
     /** @var View */
@@ -75,6 +79,9 @@ abstract class CubeRenderer
             ->initializeSummaries();
     }
 
+    /**
+     * @return $this
+     */
     protected function initializeLastRow()
     {
         $object = (object) array();
@@ -87,6 +94,9 @@ abstract class CubeRenderer
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     protected function initializeDimensions()
     {
         $this->dimensions = $this->cube->listDimensions();
@@ -107,18 +117,28 @@ abstract class CubeRenderer
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     protected function initializeFacts()
     {
         $this->facts = $this->cube->listFacts();
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     protected function initializeSummaries()
     {
         $this->summaries = (object) array();
         return $this;
     }
 
+    /**
+     * @param object $row
+     * @return bool
+     */
     protected function startsDimension($row)
     {
         foreach ($this->dimensions as $name) {
@@ -131,6 +151,10 @@ abstract class CubeRenderer
         return false;
     }
 
+    /**
+     * @param $row
+     * @return object
+     */
     protected function extractFacts($row)
     {
         $res = (object) array();
