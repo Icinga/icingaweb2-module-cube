@@ -290,7 +290,7 @@ abstract class CubeRenderer
             . $indent . '  <div class="header"><a href="'
             . $this->getDetailsUrl($name, $row)
             . '" title="' . $view->escape('Show more details') . '"'
-            . '" data-base-target="_next">'
+            . ' data-base-target="_next">'
             . $this->renderDimensionLabel($name, $row)
             . '</a><a class="icon-filter" href="'
             . $this->getSliceUrl($name, $row)
