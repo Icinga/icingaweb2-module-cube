@@ -47,6 +47,8 @@ abstract class Cube
         if ($slices !== null) {
             $parts[] = $slices;
         }
+
+        return implode(', ', $parts);
     }
 
     public function getDimensionsLabel()
