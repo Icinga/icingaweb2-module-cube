@@ -12,7 +12,7 @@ abstract class ActionLinksHook
 
     final public static function getAllHtml(View $view, Cube $cube)
     {
-        $htm = [];
+        $htm = array();
 
         foreach (Hook::all('Cube/ActionLinks') as $links) {
             $htm[] = $links->getHtml($view, $cube);
