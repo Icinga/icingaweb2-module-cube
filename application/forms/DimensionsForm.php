@@ -4,9 +4,13 @@ namespace Icinga\Module\Cube\Forms;
 
 use Icinga\Module\Cube\Cube;
 use Icinga\Module\Cube\Web\Form;
+use Icinga\Module\Cube\Web\IconHelper;
 
 class DimensionsForm extends Form
 {
+    /**
+     * @var Cube
+     */
     private $cube;
 
     public function setCube(Cube $cube)
@@ -27,11 +31,10 @@ class DimensionsForm extends Form
         if (! empty($dimensions)) {
             $dimensions = array_combine($dimensions, $dimensions);
         }
-
         $this->addElement('select', 'addDimension', array(
             'multiOptions' => array(
-                null => $this->translate('+ Add a dimension')
-            ) + $dimensions,
+                    null => $this->translate('+ Add a dimension')
+                ) + $dimensions,
             'decorators'   => array('ViewHelper'),
             'class'        => 'autosubmit'
         ));
@@ -46,6 +49,7 @@ class DimensionsForm extends Form
             $this->addSlice($key, $value);
         }
 
+
         $this->setSubmitLabel(false);
     }
 
@@ -57,7 +61,7 @@ class DimensionsForm extends Form
         );
 
         $this->addElement('submit', 'removeSlice_' . $key, array(
-            'label' => $this->translate('x'),
+            'label'      => IconHelper::instance()->iconCharacter('cancel'),
             'decorators' => array('ViewHelper')
         ));
 
@@ -74,23 +78,26 @@ class DimensionsForm extends Form
     protected function addDimensionButtons($dimension, $pos, $total)
     {
         $this->addHtml(
-            '<span>' . $this->getView()->escape($dimension) . '</span>',
+            '<span class="dimension-name">' . $this->getView()->escape($dimension) . '</span>',
             array('name' => 'dimension_' . $dimension)
         );
-
+        $icons = IconHelper::instance();
         $this->addElement('submit', 'removeDimension_' . $dimension, array(
-            'label' => $this->translate('x'),
-            'decorators' => array('ViewHelper')
+            'label' => $icons->iconCharacter('cancel'),
+            'decorators' => array('ViewHelper'),
+            'title' => sprintf($this->translate('Remove dimension "%s"'), $dimension),
         ));
 
         $this->addElement('submit', 'moveDimensionUp_' . $dimension, array(
-            'label' => sprintf($this->translate('^'), $dimension),
+            'label' => $icons->iconCharacter('angle-double-left'),
             'decorators' => array('ViewHelper'),
+            'title' => sprintf($this->translate('Move dimension "%s" up'), $dimension),
         ));
 
         $this->addElement('submit', 'moveDimensionDown_' . $dimension, array(
-            'label' => sprintf($this->translate('^'), $dimension),
-            'decorators' => array('ViewHelper')
+            'label' => $icons->iconCharacter('angle-double-right'),
+            'decorators' => array('ViewHelper'),
+            'title' => sprintf($this->translate('Move dimension "%s" down'), $dimension),
         ));
 
         if ($pos === 0) {
@@ -103,10 +110,10 @@ class DimensionsForm extends Form
 
         $this->addSimpleDisplayGroup(
             array(
-                'dimension_' . $dimension,
                 'removeDimension_' . $dimension,
                 'moveDimensionUp_' . $dimension,
                 'moveDimensionDown_' . $dimension,
+                'dimension_' . $dimension,
             ),
             $dimension,
             array('class' => 'dimensions')

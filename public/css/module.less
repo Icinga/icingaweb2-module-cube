@@ -1,5 +1,3 @@
-/* BEGIN Cube */
-
 .controls > a {
   color: @icinga-blue;
 
@@ -103,28 +101,41 @@ fieldset.dimensions {
     min-width: 18em;
     display: inline-block;
   }
+  input[type=submit] {
+    border: none;
+    color: @text-color;
+    font-family: 'ifont';
+    font-weight: bold;
+  }
+
+  input[type=submit][disabled] {
+    color: white;
+    background-color: white;
+    cursor: auto;
+  }
+
+  input[type=submit]:nth-of-type(2) {
+    -moz-transform: rotate(90deg);
+    -ms-transform: rotate(90deg);
+    -o-transform: rotate(90deg);
+    -webkit-transform: rotate(90deg);
+    transform: rotate(90deg);
+  }
 
   input[type=submit]:nth-of-type(3) {
-    -moz-transform: rotate(180deg);
-    -ms-transform: rotate(180deg);
-    -o-transform: rotate(180deg);
-    -webkit-transform: rotate(180deg);
-    transform: rotate(180deg);
+    -moz-transform: rotate(90deg);
+    -ms-transform: rotate(90deg);
+    -o-transform: rotate(90deg);
+    -webkit-transform: rotate(90deg);
+    transform: rotate(90deg);
   }
 
-/*
-  input[type=submit] {
-    font-family: 'ifont';
-    width: 2em;
-    height: 2em;
-    font-size: 1em;
-    margin-left: 0.2em;
-    padding: 1px 0 1px 0;
-  }
-*/
   &:last-of-type {
     margin-bottom: 0.5em;
   }
 }
 
-/* END Cube */
+.dimension-name {
+  font-weight: bold;
+  margin-left: 1em;
+}
