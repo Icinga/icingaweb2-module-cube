@@ -5,15 +5,33 @@ namespace Icinga\Module\Cube\Ido;
 use Icinga\Module\Cube\Cube;
 use Icinga\Module\Cube\Dimension;
 
+/**
+ * CustomVarDimension
+ *
+ * This provides dimenstions for custom variables available in the IDO
+ *
+ * @package Icinga\Module\Cube\Ido
+ */
 class CustomVarDimension implements Dimension
 {
-    protected $varname;
+    /**
+     * @var string custom variable name
+     */
+    protected $varName;
 
+    /**
+     * @var bool Whether null values should be shown
+     */
     protected $wantNull = false;
 
-    public function __construct($varname)
+    /**
+     * CustomVarDimension constructor.
+     *
+     * @param $varName
+     */
+    public function __construct($varName)
     {
-        $this->varname = $varname;
+        $this->varName = $varName;
     }
 
     public function wantNull($wantNull = true)
@@ -24,15 +42,15 @@ class CustomVarDimension implements Dimension
 
     public function getName()
     {
-        return strtolower($this->varname);
+        return strtolower($this->varName);
     }
 
     public function getColumnExpression()
     {
         if ($this->wantNull) {
-            return 'COALESCE(c_' . $this->varname . ".varvalue, '-')";
+            return 'COALESCE(c_' . $this->varName . ".varvalue, '-')";
         } else {
-            return 'c_' . $this->varname . '.varvalue';
+            return 'c_' . $this->varName . '.varvalue';
         }
     }
 
@@ -43,7 +61,8 @@ class CustomVarDimension implements Dimension
 
     public function addToCube(Cube $cube)
     {
-        $name = $this->varname;
+        /** @var $cube IdoCube */
+        $name = $this->varName;
         $alias = 'c_' . $this->safeVarname($name);
         $cube->innerQuery()->joinLeft(
             array($alias => $cube->tableName('icinga_customvariablestatus')),

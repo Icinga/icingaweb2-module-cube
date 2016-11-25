@@ -9,8 +9,6 @@ use Icinga\Web\Controller as WebController;
 
 class Controller extends WebController
 {
-    private $db;
-
     public function loadForm($name)
     {
         $form = FormLoader::load($name, $this->Module());

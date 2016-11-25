@@ -3,6 +3,7 @@
 namespace Icinga\Module\Cube;
 
 use Icinga\Data\Db\DbConnection;
+use Zend_Db_Select;
 
 abstract class DbCube extends Cube
 {
@@ -55,7 +56,13 @@ abstract class DbCube extends Cube
         return $this->dbName;
     }
 
-    // Used to get rid of NULL values
+    /**
+     * Get our inner query
+     *
+     * Hint: mostly used to get rid of NULL values
+     *
+     * @return Zend_Db_Select
+     */
     public function innerQuery()
     {
         if ($this->innerQuery === null) {

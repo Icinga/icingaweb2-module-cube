@@ -4,8 +4,15 @@ namespace Icinga\Module\Cube\Ido;
 
 use Icinga\Module\Cube\CubeRenderer;
 
+/**
+ * Class IdoHostStatusCubeRenderer
+ * @package Icinga\Module\Cube\Ido
+ */
 class IdoHostStatusCubeRenderer extends CubeRenderer
 {
+    /**
+     * @inheritdoc
+     */
     protected function renderDimensionLabel($name, $row)
     {
         $htm = parent::renderDimensionLabel($name, $row);

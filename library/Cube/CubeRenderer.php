@@ -8,33 +8,64 @@ FactRenderer
 SummaryHelper
 */
 
+use Icinga\Web\View;
+
 abstract class CubeRenderer
 {
+    /** @var View */
     protected $view;
 
+    /** @var Cube */
     protected $cube;
 
+    /** @var array Our dimension in regular order */
     protected $dimensions;
 
+    /** @var array Our dimension in reversed order as a quick lookup source */
     protected $reversedDimensions;
 
+    /** @var array Level (deepness) for each dimension (0, 1, 2...) */
     protected $dimensionLevels;
 
     protected $facts;
 
+    /** @var object The row before the current one */
     protected $lastRow;
 
+    /**
+     * Current summaries
+     *
+     * This is an object of objects, with dimension names being the keys and
+     * a facts row containing current (rollup) summaries for that dimension
+     * being it's value
+     *
+     * @var object
+     */
     protected $summaries;
 
     protected $started;
 
-    public function __construct($cube)
+    /**
+     * CubeRenderer constructor.
+     *
+     * @param Cube $cube
+     */
+    public function __construct(Cube $cube)
     {
         $this->cube = $cube;
     }
 
+    /**
+     * Render the given facts
+     *
+     * @param $facts
+     * @return string
+     */
     abstract public function renderFacts($facts);
 
+    /**
+     * Initialize all we need
+     */
     protected function initialize()
     {
         $this->started = false;
@@ -111,7 +142,7 @@ abstract class CubeRenderer
         return $res;
     }
 
-    public function render($view)
+    public function render(View $view)
     {
         $this->view = $view;
         $this->initialize();
@@ -243,6 +274,15 @@ abstract class CubeRenderer
             . $indent . '  <div class="body">' . "\n";
     }
 
+    /**
+     * Render the label for a given dimension name
+     *
+     * To have some context available, also
+     *
+     * @param $name
+     * @param $row
+     * @return string
+     */
     protected function renderDimensionLabel($name, $row)
     {
         $caption = $row->$name;
@@ -305,16 +345,25 @@ abstract class CubeRenderer
         return $this->dimensionLevels[$name];
     }
 
+    /**
+     * @return string
+     */
     protected function beginContainer()
     {
         return '<div class="cube">' . "\n";
     }
 
+    /**
+     * @return string
+     */
     protected function endContainer()
     {
         return '</div>' . "\n";
     }
 
+    /**
+     * Well... just to be on the safe side
+     */
     public function __destruct()
     {
         unset($this->cube);

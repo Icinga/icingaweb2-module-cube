@@ -7,6 +7,14 @@ use Icinga\Module\Cube\Cube;
 use Icinga\Module\Cube\Ido\IdoHostStatusCube;
 use Icinga\Web\View;
 
+/**
+ * MonitoringActionLinks
+ *
+ * An action link hook implementation linking to matching hosts in the
+ * monitoring module
+ *
+ * @package Icinga\Module\Cube\ProvidedHook\Cube
+ */
 class MonitoringActionLinks extends ActionLinksHook
 {
     public function getHtml(View $view, Cube $cube)
