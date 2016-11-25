@@ -55,20 +55,30 @@ class DimensionsForm extends Form
 
     protected function addSlice($key, $value)
     {
-        $this->addHtml(
-            '<span>' . $this->getView()->escape(sprintf('%s = %s', $key, $value)) . '</span>',
-            array('name' => 'slice_' . $key)
-        );
+        $view = $this->getView();
 
         $this->addElement('submit', 'removeSlice_' . $key, array(
             'label'      => IconHelper::instance()->iconCharacter('cancel'),
             'decorators' => array('ViewHelper')
         ));
 
+        $label = $view->escape(
+            sprintf(
+                '%s: %s = %s',
+                $view->translate('Slice/Filter'),
+                $key, $value
+            )
+        );
+
+        $this->addHtml(
+            '<span class="dimension-name">' . $label . '</span>',
+            array('name' => 'slice_' . $key)
+        );
+
         $this->addSimpleDisplayGroup(
             array(
-                'slice_' . $key,
                 'removeSlice_' . $key,
+                'slice_' . $key,
             ),
             $key,
             array('class' => 'dimensions')
