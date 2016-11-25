@@ -5,6 +5,8 @@ The Cube is a tiny but useful [Icinga Web 2](https://github.com/Icinga/icingaweb
 module. It currently shows host statistics (total count, health) grouped by
 various custom variables in multiple dimensions.
 
+![Cube - Overview](doc/img/cube_simple.png)
+
 It will be your new best friend in case you are running a large environment and
 want to get a quick answers to questions like:
 
@@ -24,15 +26,27 @@ want to get a quick answers to questions like:
   * Who is running the oldest ones? In production?
 * Which projects are still using physical servers in which environment?
 
-For Businessmen
----------------
+For Businessmen - Drill and Slice
+---------------------------------
 
 Get answers to your questions. Quick and fully autonomous, using the cube
-requires no technical skills. All facts configured for systems monitored by
-[Icinga](https://www.icinga.com/) can be used for your research.
+requires no technical skills. Choose amongst all available dimensions and rotate
+the Cube to fit your needs.
+
+![Cube - Configure Dimensions](doc/img/cube_move-up.png)
+
+Want to drill down? Choose a slice and get your
+ answers:
+
+![Cube - Configure Dimensions](doc/img/cube_slice.png)
+
+All facts configured for systems monitored by [Icinga](https://www.icinga.com/)
+ can be used for your research.
 
 For Icinga Director users
 -------------------------
+
+![Cube - Action Links](doc/img/cube_action-links.png)
 
 In case you are using the [Icinga Director](https://github.com/Icinga/icingaweb2-module-director),
 in addition to the multi-selection/edit feature the cube provides a nice way to
