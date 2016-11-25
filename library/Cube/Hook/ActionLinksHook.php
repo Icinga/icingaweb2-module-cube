@@ -3,8 +3,10 @@
 namespace Icinga\Module\Cube\Hook;
 
 use Icinga\Module\Cube\Cube;
+use Icinga\Module\Cube\Web\ActionLink;
+use Icinga\Module\Cube\Web\ActionLinks;
+use Icinga\Web\Url;
 use Icinga\Web\View;
-use Icinga\Application\Hook;
 
 /**
  * ActionLinksHook
@@ -16,47 +18,80 @@ use Icinga\Application\Hook;
  */
 abstract class ActionLinksHook
 {
-    /**
-     * Your implementation needs to extend this methos
-     *
-     * This allows you to return free-form HTML. With great power comes great
-     * responsibility, so please try to provide just links fitting the layout
-     * of currently available examples.
-     *
-     * In case you have the need to provide a neon-green/pink blinking 72pt
-     * "CLICK ME" link nobody will hinder you from doing so. Have fun!
-     *
-     * @param View $view
-     * @param Cube $cube
-     * @return string
-     */
-    abstract public function getHtml(View $view, Cube $cube);
+    /** @var ActionLinks */
+    private $actionLinks;
 
     /**
-     * Get all links for all Hook implementations
+     * Your implementation should extend this method
      *
-     * This is what the Cube calls when rendering details
+     * Then use the addActionLink() method, eventually combined with the
+     * createUrl() helper like this:
      *
-     * @param View $view
+     * <code>
+     * $this->addActionLink(
+     *     $this->makeUrl('mymodule/controller/action', array('some' => 'param')),
+     *     'A shown title',
+     *     'A longer description text, should fit into the available square field',
+     *     'icon-name'
+     * );
+     * </code>
+     *
+     * For a list of available icon names please enable the Icinga Web 2 'doc'
+     * module and go to "Documentation" -> "Developer - Style" -> "Icons"
+     *
      * @param Cube $cube
+     * @param View $view
      *
-     * @return string
+     * @return void
      */
-    final public static function getAllHtml(View $view, Cube $cube)
+    abstract public function prepareActionLinks(Cube $cube, View $view);
+
+    /**
+     * Lazy access to an ActionLinks object
+     *
+     * @return ActionLinks
+     */
+    public function getActionLinks()
     {
-        $htm = array();
+        if ($this->actionLinks === null) {
+            $this->actionLinks = new ActionLinks();
+        }
+        return $this->actionLinks;
+    }
 
-        /** @var ActionLinksHook $links */
-        foreach (Hook::all('Cube/ActionLinks') as $links) {
-            $htm[] = $links->getHtml($view, $cube);
+    /**
+     * Helper method instantiating an ActionLink object
+     *
+     * @param Url $url
+     * @param string $title
+     * @param string $description
+     * @param string $icon
+     *
+     * @return $this
+     */
+    public function addActionLink(Url $url, $title, $description, $icon)
+    {
+        $this->getActionLinks()->add(
+            new ActionLink($url, $title, $description, $icon)
+        );
+
+        return $this;
+    }
+
+    /**
+     * Helper method instantiating an Url object
+     *
+     * @param string $path
+     * @param array $params
+     * @return Url
+     */
+    public function makeUrl($path, $params = null)
+    {
+        $url = Url::fromPath($path);
+        if ($params !== null) {
+            $url->getParams()->mergeValues($params);
         }
 
-        if (empty($htm)) {
-            $htm[] = $view->translate(
-                'No action links have been provided for this cube'
-            );
-        }
-
-        return implode('<br />', $htm);
+        return $url;
     }
 }

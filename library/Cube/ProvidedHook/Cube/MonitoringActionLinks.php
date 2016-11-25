@@ -17,11 +17,13 @@ use Icinga\Web\View;
  */
 class MonitoringActionLinks extends ActionLinksHook
 {
-    public function getHtml(View $view, Cube $cube)
+    /**
+     * @inheritdoc
+     */
+    public function prepareActionLinks(Cube $cube, View $view)
     {
-
         if (! $cube instanceof IdoHostStatusCube) {
-            return '';
+            return;
         }
 
         $vars = array();
@@ -31,11 +33,11 @@ class MonitoringActionLinks extends ActionLinksHook
 
         $url = 'monitoring/list/hosts';
 
-        return $view->qlink(
-            $view->translate('Show filtered hosts status'),
-            $url,
-            $vars,
-            array('class' => 'icon-host')
+        $this->addActionLink(
+            $this->makeUrl($url, $vars),
+            $view->translate('Show hosts status'),
+            $view->translate('This shows all matching hosts and their current state in the monitoring module'),
+            'host'
         );
     }
 }

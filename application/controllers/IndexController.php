@@ -3,11 +3,15 @@
 namespace Icinga\Module\Cube\Controllers;
 
 use Icinga\Module\Cube\Ido\IdoHostStatusCube;
-use Icinga\Module\Cube\Hook\ActionLinksHook;
+use Icinga\Module\Cube\Web\ActionLinks;
 use Icinga\Module\Cube\Web\Controller;
+use Icinga\Web\UrlParams;
 
 class IndexController extends Controller
 {
+    /** @var UrlParams */
+    protected $params;
+
     public function indexAction()
     {
         $this->getTabs()->add('cube', array(
@@ -48,9 +52,13 @@ class IndexController extends Controller
         $cube = $this->cubeFromParams($this->params);
 
         $this->view->title = $cube->getSlicesLabel();
-        $this->view->links = ActionLinksHook::getAllHtml($this->view, $cube);
+        $this->view->links = ActionLinks::renderAll($cube, $this->view);
     }
 
+    /**
+     * @param  UrlParams $params
+     * @return IdoHostStatusCube
+     */
     protected function cubeFromParams($params)
     {
         $cube = new IdoHostStatusCube();

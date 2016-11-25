@@ -139,3 +139,57 @@ fieldset.dimensions {
   font-weight: bold;
   margin-left: 1em;
 }
+
+ul.action-links {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+ul.action-links {
+  li {
+    margin: 0;
+    padding: 0;
+    float: left;
+    display: inline-block;
+    width: 18em;
+    height: 10em;
+    overflow: hidden;
+  }
+
+  li.error {
+    background-color: @colorCritical;
+    color: white;
+    padding: 1em;
+    font-weight: bold;
+    text-align: center;
+  }
+
+  a {
+    width: 100%;
+    height: 100%;
+    padding: 0.5em 1em;
+    display: block;
+    text-decoration: none;
+
+    .title {
+      margin-left: 5em;
+      font-weight: bold;
+    }
+
+    p {
+      margin-left: 5em;
+    }
+
+    i {
+      position: absolute;
+      font-size: 3em;
+      display: inline-block;
+    }
+    &:hover {
+      background: @text-color;
+      color: white;
+      text-decoration: none;
+    }
+  }
+}

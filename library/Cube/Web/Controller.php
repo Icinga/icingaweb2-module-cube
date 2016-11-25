@@ -3,12 +3,21 @@
 namespace Icinga\Module\Cube\Web;
 
 use Icinga\Application\Icinga;
-use Icinga\Exception\ConfigError;
 use Icinga\Module\Director\Web\Form\FormLoader;
 use Icinga\Web\Controller as WebController;
+use Icinga\Web\View;
 
 class Controller extends WebController
 {
+    /** @var View This helps IDEs to understand that this is not ZF view */
+    public $view;
+
+    /**
+     * Load a form with a specific name
+     *
+     * @param $name
+     * @return mixed
+     */
     public function loadForm($name)
     {
         $form = FormLoader::load($name, $this->Module());
