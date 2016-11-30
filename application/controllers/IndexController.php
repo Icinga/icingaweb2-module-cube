@@ -6,6 +6,7 @@ use Icinga\Module\Cube\Ido\IdoHostStatusCube;
 use Icinga\Module\Cube\Web\ActionLinks;
 use Icinga\Module\Cube\Web\Controller;
 use Icinga\Web\UrlParams;
+use Icinga\Web\Widget\Tabextension\DashboardAction;
 
 class IndexController extends Controller
 {
@@ -17,7 +18,7 @@ class IndexController extends Controller
         $this->getTabs()->add('cube', array(
             'label' => $this->translate('Cube'),
             'url'   => $this->getRequest()->getUrl()
-        ))->activate('cube');
+        ))->activate('cube')->extend(new DashboardAction());
 
         // Hint: order matters, we are shifting!
         $showSettings = $this->params->shift('showSettings');
@@ -74,7 +75,7 @@ class IndexController extends Controller
             }
         }
 
-        foreach (array('renderLayout', 'showFullscreen', 'showCompact') as $p) {
+        foreach (array('renderLayout', 'showFullscreen', 'showCompact', 'view') as $p) {
             $params->shift($p);
         }
 
