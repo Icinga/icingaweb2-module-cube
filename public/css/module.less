@@ -122,6 +122,8 @@ div.cube {
 fieldset.dimensions {
   margin: 0;
   padding: 0;
+  border: none;
+
   span {
     min-width: 18em;
     display: inline-block;
@@ -217,4 +219,153 @@ ul.action-links {
       text-decoration: none;
     }
   }
+}
+
+/** Form, stolen from Director **/
+
+.content form {
+  margin-bottom: 2em;
+}
+
+
+form input[type=submit] {
+  .button();
+  border-width: 1px;
+  margin-top: 0.5em;
+
+  &:disabled {
+    border-color: @gray-light;
+    background-color: @gray-light;
+    color: #fff;
+  }
+}
+
+form input[type=submit]:first-of-type {
+    border-width: 2px;
+}
+
+form input[type=submit].link-button {
+  color: @icinga-blue;
+  background: none;
+  border: none;
+  padding: 0;
+
+  text-align: left;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+form p.description {
+  padding: 1em 1em;
+  margin: 0;
+  font-style: italic;
+  width: 100%;
+}
+
+input, select, select option, textarea {
+   -webkit-appearance: none;
+   -moz-appearance: none;
+   appearance: none;
+}
+
+form ul.form-errors {
+    margin-bottom: 0.5em;
+
+    ul.errors li {
+        background: @color-critical;
+        font-weight: bold;
+        padding: 0.5em 1em;
+        color: white;
+    }
+}
+
+select::-ms-expand, input::-ms-expand, textarea::-ms-expand { /* for IE 11 */
+    display: none;
+}
+
+select {
+    border: 1px solid #ddd;
+    cursor: pointer;
+    background: none;
+}
+
+input[type=text], input[type=password], textarea, select {
+    max-width: 36em;
+    min-width: 20em;
+    width: 100%;
+    line-height: 2em;
+    height: 2.4em;
+    padding-left: 0.5em;
+    border-style: solid;
+    border-color: transparent;
+    border-bottom-color: @gray-lighter;
+    border-width: 1px 1px 1px 3px;
+    background-color: white;
+
+    &.search {
+        background: transparent url("../img/icons/search.png") no-repeat scroll 0.5em center / 1em 1em;
+        padding-left: 2em;
+    }
+}
+
+select[multiple] {
+    height: auto;
+}
+
+select option {
+    height: 2em;
+    padding-top: 0.3em;
+}
+
+select[multiple=multiple] {
+  height: auto;
+}
+
+label {
+    line-height: 2em;
+}
+
+form dl {
+    margin: 0;
+    padding: 0;
+}
+
+
+select::-moz-focus-inner { border: 0; }
+
+select:-moz-focusring {
+    color: transparent;
+    text-shadow: 0 0 0 #000;
+}
+
+select, input[type=text], textarea {
+    &:hover {
+        border-style: dotted solid dotted solid;
+        border-color: @gray-light;
+    }
+
+    &:focus, &:focus:hover {
+        border-style: solid;
+        border-color: @icinga-blue;
+        outline: none;
+    }
+}
+
+select[value=""] {
+    color: blue;
+    border: 1px solid #666;
+    background-color: white;
+}
+
+select option {
+    color: inherit;
+    padding-left: 0.5em;
+    background-color: white;
+}
+
+select option[value=""] {
+    color: #aaa;
+    background-color: white;
 }

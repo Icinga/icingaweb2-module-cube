@@ -3,10 +3,10 @@
 namespace Icinga\Module\Cube\Forms;
 
 use Icinga\Module\Cube\Cube;
-use Icinga\Module\Cube\Web\Form;
+use Icinga\Module\Cube\Web\Form\QuickForm;
 use Icinga\Module\Cube\Web\IconHelper;
 
-class DimensionsForm extends Form
+class DimensionsForm extends QuickForm
 {
     /**
      * @var Cube
