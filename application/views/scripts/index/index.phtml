@@ -11,12 +11,14 @@
 </div>
 
 <div class="content">
-<?php if ($this->form): ?>
-<div class="icinga-module module-director">
-<?= $this->form ?>
-</div>
-<?php endif ?>
-<?php if ($this->cube): ?>
-<?= $cube->render($this) ?>
-<?php endif ?>
+  <?php if ($this->form): ?>
+    <?php if (! $this->compact): ?>
+      <div class="icinga-module module-director">
+        <?= $this->form ?> 
+      </div>
+    <?php endif ?>
+  <?php endif ?>
+  <?php if ($this->cube): ?>
+    <?= $cube->render($this) ?>
+  <?php endif ?>
 </div>
