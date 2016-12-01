@@ -66,7 +66,8 @@ class DimensionsForm extends Form
             sprintf(
                 '%s: %s = %s',
                 $view->translate('Slice/Filter'),
-                $key, $value
+                $key,
+                $value
             )
         );
 
