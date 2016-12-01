@@ -1,5 +1,5 @@
 Name: Cube
-Version: 1.0.0-rc1
+Version: 1.0.0
 Depends: monitoring (>= 2.3.4), director (>= 1.2.0)
 Description: Cube for Icinga Web 2
  The Cube allows you to analyze data across multiple dimensions in your
