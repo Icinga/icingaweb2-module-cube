@@ -9,14 +9,14 @@ use Icinga\Web\Url;
 use Icinga\Web\View;
 
 /**
- * ActionLinksHook
+ * ActionsHook
  *
  * Implement this hook in case your module wants to add links to the detail
  * page shown for a slice.
  *
  * @package Icinga\Module\Cube\Hook
  */
-abstract class ActionLinksHook
+abstract class ActionsHook
 {
     /** @var ActionLinks */
     private $actionLinks;

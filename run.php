@@ -1,3 +1,3 @@
 <?php
 
-$this->provideHook('cube/ActionLinks', 'Cube/MonitoringActionLinks');
+$this->provideHook('cube/Actions', 'Cube/MonitoringActions');

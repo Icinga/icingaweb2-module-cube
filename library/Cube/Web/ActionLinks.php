@@ -5,13 +5,13 @@ namespace Icinga\Module\Cube\Web;
 use Exception;
 use Icinga\Application\Hook;
 use Icinga\Module\Cube\Cube;
-use Icinga\Module\Cube\Hook\ActionLinksHook;
+use Icinga\Module\Cube\Hook\ActionsHook;
 use Icinga\Web\View;
 
 /**
  * ActionLink
  *
- * ActionLinksHook implementations return instances of this class
+ * ActionsHook implementations return instances of this class
  *
  * @package Icinga\Module\Cube\Web
  */
@@ -34,8 +34,8 @@ class ActionLinks
     {
         $html = array();
 
-        /** @var ActionLinksHook $hook */
-        foreach (Hook::all('Cube/ActionLinks') as $hook) {
+        /** @var ActionsHook $hook */
+        foreach (Hook::all('Cube/Actions') as $hook) {
             try {
                 $hook->prepareActionLinks($cube, $view);
             } catch (Exception $e) {

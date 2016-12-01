@@ -2,7 +2,7 @@
 
 namespace Icinga\Module\Cube\ProvidedHook\Cube;
 
-use Icinga\Module\Cube\Hook\ActionLinksHook;
+use Icinga\Module\Cube\Hook\ActionsHook;
 use Icinga\Module\Cube\Cube;
 use Icinga\Module\Cube\Ido\IdoHostStatusCube;
 use Icinga\Web\View;
@@ -15,7 +15,7 @@ use Icinga\Web\View;
  *
  * @package Icinga\Module\Cube\ProvidedHook\Cube
  */
-class MonitoringActionLinks extends ActionLinksHook
+class MonitoringActions extends ActionsHook
 {
     /**
      * @inheritdoc
