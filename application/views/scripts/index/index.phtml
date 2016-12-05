@@ -11,7 +11,7 @@
 </div>
 
 <div class="content">
-<?php if ($this->form): ?>
+<?php if ($this->form && ! $this->compact): ?>
 <?= $this->form ?>
 <?php endif ?>
 <?php if ($this->cube): ?>
