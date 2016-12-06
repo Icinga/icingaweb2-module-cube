@@ -199,7 +199,7 @@ abstract class DbCube extends Cube
      * The full query wraps the rollup query in a sub-query to work around
      * MySQL limitations. This is required to not get into trouble when ordering,
      * especially combined with the need to keep control over (eventually desired)
-     * NULL value fact colums
+     * NULL value fact columns
      *
      * @return \Zend_Db_Select
      */
@@ -238,6 +238,17 @@ abstract class DbCube extends Cube
     }
 
     /**
+     * Whether our connection is PostgreSQL
+     *
+     * @return bool
+     */
+    public function isPgsql()
+    {
+        return $this->connection->getDbType() === 'pgsql';
+    }
+
+
+    /**
      * This prepares the rollup query
      *
      * Inner query is wrapped in a subquery, summaries for all facts are
@@ -252,6 +263,7 @@ abstract class DbCube extends Cube
 
         $dimensions = $this->listDimensions();
         $this->finalizeInnerQuery();
+        $columns = array();
         foreach ($dimensions as $dimension) {
             $columns[$dimension] = $alias . '.' . $dimension;
         }
@@ -263,7 +275,13 @@ abstract class DbCube extends Cube
         $select = $this->db()->select()->from(
             array($alias => $this->innerQuery()),
             $columns
-        )->group('(' . implode('), (', $dimensions) . ') WITH ROLLUP');
+        );
+
+        if ($this->isPgsql()) {
+            $select->group('ROLLUP (' . implode('), (', $dimensions) . ')');
+        } else {
+            $select->group('(' . implode('), (', $dimensions) . ') WITH ROLLUP');
+        }
 
         return $select;
     }
