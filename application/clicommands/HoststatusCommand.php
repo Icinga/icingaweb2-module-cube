@@ -76,7 +76,21 @@ public function factsAction(){
  *   icingacli cube hoststatus columns --dimensions=OS
  */
 public function columnsAction(){
-       print_r ($this->cube->listColumns());
+   if ($this->formatIsJson()){
+     echo json_encode($this->cube->listColumns());
+     return;
+   }
+
+   if ($this->formatIsCsv() && 0==1){
+      showArray($this->cube->listColumns());
+//      Csv::fromQuery(new ArrayIterator($this->cube->listColumns()))->dump();
+      return;
+   }
+  $screen = $this->screen;
+  print $screen->underline($this->translate('Cube')." - ".$this->translate('columns')."\n");
+  foreach($this->cube->listColumns() as $aColumn){
+  print "-> ".$aColumn."\n";
+  }
 }
 
 /**
@@ -84,8 +98,12 @@ public function columnsAction(){
  *
  */
 public function additionalAction(){
-  print_r( $this->cube->listAdditionalDimensions());
-//   $this->showArray(array_values($this->cube->listAdditionalDimensions()));
+  $screen = $this->screen;
+  print $screen->underline($this->translate('Cube')." - ".$this->translate('additional dimensions')."\n");
+
+  foreach ($this->cube->listAdditionalDimensions() as $aAdditional){
+  print "-> ".$aAdditional."\n";
+  }
 }
 
 
