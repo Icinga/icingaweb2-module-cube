@@ -80,7 +80,7 @@ class IndexController extends Controller
         }
 
         foreach ($this->params->toArray() as $param) {
-            $cube->slice($param[0], $param[1]);
+            $cube->slice($param[0], urldecode($param[1]));
         }
 
         return $cube;
