@@ -84,4 +84,13 @@ Permissions
 
 Someone able to access the cube will see statistics for **all** available
 objects. Restrictions applied to other modules will have no effect, at lease
-not unless those modules provide their own Cube hooks taking care about such. 
+not unless those modules provide their own Cube hooks taking care about such.
+
+Changes
+-------
+
+### v1.0.1
+
+* Fix layout when rendered to a Dashboard
+* Fix PostgreSQL support
+* Fix problems with special characters
