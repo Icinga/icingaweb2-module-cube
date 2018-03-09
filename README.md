@@ -68,6 +68,12 @@ Yes, it's mostly what the name suggests. Just a configurable Rollup Cube,
 providing a frontend allowing you to add and flip dimensions at will. You
 can slice and dice your data, drill down and pivot/rotate the whole cube.
 
+Requirements
+------------
+
+If you are using PostgreSQL, you need at least 9.5 which provides the `ROLLUP`
+feature.
+
 Installation
 ------------
 
