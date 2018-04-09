@@ -2,8 +2,17 @@
 
 namespace Icinga\Module\Cube\Ido;
 
+use Icinga\Application\Config;
+
 class IdoHostStatusCube extends IdoCube
 {
+    /**
+     * Cache for {@link filterProtectedCustomvars()}
+     *
+     * @var string|null
+     */
+    protected $protectedCustomvars;
+
     public function getRenderer()
     {
         return new IdoHostStatusCubeRenderer($this);
@@ -34,7 +43,11 @@ class IdoHostStatusCube extends IdoCube
      */
     public function addDimensionByName($name)
     {
-        return $this->addDimension(new CustomVarDimension($name));
+        if (count($this->filterProtectedCustomvars(array($name))) === 1) {
+            $this->addDimension(new CustomVarDimension($name));
+        }
+
+        return $this;
     }
 
     /**
@@ -57,7 +70,7 @@ class IdoHostStatusCube extends IdoCube
             $select->where('cv.is_json = 0');
         }
 
-        return $this->db()->fetchCol($select);
+        return $this->filterProtectedCustomvars($this->db()->fetchCol($select));
     }
 
     public function prepareInnerQuery()
@@ -76,5 +89,35 @@ class IdoHostStatusCube extends IdoCube
         );
 
         return $select;
+    }
+
+    /**
+     * Return the given array without values matching the custom variables protected by the monitoring module
+     *
+     * @param   string[]    $customvars
+     *
+     * @return  string[]
+     */
+    protected function filterProtectedCustomvars(array $customvars)
+    {
+        if ($this->protectedCustomvars === null) {
+            $config = Config::module('monitoring')->get('security', 'protected_customvars');
+            $protectedCustomvars = array();
+
+            foreach (preg_split('~,~', $config, -1, PREG_SPLIT_NO_EMPTY) as $pattern) {
+                $regex = array();
+                foreach (explode('*', $pattern) as $literal) {
+                    $regex[] = preg_quote($literal, '/');
+                }
+
+                $protectedCustomvars[] = implode('.*', $regex);
+            }
+
+            $this->protectedCustomvars = empty($protectedCustomvars)
+                ? '/^$/'
+                : '/^(?:' . implode('|', $protectedCustomvars) . ')$/';
+        }
+
+        return preg_grep($this->protectedCustomvars, $customvars, PREG_GREP_INVERT);
     }
 }
