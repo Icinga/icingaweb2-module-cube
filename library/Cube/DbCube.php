@@ -278,7 +278,7 @@ abstract class DbCube extends Cube
         );
 
         if ($this->isPgsql()) {
-            $select->group('ROLLUP (' . implode('), (', $dimensions) . ')');
+            $select->group('ROLLUP (' . implode(', ', $dimensions) . ')');
         } else {
             $select->group('(' . implode('), (', $dimensions) . ') WITH ROLLUP');
         }
