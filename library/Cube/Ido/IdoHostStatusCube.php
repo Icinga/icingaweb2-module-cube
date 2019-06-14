@@ -44,7 +44,7 @@ class IdoHostStatusCube extends IdoCube
     public function addDimensionByName($name)
     {
         if (count($this->filterProtectedCustomvars(array($name))) === 1) {
-            $this->addDimension(new CustomVarDimension($name));
+            $this->addDimension(new CustomVarDimension($name, CustomVarDimension::TYPE_HOST));
         }
 
         return $this;
@@ -57,14 +57,21 @@ class IdoHostStatusCube extends IdoCube
      */
     public function listAvailableDimensions()
     {
-        $select = $this->db()->select()->from(
-            array('cv' => $this->tableName('icinga_customvariablestatus')),
-            array('varname' => 'cv.varname')
-        )->join(
-            array('o' => $this->tableName('icinga_objects')),
-            'cv.object_id = o.object_id AND o.is_active = 1 AND o.objecttype_id = 1',
-            array()
-        )->group('cv.varname');
+        $this->requireBackend();
+
+        $view = $this->backend->select()->from('hoststatus');
+
+        $view->applyFilter($this->getMonitoringRestriction());
+
+        $select = $view->getQuery()->getSelectQuery();
+
+        $select
+            ->columns('cv.varname')
+            ->join(
+                ['cv' => $this->tableName('icinga_customvariablestatus')],
+                'cv.object_id = so.object_id'
+            )
+            ->group('cv.varname');
 
         if (version_compare($this->getIdoVersion(), '1.12.0', '>=')) {
             $select->where('cv.is_json = 0');
@@ -75,18 +82,15 @@ class IdoHostStatusCube extends IdoCube
 
     public function prepareInnerQuery()
     {
-        $select = $this->db()->select()->from(
-            array('o' => $this->tableName('icinga_objects')),
-            array()
-        )->join(
-            array('h' => $this->tableName('icinga_hosts')),
-            'o.object_id = h.host_object_id AND o.is_active = 1',
-            array()
-        )->joinLeft(
-            array('hs' => $this->tableName('icinga_hoststatus')),
-            'hs.host_object_id = h.host_object_id',
-            array()
-        );
+        $this->requireBackend();
+
+        $view = $this->backend->select()->from('hoststatus');
+
+        $view->getQuery()->requireColumn('host_state');
+
+        $view->applyFilter($this->getMonitoringRestriction());
+
+        $select = $view->getQuery()->getSelectQuery();
 
         return $select;
     }
