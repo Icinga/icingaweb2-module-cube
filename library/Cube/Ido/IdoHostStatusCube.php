@@ -70,7 +70,7 @@ class IdoHostStatusCube extends IdoCube
             ->columns('cv.varname')
             ->join(
                 ['cv' => $this->tableName('icinga_customvariablestatus')],
-                'cv.object_id = so.object_id'
+                'cv.object_id = ho.object_id'
             )
             ->group('cv.varname');
 
