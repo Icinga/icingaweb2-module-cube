@@ -20,6 +20,9 @@ abstract class IdoCube extends DbCube
     /** @var string We ask for the IDO version for compatibility reasons */
     protected $idoVersion;
 
+    /** @var MonitoringBackend */
+    protected $backend;
+
     /**
      * We can steal the DB connection directly from a Monitoring backend
      *
@@ -28,7 +31,11 @@ abstract class IdoCube extends DbCube
      */
     public function setBackend(MonitoringBackend $backend)
     {
-        return $this->setConnection($backend->getResource());
+        $this->backend = $backend;
+
+        $this->setConnection($backend->getResource());
+
+        return $this;
     }
 
     /**
