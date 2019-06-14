@@ -2,6 +2,10 @@
 
 namespace Icinga\Module\Cube\Ido;
 
+use Icinga\Authentication\Auth;
+use Icinga\Data\Filter\Filter;
+use Icinga\Exception\ConfigurationError;
+use Icinga\Exception\QueryException;
 use Icinga\Module\Cube\DbCube;
 use Icinga\Module\Monitoring\Backend\MonitoringBackend;
 
@@ -81,5 +85,48 @@ abstract class IdoCube extends DbCube
         if ($this->db === null) {
             $this->setBackend(MonitoringBackend::instance());
         }
+    }
+
+    protected function getMonitoringRestriction()
+    {
+        $restriction = Filter::matchAny();
+        $restriction->setAllowedFilterColumns(array(
+            'host_name',
+            'hostgroup_name',
+            'instance_name',
+            'service_description',
+            'servicegroup_name',
+            function ($c) {
+                return preg_match('/^_(?:host|service)_/i', $c);
+            }
+        ));
+
+        $filters = Auth::getInstance()->getUser()->getRestrictions('monitoring/filter/objects');
+
+        foreach ($filters as $filter) {
+            if ($filter === '*') {
+                return Filter::matchAny();
+            }
+            try {
+                $restriction->addFilter(Filter::fromQueryString($filter));
+            } catch (QueryException $e) {
+                throw new ConfigurationError(
+                    'Cannot apply restriction %s using the filter %s. You can only use the following columns: %s',
+                    'monitoring/filter/objects',
+                    $filter,
+                    implode(', ', array(
+                        'instance_name',
+                        'host_name',
+                        'hostgroup_name',
+                        'service_description',
+                        'servicegroup_name',
+                        '_(host|service)_<customvar-name>'
+                    )),
+                    $e
+                );
+            }
+        }
+
+        return $restriction;
     }
 }
