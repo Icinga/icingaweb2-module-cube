@@ -16,6 +16,10 @@ use Icinga\Module\Cube\Dimension;
  */
 class CustomVarDimension implements Dimension
 {
+    const TYPE_HOST = 'host';
+
+    const TYPE_SERVICE = 'service';
+
     /**
      * @var string custom variable name
      */
@@ -26,14 +30,19 @@ class CustomVarDimension implements Dimension
      */
     protected $wantNull = false;
 
+    /** @var string Type of the custom var */
+    protected $type;
+
     /**
      * CustomVarDimension constructor.
      *
      * @param $varName
+     * @param   string  $type   Type of the custom var
      */
-    public function __construct($varName)
+    public function __construct($varName, $type = null)
     {
         $this->varName = $varName;
+        $this->type = $type;
     }
 
     /**
@@ -72,13 +81,23 @@ class CustomVarDimension implements Dimension
 
     public function addToCube(Cube $cube)
     {
-        /** @var $cube IdoCube */
+        switch ($this->type) {
+            case self::TYPE_HOST:
+                $objectId = 'ho.object_id';
+                break;
+            case self::TYPE_SERVICE:
+                $objectId = 'so.object_id';
+                break;
+            default:
+                $objectId = 'o.object_id';
+        }
         $name = $this->varName;
         $alias = 'c_' . $this->safeVarname($name);
+        /** @var $cube IdoCube */
         $cube->innerQuery()->joinLeft(
             array($alias => $cube->tableName('icinga_customvariablestatus')),
             $cube->db()->quoteInto($alias . '.varname = ?', $name)
-            . ' AND ' . $alias . '.object_id = o.object_id',
+            . ' AND ' . $alias . '.object_id = ' . $objectId,
             array()
         )->group($alias . '.varvalue');
     }
