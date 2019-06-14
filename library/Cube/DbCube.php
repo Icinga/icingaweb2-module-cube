@@ -1,4 +1,5 @@
 <?php
+// Icinga Web 2 Cube Module | (c) 2016 Icinga GmbH | GPLv2
 
 namespace Icinga\Module\Cube;
 
@@ -267,7 +268,7 @@ abstract class DbCube extends Cube
         foreach ($dimensions as $dimension) {
             $columns[$dimension] = $alias . '.' . $dimension;
         }
-        
+
         foreach ($this->listFacts() as $fact) {
             $columns[$fact] = 'SUM(' . $fact . ')';
         }

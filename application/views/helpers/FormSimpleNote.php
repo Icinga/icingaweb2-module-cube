@@ -1,4 +1,5 @@
 <?php
+// Icinga Web 2 Cube Module | (c) 2016 Icinga GmbH | GPLv2
 
 // Avoid complaints about missing namespace and invalid class name
 // @codingStandardsIgnoreStart
