@@ -7,7 +7,7 @@ class IdoHostStatusCube extends IdoCube
 {
     public function getRenderer()
     {
-        return new IdoHostStatusCubeRenderer($this);
+        return new IdoStatusCubeRenderer($this);
     }
 
     /**
