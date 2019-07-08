@@ -20,7 +20,8 @@ div.cube {
     border-left: 0.5em solid transparent;
   }
 
-  div.cube-dimension1 > .header, div.cube-dimension2 {
+  div.cube-dimension1 > .header,
+  div.cube-dimension2 {
     display: inline-block;
     width: 10em;
     height: 10em;
@@ -32,21 +33,33 @@ div.cube {
   }
 
   div.cube-dimension1 > .header {
+    display: flex;
     float: left;
     font-weight: bold;
     text-align: center;
     padding-left: 0;
-  }
 
-  div.cube-dimension1 > .body {
-    margin-left: 10em;
+    > a:first-child {
+      flex: 1;
+      max-width: 8em;
+      word-wrap: break-word;
+    }
   }
 
   div.cube-dimension2 {
     > .header {
+      display: flex;
       text-align: center;
       color: white;
       margin-bottom: 1em;
+
+      > a:first-child {
+        flex: 1;
+        max-width: 8em;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
     }
 
     background: @color-ok;
