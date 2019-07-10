@@ -134,7 +134,6 @@ abstract class DbCube extends Cube
     {
         if ($this->innerQuery === null) {
             $this->innerQuery = $this->prepareInnerQuery();
-
         }
 
         return $this->innerQuery;
@@ -165,7 +164,12 @@ abstract class DbCube extends Cube
             }
         }
 
-        $query->columns($columns + $this->factColumns);
+        $c = [];
+        foreach ($columns + $this->factColumns as $k => $v) {
+            $c[$this->db()->quoteIdentifier($k)] = $v;
+        }
+
+        $query->columns($c);
     }
 
     /**
@@ -212,7 +216,7 @@ abstract class DbCube extends Cube
         $columns = array();
 
         foreach ($cols as $col) {
-            $columns[$col] = $alias . '.' . $col;
+            $columns[$this->db()->quoteIdentifier($col)] = $alias . '.' . $this->db()->quoteIdentifier($col);
         }
 
         $select = $this->db()->select()->from(
@@ -262,7 +266,9 @@ abstract class DbCube extends Cube
     {
         $alias = 'sub';
 
-        $dimensions = $this->listDimensions();
+        $dimensions = array_map(function ($val) {
+            return $this->db()->quoteIdentifier($val);
+        }, $this->listDimensions());
         $this->finalizeInnerQuery();
         $columns = array();
         foreach ($dimensions as $dimension) {
