@@ -69,6 +69,13 @@ abstract class CubeRenderer
     abstract public function renderFacts($facts);
 
     /**
+     * Returns the base url for the details action
+     *
+     * @return string
+     */
+    abstract protected function getDetailsBaseUrl();
+
+    /**
      * Initialize all we need
      */
     protected function initialize()
@@ -338,8 +345,7 @@ abstract class CubeRenderer
         }
 
         return $this->view->url(
-            'cube/index/details',
-            // 'cube',
+            $this->getDetailsBaseUrl(),
             $params
         );
     }
