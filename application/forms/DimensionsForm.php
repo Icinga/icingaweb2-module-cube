@@ -24,21 +24,22 @@ class DimensionsForm extends QuickForm
     {
         $cube = $this->cube;
 
-        $dimensions = array_diff(
-            $cube->listAdditionalDimensions(),
-            $cube->listDimensions()
-        );
+        if (count($cube->listDimensions()) < 3) {
+            $dimensions = array_diff(
+                $cube->listAdditionalDimensions(),
+                $cube->listDimensions()
+            );
 
-        if (! empty($dimensions)) {
-            $dimensions = array_combine($dimensions, $dimensions);
+            if (! empty($dimensions)) {
+                $dimensions = array_combine($dimensions, $dimensions);
+            }
+
+            $this->addElement('select', 'addDimension', [
+                'multiOptions'  => [null => $this->translate('+ Add a dimension')] + $dimensions,
+                'decorators'    => ['ViewHelper'],
+                'class'         => 'autosubmit'
+            ]);
         }
-        $this->addElement('select', 'addDimension', array(
-            'multiOptions' => array(
-                    null => $this->translate('+ Add a dimension')
-                ) + $dimensions,
-            'decorators'   => array('ViewHelper'),
-            'class'        => 'autosubmit'
-        ));
 
         $dimensions = $cube->listDimensions();
         $cnt = count($dimensions);
