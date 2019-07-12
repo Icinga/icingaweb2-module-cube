@@ -92,8 +92,8 @@ class CustomVarDimension implements Dimension
             default:
                 $objectId = 'o.object_id';
         }
-        $name = $this->varName;
-        $alias = 'c_' . $this->safeVarname($name);
+        $name = $this->safeVarname($this->varName);
+        $alias = 'c_' . $name;
         /** @var $cube IdoCube */
         $cube->innerQuery()->joinLeft(
             array($alias => $cube->tableName('icinga_customvariablestatus')),
