@@ -111,4 +111,9 @@ class IdoStatusCubeRenderer extends CubeRenderer
                 $count
             ) . "\n";
     }
+
+    protected function getDetailsBaseUrl()
+    {
+        return 'cube/' . $this->factsPrefix . '/details';
+    }
 }
