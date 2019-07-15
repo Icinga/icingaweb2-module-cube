@@ -60,17 +60,6 @@ class IdoStatusCubeRenderer extends CubeRenderer
         return $main . $sub;
     }
 
-    protected function getDetailsUrl($name, $row)
-    {
-        $url = parent::getDetailsUrl($name, $row);
-
-        if ($this->factsPrefix === 'services') {
-            $url->addParams(['cube' => 'services']);
-        }
-
-        return $url;
-    }
-
     /**
      * @inheritdoc
      */
