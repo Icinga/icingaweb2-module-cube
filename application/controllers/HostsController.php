@@ -10,7 +10,7 @@ class HostsController extends IdoController
 {
     public function indexAction()
     {
-        $this->getTabs()->activate('cube/hosts');
+        $this->createTabs()->activate('cube/hosts');
 
         $this->renderCube();
     }

@@ -7,9 +7,9 @@ use Icinga\Web\Widget\Tabextension\DashboardAction;
 
 abstract class IdoController extends Controller
 {
-    public function getTabs()
+    public function createTabs()
     {
-        return parent::getTabs()
+        return $this->getTabs()
             ->add('cube/hosts', [
                 'label' => $this->translate('Hosts'),
                 'url'   => 'cube/hosts' . ($this->params->toString() === '' ? '' : '?' . $this->params->toString())

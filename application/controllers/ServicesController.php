@@ -10,7 +10,7 @@ class ServicesController extends IdoController
 {
     public function indexAction()
     {
-        $this->getTabs()->activate('cube/services');
+        $this->createTabs()->activate('cube/services');
 
         $this->renderCube();
     }
