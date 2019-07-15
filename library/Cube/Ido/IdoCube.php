@@ -10,6 +10,7 @@ use Icinga\Exception\ConfigurationError;
 use Icinga\Exception\QueryException;
 use Icinga\Module\Cube\DbCube;
 use Icinga\Module\Monitoring\Backend\MonitoringBackend;
+use Icinga\Util\GlobFilter;
 
 /**
  * IdoCube
@@ -35,6 +36,9 @@ abstract class IdoCube extends DbCube
      * @var string|null
      */
     protected $protectedCustomvars;
+
+    /** @var GlobFilter The properties to hide from the user */
+    protected $blacklistedProperties;
 
     /**
      * We can steal the DB connection directly from a Monitoring backend
@@ -148,6 +152,24 @@ abstract class IdoCube extends DbCube
      */
     protected function filterProtectedCustomvars(array $customvars)
     {
+        if ($this->blacklistedProperties === null) {
+            $this->blacklistedProperties = new GlobFilter(
+                Auth::getInstance()->getRestrictions('monitoring/blacklist/properties')
+            );
+        }
+
+        if ($this instanceof IdoServiceStatusCube) {
+            $type = 'service';
+        } else {
+            $type = 'host';
+        }
+
+        $customvars = $this->blacklistedProperties->removeMatching(
+            [$type => ['vars' => array_flip($customvars)]]
+        );
+
+        $customvars = isset($customvars[$type]['vars']) ? array_flip($customvars[$type]['vars']) : [];
+
         if ($this->protectedCustomvars === null) {
             $config = Config::module('monitoring')->get('security', 'protected_customvars');
             $protectedCustomvars = array();
