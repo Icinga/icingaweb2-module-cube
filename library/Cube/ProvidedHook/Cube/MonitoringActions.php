@@ -13,14 +13,9 @@ use Icinga\Web\View;
  *
  * An action link hook implementation linking to matching hosts in the
  * monitoring module
- *
- * @package Icinga\Module\Cube\ProvidedHook\Cube
  */
 class MonitoringActions extends ActionsHook
 {
-    /**
-     * @inheritdoc
-     */
     public function prepareActionLinks(Cube $cube, View $view)
     {
         if (! $cube instanceof IdoHostStatusCube) {
