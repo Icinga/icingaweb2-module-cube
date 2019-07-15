@@ -13,7 +13,7 @@ abstract class DbCube extends Cube
     /** @var \Zend_Db_Adapter_Abstract */
     protected $db;
 
-    /** @var \Zend_Db_Select The inner query fetching all required data */
+    /** @var ZfSelectWrapper The inner query fetching all required data */
     protected $innerQuery;
 
     /** @var \Zend_Db_Select The rollup query, creating grouped sums over innerQuery */
@@ -128,12 +128,12 @@ abstract class DbCube extends Cube
      *
      * Hint: mostly used to get rid of NULL values
      *
-     * @return \Zend_Db_Select
+     * @return ZfSelectWrapper
      */
     public function innerQuery()
     {
         if ($this->innerQuery === null) {
-            $this->innerQuery = $this->prepareInnerQuery();
+            $this->innerQuery = new ZfSelectWrapper($this->prepareInnerQuery());
         }
 
         return $this->innerQuery;
@@ -150,7 +150,7 @@ abstract class DbCube extends Cube
      */
     public function finalizeInnerQuery()
     {
-        $query = $this->innerQuery();
+        $query = $this->innerQuery()->unwrap();
         $columns = array();
         foreach ($this->dimensions as $name => $dimension) {
             $dimension->addToCube($this);
@@ -280,7 +280,7 @@ abstract class DbCube extends Cube
         }
 
         $select = $this->db()->select()->from(
-            array($alias => $this->innerQuery()),
+            array($alias => $this->innerQuery()->unwrap()),
             $columns
         );
 
