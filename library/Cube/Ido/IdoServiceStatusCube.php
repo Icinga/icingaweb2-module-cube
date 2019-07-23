@@ -36,13 +36,14 @@ class IdoServiceStatusCube extends IdoCube
 
         $view->applyFilter($this->getMonitoringRestriction());
 
-        $select = $view->getQuery()->getSelectQuery();
+        $select = $view->getQuery()->clearOrder()->getSelectQuery();
 
         $select
             ->columns('cv.varname')
             ->join(
                 ['cv' => $this->tableName('icinga_customvariablestatus')],
-                'cv.object_id = so.object_id'
+                'cv.object_id = so.object_id',
+                []
             )
             ->group('cv.varname');
 
@@ -63,7 +64,7 @@ class IdoServiceStatusCube extends IdoCube
 
         $view->applyFilter($this->getMonitoringRestriction());
 
-        $select = $view->getQuery()->getSelectQuery();
+        $select = $view->getQuery()->clearOrder()->getSelectQuery();
 
         return $select;
     }
