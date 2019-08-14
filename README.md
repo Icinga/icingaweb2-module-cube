@@ -2,7 +2,7 @@ The Icinga Web 2 Cube
 =====================
 
 The Cube is a tiny but useful [Icinga Web 2](https://github.com/Icinga/icingaweb2)
-module. It currently shows host statistics (total count, health) grouped by
+module. It currently shows host and service statistics (total count, health) grouped by
 various custom variables in multiple dimensions.
 
 ![Cube - Overview](doc/img/cube_simple.png)
