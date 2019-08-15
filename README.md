@@ -88,6 +88,6 @@ Enable the module. That's it.
 Permissions
 -----------
 
-Someone able to access the cube will see statistics for **all** available
-objects. Restrictions applied to other modules will have no effect, at lease
+Someone able to access the cube will see statistics for only the objects they have permissions to view. Blacklist properties also apply.
+Restrictions applied to other modules will have no effect, at lease
 not unless those modules provide their own Cube hooks taking care about such.
