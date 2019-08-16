@@ -19,7 +19,7 @@ want to get a quick answers to questions like:
   * Which projects are to blame for this?
   * Do we have applications where the operating systems used differ in staging
     and production? 
-* Which project uses which operating system version for which application
+* Which project uses which operating system version for which application?
   * Which projects have homogeneous environments?
   * Which projects are at a consistent patch level?
   * How many RHEL 6 variants (6.1, 6.2, 6.3...) do we use?
