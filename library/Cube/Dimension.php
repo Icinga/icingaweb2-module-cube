@@ -25,9 +25,11 @@ interface Dimension
      * This is the expression used to fetch the related column. Usually an SQL
      * snippet when a relational database is involved
      *
+     * @param Cube $cube
+     *
      * @return string
      */
-    public function getColumnExpression();
+    public function getColumnExpression(Cube $cube);
 
     /**
      * Add this dimension to a cube
