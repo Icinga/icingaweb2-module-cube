@@ -66,12 +66,13 @@ class CustomVarDimension implements Dimension
         return strtolower($this->varName);
     }
 
-    public function getColumnExpression()
+    public function getColumnExpression(Cube $cube)
     {
+        /** @var IdoCube $cube */
         if ($this->wantNull) {
-            return 'COALESCE(c_' . $this->varName . ".varvalue, '-')";
+            return 'COALESCE(' . $cube->db()->quoteIdentifier(['c_' . $this->varName, 'varvalue']) . ", '-')";
         } else {
-            return 'c_' . $this->varName . '.varvalue';
+            return $cube->db()->quoteIdentifier(['c_' . $this->varName, 'varvalue']);
         }
     }
 
@@ -93,8 +94,8 @@ class CustomVarDimension implements Dimension
                 $objectId = 'o.object_id';
         }
         $name = $this->safeVarname($this->varName);
-        $alias = 'c_' . $name;
         /** @var $cube IdoCube */
+        $alias = $cube->db()->quoteIdentifier(['c_' . $name]);
         $cube->innerQuery()->joinLeft(
             array($alias => $cube->tableName('icinga_customvariablestatus')),
             $cube->db()->quoteInto($alias . '.varname = ?', $name)
