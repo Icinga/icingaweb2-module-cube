@@ -27,16 +27,32 @@ class IdoStatusCubeRenderer extends CubeRenderer
         $indent = str_repeat('    ', 3);
         $parts = [];
 
-        if ($facts->{$this->factsPrefix . '_unhandled_nok'} > 0) {
-            $parts['critical'] = $facts->{$this->factsPrefix . '_unhandled_nok'};
+        if ($facts->{$this->factsPrefix . '_unhandled_critical'} > 0) {
+            $parts['critical'] = $facts->{$this->factsPrefix . '_unhandled_critical'};
         }
 
-        if ($facts->{$this->factsPrefix . '_nok'} > 0 && $facts->{$this->factsPrefix . '_nok'} > $facts->{$this->factsPrefix . '_unhandled_nok'}) {
-            $parts['critical handled'] = $facts->{$this->factsPrefix . '_nok'} - $facts->{$this->factsPrefix . '_unhandled_nok'};
+        if ($facts->{$this->factsPrefix . '_critical'} > 0 && $facts->{$this->factsPrefix . '_critical'} > $facts->{$this->factsPrefix . '_unhandled_critical'}) {
+            $parts['critical handled'] = $facts->{$this->factsPrefix . '_critical'} - $facts->{$this->factsPrefix . '_unhandled_critical'};
         }
 
-        if ($facts->{$this->factsPrefix . '_cnt'} > $facts->{$this->factsPrefix . '_nok'}) {
-            $parts['ok'] = $facts->{$this->factsPrefix . '_cnt'} - $facts->{$this->factsPrefix . '_nok'};
+        if ($facts->{$this->factsPrefix . '_unhandled_warning'} > 0) {
+            $parts['warning'] = $facts->{$this->factsPrefix . '_unhandled_warning'};
+        }
+
+        if ($facts->{$this->factsPrefix . '_warning'} > 0 && $facts->{$this->factsPrefix . '_warning'} > $facts->{$this->factsPrefix . '_unhandled_warning'}) {
+            $parts['warning handled'] = $facts->{$this->factsPrefix . '_warning'} - $facts->{$this->factsPrefix . '_unhandled_warning'};
+        }
+
+        if ($facts->{$this->factsPrefix . '_unhandled_unknown'} > 0) {
+            $parts['unknown'] = $facts->{$this->factsPrefix . '_unhandled_unknown'};
+        }
+
+        if ($facts->{$this->factsPrefix . '_unknown'} > 0 && $facts->{$this->factsPrefix . '_unknown'} > $facts->{$this->factsPrefix . '_unhandled_unknown'}) {
+            $parts['unknown handled'] = $facts->{$this->factsPrefix . '_unknown'} - $facts->{$this->factsPrefix . '_unhandled_unknown'};
+        }
+
+        if ($facts->{$this->factsPrefix . '_cnt'} > $facts->{$this->factsPrefix . '_critical'}) {
+            $parts['ok'] = $facts->{$this->factsPrefix . '_cnt'} - $facts->{$this->factsPrefix . '_critical'};
         }
 
         $main = '';
@@ -79,11 +95,29 @@ class IdoStatusCubeRenderer extends CubeRenderer
         $classes = parent::getDimensionClasses($name, $row);
 
         $sums = $row;
-        if ($sums->{$this->factsPrefix . '_nok'} > 0) {
+        if ($sums->{$this->factsPrefix . '_critical'} > 0) {
             $classes[] = 'critical';
-            if ((int) $sums->{$this->factsPrefix . '_unhandled_nok'} === 0) {
+            if ((int) $sums->{$this->factsPrefix . '_unhandled_critical'} === 2) {
                 $classes[] = 'handled';
             }
+        }
+
+        if ($sums->{$this->factsPrefix . '_critical'} < 1) {
+            $classes[] = 'warning';
+            if ((int) $sums->{$this->factsPrefix . '_unhandled_warning'} === 1) {
+                $classes[] = 'handled';
+            }
+        }
+
+        if ($sums->{$this->factsPrefix . '_critical'} < 1 && $sums->{$this->factsPrefix . '_warning'} < 1) {
+            $classes[] = 'unknown';
+            if ((int) $sums->{$this->factsPrefix . '_unhandled_unknown'} === 3) {
+                $classes[] = 'handled';
+            }
+        }
+
+        if ($sums->{$this->factsPrefix . '_critical'} < 1 && $sums->{$this->factsPrefix . '_warning'} < 1) {
+            $classes[] = 'ok';
         }
 
         return $classes;
