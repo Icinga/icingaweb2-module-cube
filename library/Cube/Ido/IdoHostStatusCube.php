@@ -7,7 +7,7 @@ class IdoHostStatusCube extends IdoCube
 {
     public function getRenderer()
     {
-        return new IdoStatusCubeRenderer($this);
+        return new IdoHostStatusCubeRenderer($this);
     }
 
     /**
@@ -17,8 +17,12 @@ class IdoHostStatusCube extends IdoCube
     {
         return array(
             'hosts_cnt'           => 'COUNT(*)',
-            'hosts_nok'           => 'SUM(CASE WHEN hs.current_state = 0 THEN 0 ELSE 1 END)',
-            'hosts_unhandled_nok' => 'SUM(CASE WHEN hs.current_state != 0'
+            'hosts_nok'           => 'SUM(CASE WHEN hs.current_state = 1 THEN 1 ELSE 0 END)',
+            'hosts_unhandled_nok' => 'SUM(CASE WHEN hs.current_state = 1'
+                . ' AND hs.problem_has_been_acknowledged = 0 AND hs.scheduled_downtime_depth = 0'
+                . ' THEN 1 ELSE 0 END)',
+            'hosts_unreachable'           => 'SUM(CASE WHEN hs.current_state = 2 THEN 1 ELSE 0 END)',
+            'hosts_unhandled_unreachable' => 'SUM(CASE WHEN hs.current_state = 2'
                 . ' AND hs.problem_has_been_acknowledged = 0 AND hs.scheduled_downtime_depth = 0'
                 . ' THEN 1 ELSE 0 END)',
         );

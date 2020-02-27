@@ -3,6 +3,7 @@
 
 namespace Icinga\Module\Cube\Ido;
 
+use Icinga\Module\Cube\Cube;
 use Icinga\Module\Cube\CubeRenderer;
 
 /**
@@ -11,6 +12,19 @@ use Icinga\Module\Cube\CubeRenderer;
  */
 class IdoHostStatusCubeRenderer extends CubeRenderer
 {
+    protected $factsPrefix;
+
+    public function __construct(Cube $cube)
+    {
+        parent::__construct($cube);
+
+        if ($cube instanceof IdoHostStatusCube) {
+            $this->factsPrefix = 'hosts';
+        } else {
+            $this->factsPrefix = 'services';
+        }
+    }
+
     /**
      * @inheritdoc
      */
@@ -30,11 +44,22 @@ class IdoHostStatusCubeRenderer extends CubeRenderer
         $classes = parent::getDimensionClasses($name, $row);
 
         $sums = $row;
-        if ($sums->hosts_nok > 0) {
+        if ($sums->{$this->factsPrefix . '_nok'} > 0) {
             $classes[] = 'critical';
-            if ((int) $sums->hosts_unhandled_nok === 0) {
+            if ((int)$sums->{$this->factsPrefix . '_unhandled_nok'} === 1) {
                 $classes[] = 'handled';
             }
+        }
+
+        if ($sums->{$this->factsPrefix . '_nok'} < 1) {
+            $classes[] = 'unreachable';
+            if ((int)$sums->{$this->factsPrefix . '_unhandled_unreachable'} === 2) {
+                $classes[] = 'handled';
+            }
+        }
+
+        if ($sums->{$this->factsPrefix . '_nok'} < 1 && $sums->{$this->factsPrefix . '_unreachable'} < 1) {
+            $classes[] = 'ok';
         }
 
         return $classes;
@@ -45,16 +70,24 @@ class IdoHostStatusCubeRenderer extends CubeRenderer
         $indent = str_repeat('    ', 3);
         $parts = array();
 
-        if ($facts->hosts_unhandled_nok > 0) {
-            $parts['critical'] = $facts->hosts_unhandled_nok;
+        if ($facts->{$this->factsPrefix . '_unhandled_nok'} > 0) {
+            $parts['critical'] = $facts->{$this->factsPrefix . '_unhandled_nok'};
         }
 
-        if ($facts->hosts_nok > 0 && $facts->hosts_nok > $facts->hosts_unhandled_nok) {
-            $parts['critical handled'] = $facts->hosts_nok - $facts->hosts_unhandled_nok;
+        if ($facts->{$this->factsPrefix . '_nok'} > 0 && $facts->{$this->factsPrefix . '_nok'} > $facts->{$this->factsPrefix . '_unhandled_nok'}) {
+            $parts['critical handled'] = $facts->{$this->factsPrefix . '_nok'} - $facts->{$this->factsPrefix . '_unhandled_nok'};
         }
 
-        if ($facts->hosts_cnt > $facts->hosts_nok) {
-            $parts['ok'] = $facts->hosts_cnt - $facts->hosts_nok;
+        if ($facts->{$this->factsPrefix . '_unhandled_unreachable'} > 0) {
+            $parts['unreachable'] = $facts->{$this->factsPrefix . '_unhandled_unreachable'};
+        }
+
+        if ($facts->{$this->factsPrefix . '_unreachable'} > 0 && $facts->{$this->factsPrefix . '_unreachable'} > $facts->{$this->factsPrefix . '_unhandled_unreachable'}) {
+            $parts['unreachable handled'] = $facts->{$this->factsPrefix . '_unreachable'} - $facts->{$this->factsPrefix . '_unhandled_unreachable'};
+        }
+
+        if ($facts->{$this->factsPrefix . '_cnt'} > $facts->{$this->factsPrefix . '_nok'}) {
+            $parts['ok'] = $facts->{$this->factsPrefix . '_cnt'} - $facts->{$this->factsPrefix . '_nok'};
         }
 
         $main = '';
@@ -87,5 +120,10 @@ class IdoHostStatusCubeRenderer extends CubeRenderer
             $class,
             $count
         ) . "\n";
+    }
+
+    protected function getDetailsBaseUrl()
+    {
+        return 'cube/' . $this->factsPrefix . '/details';
     }
 }
