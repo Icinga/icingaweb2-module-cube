@@ -3,43 +3,43 @@
 
 namespace Icinga\Module\Cube\Ido;
 
-use Icinga\Module\Cube\Cube;
 use Icinga\Module\Cube\CubeRenderer;
 
 class IdoStatusCubeRenderer extends CubeRenderer
 {
-    /** @var string Prefix of the facts */
-    protected $factsPrefix;
-
-    public function __construct(Cube $cube)
-    {
-        parent::__construct($cube);
-
-        if ($cube instanceof IdoServiceStatusCube) {
-            $this->factsPrefix = 'services';
-        } else {
-            $this->factsPrefix = 'hosts';
-        }
-    }
-
     public function renderFacts($facts)
     {
         $indent = str_repeat('    ', 3);
         $parts = [];
 
-        if ($facts->{$this->factsPrefix . '_unhandled_nok'} > 0) {
-            $parts['critical'] = $facts->{$this->factsPrefix . '_unhandled_nok'};
+        if ($facts->services_unhandled_critical > 0) {
+            $parts['critical'] = $facts->services_unhandled_critical;
         }
 
-        if ($facts->{$this->factsPrefix . '_nok'} > 0
-            && $facts->{$this->factsPrefix . '_nok'} > $facts->{$this->factsPrefix . '_unhandled_nok'}
-        ) {
-            $parts['critical handled'] =
-                $facts->{$this->factsPrefix . '_nok'} - $facts->{$this->factsPrefix . '_unhandled_nok'};
+        if ($facts->services_critical > 0 && $facts->services_critical > $facts->services_unhandled_critical) {
+            $parts['critical handled'] = $facts->services_critical - $facts->services_unhandled_critical;
         }
 
-        if ($facts->{$this->factsPrefix . '_cnt'} > $facts->{$this->factsPrefix . '_nok'}) {
-            $parts['ok'] = $facts->{$this->factsPrefix . '_cnt'} - $facts->{$this->factsPrefix . '_nok'};
+        if ($facts->services_unhandled_warning > 0) {
+            $parts['warning'] = $facts->services_unhandled_warning;
+        }
+
+        if ($facts->services_warning > 0 && $facts->services_warning > $facts->services_unhandled_warning) {
+            $parts['warning handled'] = $facts->services_warning - $facts->services_unhandled_warning;
+        }
+
+        if ($facts->services_unhandled_unknown > 0) {
+            $parts['unknown'] = $facts->services_unhandled_unknown;
+        }
+
+        if ($facts->services_unknown > 0 && $facts->services_unknown > $facts->services_unhandled_unknown) {
+            $parts['unknown handled'] = $facts->services_unknown - $facts->services_unhandled_unknown;
+        }
+
+        if ($facts->services_cnt > $facts->services_critical && $facts->services_cnt > $facts->services_warning
+            && $facts->services_cnt > $facts->services_unknown) {
+            $parts['ok'] = $facts->services_cnt - $facts->services_critical - $facts->services_warning -
+                $facts->services_unknown;
         }
 
         $main = '';
@@ -71,7 +71,7 @@ class IdoStatusCubeRenderer extends CubeRenderer
         $htm = parent::renderDimensionLabel($name, $row);
 
         if (($next = $this->cube->getDimensionAfter($name)) && isset($this->summaries->$next)) {
-            $htm .= ' <span class="sum">(' . $this->summaries->$next->{$this->factsPrefix . '_cnt'} . ')</span>';
+            $htm .= ' <span class="sum">(' . $this->summaries->$next->services_cnt . ')</span>';
         }
 
         return $htm;
@@ -82,11 +82,23 @@ class IdoStatusCubeRenderer extends CubeRenderer
         $classes = parent::getDimensionClasses($name, $row);
 
         $sums = $row;
-        if ($sums->{$this->factsPrefix . '_nok'} > 0) {
+        if ($sums->services_critical > 0) {
             $classes[] = 'critical';
-            if ((int) $sums->{$this->factsPrefix . '_unhandled_nok'} === 0) {
+            if ((int) $sums->services_unhandled_critical === 0) {
                 $classes[] = 'handled';
             }
+        } else if ($sums->services_warning > 0) {
+            $classes[] = 'warning';
+            if ((int) $sums->services_unhandled_warning === 0) {
+                $classes[] = 'handled';
+            }
+        } else if ($sums->services_unknown > 0) {
+            $classes[] = 'unknown';
+            if ((int) $sums->services_unhandled_unknown === 0) {
+                $classes[] = 'handled';
+            }
+        } else {
+            $classes[] = 'ok';
         }
 
         return $classes;
@@ -106,6 +118,6 @@ class IdoStatusCubeRenderer extends CubeRenderer
 
     protected function getDetailsBaseUrl()
     {
-        return 'cube/' . $this->factsPrefix . '/details';
+        return 'cube/services/details';
     }
 }
