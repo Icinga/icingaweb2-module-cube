@@ -170,7 +170,7 @@ abstract class Cube
         return $this;
     }
 
-    protected function flipPositions(& $array, $pos1, $pos2)
+    protected function flipPositions(&$array, $pos1, $pos2)
     {
         list(
             $array[$pos1],

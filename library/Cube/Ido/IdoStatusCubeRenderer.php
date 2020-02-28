@@ -31,8 +31,11 @@ class IdoStatusCubeRenderer extends CubeRenderer
             $parts['critical'] = $facts->{$this->factsPrefix . '_unhandled_nok'};
         }
 
-        if ($facts->{$this->factsPrefix . '_nok'} > 0 && $facts->{$this->factsPrefix . '_nok'} > $facts->{$this->factsPrefix . '_unhandled_nok'}) {
-            $parts['critical handled'] = $facts->{$this->factsPrefix . '_nok'} - $facts->{$this->factsPrefix . '_unhandled_nok'};
+        if ($facts->{$this->factsPrefix . '_nok'} > 0
+            && $facts->{$this->factsPrefix . '_nok'} > $facts->{$this->factsPrefix . '_unhandled_nok'}
+        ) {
+            $parts['critical handled'] =
+                $facts->{$this->factsPrefix . '_nok'} - $facts->{$this->factsPrefix . '_unhandled_nok'};
         }
 
         if ($facts->{$this->factsPrefix . '_cnt'} > $facts->{$this->factsPrefix . '_nok'}) {
@@ -94,11 +97,11 @@ class IdoStatusCubeRenderer extends CubeRenderer
         $indent = str_repeat('    ', 3);
 
         return sprintf(
-                '%s<span class="%s">%s</span>',
-                $indent,
-                $class,
-                $count
-            ) . "\n";
+            '%s<span class="%s">%s</span>',
+            $indent,
+            $class,
+            $count
+        ) . "\n";
     }
 
     protected function getDetailsBaseUrl()
