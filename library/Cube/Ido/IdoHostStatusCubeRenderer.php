@@ -3,7 +3,6 @@
 
 namespace Icinga\Module\Cube\Ido;
 
-use Icinga\Module\Cube\Cube;
 use Icinga\Module\Cube\CubeRenderer;
 
 /**
@@ -12,12 +11,6 @@ use Icinga\Module\Cube\CubeRenderer;
  */
 class IdoHostStatusCubeRenderer extends CubeRenderer
 {
-
-    public function __construct(Cube $cube)
-    {
-        parent::__construct($cube);
-    }
-
     /**
      * @inheritdoc
      */
@@ -39,19 +32,15 @@ class IdoHostStatusCubeRenderer extends CubeRenderer
         $sums = $row;
         if ($sums->hosts_down > 0) {
             $classes[] = 'critical';
-            if ((int)$sums->hosts_unhandled_down === 1) {
+            if ((int) $sums->hosts_unhandled_down === 0) {
                 $classes[] = 'handled';
             }
-        }
-
-        if ($sums->hosts_down < 1) {
+        } elseif ($sums->hosts_unreachable > 0) {
             $classes[] = 'unreachable';
-            if ((int)$sums->hosts_unhandled_unreachable === 2) {
+            if ((int) $sums->hosts_unhandled_unreachable === 0) {
                 $classes[] = 'handled';
             }
-        }
-
-        if ($sums->hosts_down < 1 && $sums->hosts_unreachable < 1) {
+        } else {
             $classes[] = 'ok';
         }
 
@@ -79,8 +68,8 @@ class IdoHostStatusCubeRenderer extends CubeRenderer
             $parts['unreachable handled'] = $facts->hosts_unreachable - $facts->hosts_unhandled_unreachable;
         }
 
-        if ($facts->hosts_cnt > $facts->hosts_down) {
-            $parts['ok'] = $facts->hosts_cnt - $facts->hosts_down;
+        if ($facts->hosts_cnt > $facts->hosts_down && $facts->hosts_cnt > $facts->hosts_unreachable) {
+            $parts['ok'] = $facts->hosts_cnt - $facts->hosts_down - $facts->hosts_unreachable;
         }
 
         $main = '';

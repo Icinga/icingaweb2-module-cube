@@ -87,12 +87,12 @@ class IdoStatusCubeRenderer extends CubeRenderer
             if ((int) $sums->services_unhandled_critical === 0) {
                 $classes[] = 'handled';
             }
-        } else if ($sums->services_warning > 0) {
+        } elseif ($sums->services_warning > 0) {
             $classes[] = 'warning';
             if ((int) $sums->services_unhandled_warning === 0) {
                 $classes[] = 'handled';
             }
-        } else if ($sums->services_unknown > 0) {
+        } elseif ($sums->services_unknown > 0) {
             $classes[] = 'unknown';
             if ((int) $sums->services_unhandled_unknown === 0) {
                 $classes[] = 'handled';
