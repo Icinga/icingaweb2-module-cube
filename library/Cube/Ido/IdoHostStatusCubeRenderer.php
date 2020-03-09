@@ -30,11 +30,18 @@ class IdoHostStatusCubeRenderer extends CubeRenderer
         $classes = parent::getDimensionClasses($name, $row);
 
         $sums = $row;
-        if ($sums->hosts_nok > 0) {
+        if ($sums->hosts_down > 0) {
             $classes[] = 'critical';
-            if ((int) $sums->hosts_unhandled_nok === 0) {
+            if ((int) $sums->hosts_unhandled_down === 0) {
                 $classes[] = 'handled';
             }
+        } elseif ($sums->hosts_unreachable > 0) {
+            $classes[] = 'unreachable';
+            if ((int) $sums->hosts_unhandled_unreachable === 0) {
+                $classes[] = 'handled';
+            }
+        } else {
+            $classes[] = 'ok';
         }
 
         return $classes;
@@ -45,16 +52,24 @@ class IdoHostStatusCubeRenderer extends CubeRenderer
         $indent = str_repeat('    ', 3);
         $parts = array();
 
-        if ($facts->hosts_unhandled_nok > 0) {
-            $parts['critical'] = $facts->hosts_unhandled_nok;
+        if ($facts->hosts_unhandled_down > 0) {
+            $parts['critical'] = $facts->hosts_unhandled_down;
         }
 
-        if ($facts->hosts_nok > 0 && $facts->hosts_nok > $facts->hosts_unhandled_nok) {
-            $parts['critical handled'] = $facts->hosts_nok - $facts->hosts_unhandled_nok;
+        if ($facts->hosts_down > 0 && $facts->hosts_down > $facts->hosts_unhandled_down) {
+            $parts['critical handled'] = $facts->hosts_down - $facts->hosts_unhandled_down;
         }
 
-        if ($facts->hosts_cnt > $facts->hosts_nok) {
-            $parts['ok'] = $facts->hosts_cnt - $facts->hosts_nok;
+        if ($facts->hosts_unhandled_unreachable > 0) {
+            $parts['unreachable'] = $facts->hosts_unhandled_unreachable;
+        }
+
+        if ($facts->hosts_unreachable > 0 && $facts->hosts_unreachable > $facts->hosts_unhandled_unreachable) {
+            $parts['unreachable handled'] = $facts->hosts_unreachable - $facts->hosts_unhandled_unreachable;
+        }
+
+        if ($facts->hosts_cnt > $facts->hosts_down && $facts->hosts_cnt > $facts->hosts_unreachable) {
+            $parts['ok'] = $facts->hosts_cnt - $facts->hosts_down - $facts->hosts_unreachable;
         }
 
         $main = '';
@@ -87,5 +102,10 @@ class IdoHostStatusCubeRenderer extends CubeRenderer
             $class,
             $count
         ) . "\n";
+    }
+
+    protected function getDetailsBaseUrl()
+    {
+        return 'cube/hosts/details';
     }
 }

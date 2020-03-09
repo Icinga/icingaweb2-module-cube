@@ -68,6 +68,18 @@ div.cube {
       background: @color-critical;
     }
 
+    &.warning {
+      background: @color-warning;
+    }
+
+    &.unknown {
+      background: @color-unknown;
+    }
+
+    &.unreachable {
+      background: @color-unreachable;
+    }
+
     &.ok {
       background: @color-ok;
     }
@@ -84,7 +96,7 @@ div.cube {
     }
   }
 
-  span.critical, span.ok {
+  span.critical, span.warning, span.unknown, span.unreachable, span.ok {
     display: inline;
     border-radius: 0.1em;
     padding: 0.05em 0.2em;
@@ -97,11 +109,12 @@ div.cube {
   }
 
   .others {
-    display: block;
+    display: flex;
+    justify-content: center;
     span {
-      font-size: 1.5em;
-      padding-left: 0.5em;
-      padding-right: 0.5em;
+      margin-left: 0.2em;
+      margin-top: 0.8em;
+      font-size: 1em;
     }
   }
 
@@ -130,6 +143,87 @@ div.cube {
     span.sum {
       font-size: 1em;
     }
+  }
+
+  span.warning {
+    background: @color-warning;
+  }
+
+  span.warning.handled {
+    background: @color-warning-handled;
+  }
+
+  div.cube-dimension0.warning > .header {
+    color: @color-warning;
+    border-color: @color-warning;
+  }
+
+  div.cube-dimension1.warning {
+    border-left-color: @color-warning;
+
+    &.handled {
+      border-left-color: @color-warning-handled;
+    }
+  }
+
+  div.cube-dimension2.warning {
+    span.sum {
+      font-size: 1em;
+    }
+  }
+
+  span.unknown{
+    background: @color-unknown;
+  }
+
+  span.unknown.handled {
+    background: @color-unknown-handled;
+  }
+
+  div.cube-dimension0.unknown > .header {
+    color: @color-unknown;
+    border-color: @color-unknown;
+  }
+
+  div.cube-dimension1.unknown {
+    border-left-color: @color-unknown;
+
+    &.handled {
+      border-left-color: @color-unknown-handled;
+    }
+  }
+
+  div.cube-dimension2.unknown {
+    span.sum {
+      font-size: 1em;
+    }
+  }
+}
+
+span.unreachable{
+  background: @color-unreachable;
+}
+
+span.unreachable.handled {
+  background: @color-unreachable-handled;
+}
+
+div.cube-dimension0.unreachable > .header {
+  color: @color-unreachable;
+  border-color: @color-unreachable;
+}
+
+div.cube-dimension1.unreachable {
+  border-left-color: @color-unreachable;
+
+  &.handled {
+    border-left-color: @color-unreachable-handled;
+  }
+}
+
+div.cube-dimension2.unreachable {
+  span.sum {
+    font-size: 1em;
   }
 }
 
