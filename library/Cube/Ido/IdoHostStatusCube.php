@@ -74,6 +74,8 @@ class IdoHostStatusCube extends IdoCube
             $select->where('cv.is_json = 0');
         }
 
+        $select->order('cv.varname');
+
         return $this->filterProtectedCustomvars($this->db()->fetchCol($select));
     }
 
