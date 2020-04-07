@@ -297,7 +297,7 @@ abstract class CubeRenderer
             . '">' . "\n"
             . $indent . '  <div class="header"><a href="'
             . $this->getDetailsUrl($name, $row)
-            . '" title="' . $view->escape('Show more details') . '"'
+            . '" title="' . $view->escape(sprintf('Show details for %s: %s', $name, $row->$name)) . '"'
             . ' data-base-target="_next">'
             . $this->renderDimensionLabel($name, $row)
             . '</a><a class="icon-filter" href="'
