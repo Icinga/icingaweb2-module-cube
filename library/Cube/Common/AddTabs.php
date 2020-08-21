@@ -22,4 +22,3 @@ trait AddTabs
         $this->getTabs()->activate($active);
     }
 }
-
