@@ -113,7 +113,6 @@ class RollupIterator implements IteratorAggregate
         }
 
         foreach ($this->data as $data) {
-
             $data = $this->decode($data);
 
             // slice affected data should be skipped
