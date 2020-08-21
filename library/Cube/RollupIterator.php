@@ -55,7 +55,13 @@ class RollupIterator implements IteratorAggregate
     {
         $arr = [];
         foreach ($data as $key => $d) {
-            $arr[$key] = json_decode($d, true);
+            $res = json_decode($d, true);
+
+            if (is_bool($res)) {
+                $res = $res ? 'true' : 'false';
+            }
+
+            $arr[$key] = $res;
         }
 
         return (object) $arr;
@@ -107,6 +113,7 @@ class RollupIterator implements IteratorAggregate
         }
 
         foreach ($this->data as $data) {
+
             $data = $this->decode($data);
 
             // slice affected data should be skipped
