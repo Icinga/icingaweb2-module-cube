@@ -50,7 +50,12 @@ abstract class IdoCube extends DbCube
     {
         $this->backend = $backend;
 
-        $this->setConnection($backend->getResource());
+        $resource = $backend->getResource();
+        $resource->getDbAdapter()
+            ->getConnection()
+            ->setAttribute(\PDO::ATTR_CASE, \PDO::CASE_NATURAL);
+
+        $this->setConnection($resource);
 
         return $this;
     }
