@@ -60,9 +60,15 @@ class DimensionsForm extends QuickForm
     {
         $view = $this->getView();
 
-        $this->addElement('submit', 'removeSlice_' . $key, array(
-            'label'      => IconHelper::instance()->iconCharacter('cancel'),
-            'decorators' => array('ViewHelper')
+        $sha1Key = sha1($key);
+        $this->addElement('button', 'removeSlice_' . $sha1Key, array(
+            'label' => null,
+            'decorators' => array('ViewHelper'),
+            'value' => $key,
+            'type' => 'submit',
+            'escape' => false,
+            'name' => 'removeSlice',
+            'class' => 'dimension-control icon-cancel'
         ));
 
         $label = $view->escape(
@@ -76,13 +82,13 @@ class DimensionsForm extends QuickForm
 
         $this->addHtml(
             '<span class="dimension-name">' . $label . '</span>',
-            array('name' => 'slice_' . $key)
+            array('name' => 'slice_' . $sha1Key)
         );
 
         $this->addSimpleDisplayGroup(
             array(
-                'removeSlice_' . $key,
-                'slice_' . $key,
+                'removeSlice_' . $sha1Key,
+                'slice_' . $sha1Key,
             ),
             $key,
             array('class' => 'dimensions')
@@ -96,37 +102,49 @@ class DimensionsForm extends QuickForm
             array('name' => 'dimension_' . $dimension)
         );
         $icons = IconHelper::instance();
-        $this->addElement('submit', 'removeDimension_' . $dimension, array(
-            'label' => $icons->iconCharacter('cancel'),
+        $sha1 = sha1($dimension);
+        $this->addElement('button', 'removeDimension_' . $sha1, array(
+            'label' => null,
             'decorators' => array('ViewHelper'),
             'title' => sprintf($this->translate('Remove dimension "%s"'), $dimension),
+            'value' => $dimension,
+            'type' => 'submit',
+            'escape' => false,
+            'class' => 'dimension-control icon-cancel',
+            'name' => 'removeDimension'
         ));
 
-        $this->addElement('submit', 'moveDimensionUp_' . $dimension, array(
-            'label' => $icons->iconCharacter('angle-double-left'),
-            'decorators' => array('ViewHelper'),
-            'title' => sprintf($this->translate('Move dimension "%s" up'), $dimension),
-        ));
-
-        $this->addElement('submit', 'moveDimensionDown_' . $dimension, array(
-            'label' => $icons->iconCharacter('angle-double-right'),
-            'decorators' => array('ViewHelper'),
-            'title' => sprintf($this->translate('Move dimension "%s" down'), $dimension),
-        ));
-
-        if ($pos === 0) {
-            $this->getElement('moveDimensionUp_' . $dimension)->disabled = 'disabled';
+        if ($pos > 0) {
+            $this->addElement('button', 'moveDimensionUp_' . $sha1, array(
+                'label' => null,
+                'decorators' => array('ViewHelper'),
+                'title' => sprintf($this->translate('Move dimension "%s" up'), $dimension),
+                'value' => $dimension,
+                'type' => 'submit',
+                'escape' => false,
+                'class' => 'dimension-control icon-angle-double-up',
+                'name' => 'moveDimensionUp'
+            ));
         }
 
-        if ($pos + 1 === $total) {
-            $this->getElement('moveDimensionDown_' . $dimension)->disabled = 'disabled';
+        if ($pos + 1 !== $total) {
+            $this->addElement('button', 'moveDimensionDown_' . $sha1, array(
+                'label' => null,
+                'decorators' => array('ViewHelper'),
+                'title' => sprintf($this->translate('Move dimension "%s" down'), $dimension),
+                'value' => $dimension,
+                'type' => 'submit',
+                'escape' => false,
+                'class' => 'dimension-control icon-angle-double-down',
+                'name' => 'moveDimensionDown'
+            ));
         }
 
         $this->addSimpleDisplayGroup(
             array(
-                'removeDimension_' . $dimension,
-                'moveDimensionUp_' . $dimension,
-                'moveDimensionDown_' . $dimension,
+                'removeDimension_' . $sha1,
+                'moveDimensionUp_' . $sha1,
+                'moveDimensionDown_' . $sha1,
                 'dimension_' . $dimension,
             ),
             $dimension,
@@ -147,55 +165,9 @@ class DimensionsForm extends QuickForm
         $cube = $this->cube;
         $dimension = null;
 
-        foreach ($this->getElements() as $el) {
-            if (! $el->getValue()) {
-                // Skip unpressed buttons
-                continue;
-            }
-            $name = $el->getName();
-            $pos = strpos($name, '_');
-
-            if ($pos === false || $pos === 0) {
-                continue;
-            }
-
-            $action = substr($name, 0, $pos);
-            $name = substr($name, $pos + 1);
-
-            switch ($action) {
-                case 'removeSlice':
-                    $dimension = $name;
-                    $url->getParams()->remove($dimension);
-                    break 2;
-
-                case 'removeDimension':
-                    $dimension = $name;
-                    $cube->removeDimension($dimension);
-                    break 2;
-
-                case 'moveDimensionUp':
-                    $dimension = $name;
-                    $cube->moveDimensionUp($dimension);
-                    break 2;
-
-                case 'moveDimensionDown':
-                    $dimension = $name;
-                    $cube->moveDimensionDown($dimension);
-                    break 2;
-                default:
-            }
-        }
-
-        if ($dimension) {
-            $dimensions = array_merge($cube->listDimensions(), $cube->listSlices());
-            if ($action !== 'removeSlice') {
-                $url->setParam('dimensions', implode(',', $dimensions));
-            }
-            $this->redirectAndExit($url);
-        }
-
         if ($dimension = $this->getSentValue('addDimension')) {
             $dimensions = $url->getParam('dimensions');
+
             if (empty($dimensions)) {
                 $dimensions = $dimension;
             } else {
@@ -205,6 +177,28 @@ class DimensionsForm extends QuickForm
 
             $this->setSuccessUrl($url->without('addDimension'));
             $this->redirectOnSuccess($this->translate('New dimension has been added'));
+        }
+
+        if (isset($post['removeDimension'])) {
+            $dimension = $post['removeDimension'];
+            $cube->removeDimension($dimension);
+        } elseif (isset($post['moveDimensionUp'])) {
+            $dimension = $post['moveDimensionUp'];
+            $cube->moveDimensionUp($dimension);
+        } elseif (isset($post['moveDimensionDown'])) {
+            $dimension = $post['moveDimensionDown'];
+            $cube->moveDimensionDown($dimension);
+        } elseif (isset($post['removeSlice'])) {
+            $dimension = $post['removeSlice'];
+            $url->getParams()->remove(rawurlencode($dimension));
+        }
+
+        if ($dimension) {
+            $dimensions = array_merge($cube->listDimensions(), $cube->listSlices());
+            if (! isset($post['removeSlice'])) {
+                $url->setParam('dimensions', implode(',', $dimensions));
+            }
+            $this->redirectAndExit($url);
         }
     }
 }
