@@ -3,7 +3,6 @@
 
 namespace Icinga\Module\Cube;
 
-
 class DimensionParams
 {
 
@@ -25,11 +24,11 @@ class DimensionParams
     public function __construct($url = null)
     {
         if ($url !== null) {
-           $dimension = $url->getParam('dimensions');
+            $dimension = $url->getParam('dimensions');
 
-           if (! empty($dimension)) {
-               $this->dimensions = array_map('rawurldecode', explode(',', $dimension));
-           }
+            if (! empty($dimension)) {
+                $this->dimensions = array_map('rawurldecode', explode(',', $dimension));
+            }
         }
     }
 
@@ -53,7 +52,8 @@ class DimensionParams
      *
      * @return $this
      */
-    public function update($dimensions) {
+    public function update($dimensions)
+    {
         $this->dimensions = $dimensions;
 
         return $this;

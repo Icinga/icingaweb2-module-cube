@@ -88,7 +88,6 @@ abstract class Controller extends WebController
         }
 
         foreach ($this->params->toArray() as $param) {
-
             $this->cube->slice(rawurldecode($param[0]), rawurldecode($param[1]));
         }
 
