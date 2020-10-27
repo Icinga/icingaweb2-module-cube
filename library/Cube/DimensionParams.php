@@ -15,22 +15,28 @@ class DimensionParams
      * @var string encoded dimensions separated by coma
      */
     protected $params;
-
-    /**
-     * DimensionParams constructor.
-     *
-     * @param null $url
-     */
-    public function __construct($url = null)
+    
+    // For the form: DimensionsParam::fromUrl($url)
+    public static function fromUrl(Url $url)
     {
-        if ($url !== null) {
-            $dimension = $url->getParam('dimensions');
-
-            if (! empty($dimension)) {
-                $this->dimensions = array_map('rawurldecode', explode(',', $dimension));
-            }
-        }
+        return static::fromString($url->getParam('dimensions'));
     }
+    
+    public static function fromArray(array $dimensions = [])
+    {
+        $self = new static();
+        
+        $self->dimensions = array_map('rawurldecode', array_filter($dimensions));
+        
+        return $self;
+    }
+    
+    // For the controller: DimensionsParam::fromArray($this->params->shift('dimensions'))
+    public static function fromString($dimensions)
+    {
+        return static::fromArray(explode(',', $dimensions));
+    }
+   
 
     /**
      * @param $dimension
