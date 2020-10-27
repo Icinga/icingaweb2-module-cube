@@ -4,6 +4,7 @@
 namespace Icinga\Module\Cube\Forms;
 
 use Icinga\Module\Cube\Cube;
+use Icinga\Module\Cube\DimensionParams;
 use Icinga\Module\Cube\Web\Form\QuickForm;
 use Icinga\Module\Cube\Web\IconHelper;
 
@@ -166,15 +167,7 @@ class DimensionsForm extends QuickForm
         $dimension = null;
 
         if ($dimension = $this->getSentValue('addDimension')) {
-            $dimensions = $url->getParam('dimensions');
-
-            if (empty($dimensions)) {
-                $dimensions = $dimension;
-            } else {
-                $dimensions .= ',' . $dimension;
-            }
-            $url->setParam('dimensions', $dimensions);
-
+            $url->setParam('dimensions', (new DimensionParams($url))->add($dimension)->getParams());
             $this->setSuccessUrl($url->without('addDimension'));
             $this->redirectOnSuccess($this->translate('New dimension has been added'));
         }
@@ -196,7 +189,7 @@ class DimensionsForm extends QuickForm
         if ($dimension) {
             $dimensions = array_merge($cube->listDimensions(), $cube->listSlices());
             if (! isset($post['removeSlice'])) {
-                $url->setParam('dimensions', implode(',', $dimensions));
+                $url->setParam('dimensions', (new DimensionParams())->update($dimensions)->getParams());
             }
             $this->redirectAndExit($url);
         }
