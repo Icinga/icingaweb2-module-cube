@@ -37,7 +37,8 @@ class DimensionParams
      *
      * @return $this
      */
-    public function add($dimension) {
+    public function add($dimension)
+    {
         if (! empty($dimension)) {
             $this->dimensions[] = $dimension;
         }
