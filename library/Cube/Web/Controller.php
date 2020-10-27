@@ -3,6 +3,7 @@
 
 namespace Icinga\Module\Cube\Web;
 
+use Icinga\Module\Cube\DimensionParams;
 use Icinga\Module\Cube\Web\Form\FormLoader;
 use Icinga\Module\Cube\Web\Form\QuickForm;
 use Icinga\Web\Controller as WebController;
@@ -40,7 +41,7 @@ abstract class Controller extends WebController
         $wantNull = $this->params->shift('wantNull');
 
         if ($dimensions) {
-            $vars = preg_split('/,/', $dimensions, -1, PREG_SPLIT_NO_EMPTY);
+            $vars = (new DimensionParams($this->getRequest()->getUrl()))->getDimensions();
             foreach ($vars as $var) {
                 $this->cube->addDimensionByName($var);
                 if ($wantNull) {
@@ -54,7 +55,7 @@ abstract class Controller extends WebController
         }
 
         foreach ($this->params->toArray() as $param) {
-            $this->cube->slice($param[0], urldecode($param[1]));
+            $this->cube->slice(rawurldecode($param[0]), rawurldecode($param[1]));
         }
 
         $this->view->title = $this->cube->getSlicesLabel();
@@ -73,7 +74,7 @@ abstract class Controller extends WebController
         $wantNull = $this->params->shift('wantNull');
 
         if ($dimensions) {
-            $vars = preg_split('/,/', $dimensions, -1, PREG_SPLIT_NO_EMPTY);
+            $vars = (new DimensionParams($this->getRequest()->getUrl()))->getDimensions();
             foreach ($vars as $var) {
                 $this->cube->addDimensionByName($var);
                 if ($wantNull) {
@@ -87,7 +88,8 @@ abstract class Controller extends WebController
         }
 
         foreach ($this->params->toArray() as $param) {
-            $this->cube->slice($param[0], urldecode($param[1]));
+
+            $this->cube->slice(rawurldecode($param[0]), rawurldecode($param[1]));
         }
 
         $this->view->title = sprintf(
