@@ -3,6 +3,8 @@
 
 namespace Icinga\Module\Cube;
 
+use Icinga\Web\Url;
+
 class DimensionParams
 {
 
@@ -15,28 +17,28 @@ class DimensionParams
      * @var string encoded dimensions separated by coma
      */
     protected $params;
-    
+
     // For the form: DimensionsParam::fromUrl($url)
     public static function fromUrl(Url $url)
     {
         return static::fromString($url->getParam('dimensions'));
     }
-    
+
     public static function fromArray(array $dimensions = [])
     {
         $self = new static();
-        
+
         $self->dimensions = array_map('rawurldecode', array_filter($dimensions));
-        
+
         return $self;
     }
-    
+
     // For the controller: DimensionsParam::fromArray($this->params->shift('dimensions'))
     public static function fromString($dimensions)
     {
         return static::fromArray(explode(',', $dimensions));
     }
-   
+
 
     /**
      * @param $dimension
@@ -59,11 +61,12 @@ class DimensionParams
      *
      * @return $this
      */
-    public function update($dimensions)
+    public static function update($dimensions)
     {
-        $this->dimensions = $dimensions;
+        $self =  new static();
+        $self->dimensions = $dimensions;
 
-        return $this;
+        return $self;
     }
 
     /**
