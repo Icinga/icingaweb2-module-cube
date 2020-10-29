@@ -37,16 +37,13 @@ abstract class Controller extends WebController
         ])->activate('details');
 
         $this->cube->chooseFacts(array_keys($this->cube->getAvailableFactColumns()));
-        $dimensions = $this->params->shift('dimensions');
+        $vars = DimensionParams::fromString($this->params->shift('dimensions', ''))->getDimensions();
         $wantNull = $this->params->shift('wantNull');
 
-        if ($dimensions) {
-            $vars = (new DimensionParams($this->getRequest()->getUrl()))->getDimensions();
-            foreach ($vars as $var) {
-                $this->cube->addDimensionByName($var);
-                if ($wantNull) {
-                    $this->cube->getDimension($var)->wantNull();
-                }
+        foreach ($vars as $var) {
+            $this->cube->addDimensionByName($var);
+            if ($wantNull) {
+                $this->cube->getDimension($var)->wantNull();
             }
         }
 
@@ -70,16 +67,13 @@ abstract class Controller extends WebController
         $showSettings = $this->params->shift('showSettings');
 
         $this->cube->chooseFacts(array_keys($this->cube->getAvailableFactColumns()));
-        $dimensions = $this->params->shift('dimensions');
+        $vars = DimensionParams::fromString($this->params->shift('dimensions', ''))->getDimensions();
         $wantNull = $this->params->shift('wantNull');
 
-        if ($dimensions) {
-            $vars = (new DimensionParams($this->getRequest()->getUrl()))->getDimensions();
-            foreach ($vars as $var) {
-                $this->cube->addDimensionByName($var);
-                if ($wantNull) {
-                    $this->cube->getDimension($var)->wantNull();
-                }
+        foreach ($vars as $var) {
+            $this->cube->addDimensionByName($var);
+            if ($wantNull) {
+                $this->cube->getDimension($var)->wantNull();
             }
         }
 
