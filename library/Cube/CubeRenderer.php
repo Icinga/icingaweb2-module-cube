@@ -330,7 +330,7 @@ abstract class CubeRenderer
 
         $dimensions = array_merge($cube->listDimensions(), $cube->listSlices());
         $params = [
-            'dimensions' => (new DimensionParams())->update($dimensions)->getParams()
+            'dimensions' => DimensionParams::update($dimensions)->getParams()
         ];
 
         foreach ($this->cube->listDimensionsUpTo($name) as $dimensionName) {
