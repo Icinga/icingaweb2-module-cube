@@ -40,6 +40,8 @@ class IcingadbController extends CompatController
 
     protected $isSetShowSettings;
 
+    protected $dimensionsWithoutSlices;
+
     public function init()
     {
         $this->isSetShowSettings = $this->params->get('showsettings');
@@ -48,16 +50,16 @@ class IcingadbController extends CompatController
             Str::trimSplit($this->params->get('dimensions'))
         );
 
-        $dimensionsWithoutSlices = $this->urlDimensions;
+        $this->dimensionsWithoutSlices = $this->urlDimensions;
         // get slices
         foreach ($this->urlDimensions as $key => $dimension) {
             if ($this->params->has($dimension)) {
-                unset($dimensionsWithoutSlices[$key]);
+                unset($this->dimensionsWithoutSlices[$key]);
                 $this->slices[$dimension] = $this->params->get($dimension);
             }
         }
         // prepare header string for slices
-        $sliceStr = $dimensionsWithoutSlices === [] || $this->slices === [] ? '' : ', ';
+        $sliceStr = $this->dimensionsWithoutSlices === [] || $this->slices === [] ? '' : ', ';
         foreach ($this->slices as $key => $slice) {
             if ($key !== array_keys($this->slices)[0]) {
                 $sliceStr .= ', ';
@@ -68,13 +70,13 @@ class IcingadbController extends CompatController
         $header = Html::tag(
             'h1',
             ['class' => 'dimension-header'],
-            'Cube: ' . implode(' -> ', $dimensionsWithoutSlices) . $sliceStr
+            'Cube: ' . implode(' -> ', $this->dimensionsWithoutSlices) . $sliceStr
         );
         $this->addControl($header);
 
         $this->addControl($this->showSettings());
 
-        $this->setAutorefreshInterval(15);
+        //$this->setAutorefreshInterval(15);
     }
 
     public function hostsAction()
@@ -111,7 +113,8 @@ class IcingadbController extends CompatController
         return (new CubeSettings())
             ->setBaseUrl(Url::fromRequest())
             ->setSlices($this->slices)
-            ->setDimensions($this->urlDimensions);
+            ->setDimensions($this->urlDimensions)
+            ->setDimensionsWithoutSlices($this->dimensionsWithoutSlices);
     }
 
     protected function showSettings()
