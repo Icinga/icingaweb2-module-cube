@@ -5,7 +5,8 @@ namespace Icinga\Module\Cube;
 use Icinga\Module\Cube\Common\IcingaDb;
 use ipl\Sql\Select;
 
-class HostDbQuery {
+class HostDbQuery
+{
 
     use IcingaDb;
 
@@ -28,7 +29,8 @@ class HostDbQuery {
                 )
                 ->join(
                     "customvar {$dimension}",
-                    "{$dimension}.id = {$dimension}_junction.customvar_id AND {$dimension}.name = \"{$dimension}\""
+                    "{$dimension}.id = {$dimension}_junction.customvar_id 
+                    AND {$dimension}.name = \"{$dimension}\""
                 );
 
             $columns[$dimension] = $dimension . '.value';
@@ -38,7 +40,8 @@ class HostDbQuery {
         $columns['cnt'] = 'SUM(1)';
         $columns['count_up'] = 'SUM(CASE WHEN state.soft_state = 0 THEN  1 ELSE 0 END)';
         $columns['count_down'] = 'SUM(CASE WHEN state.soft_state = 1 THEN  1 ELSE 0 END)';
-        $columns['count_down_unhandled'] = 'SUM(CASE WHEN state.soft_state = 1 AND state.is_handled = "n" THEN  1 ELSE 0 END)';
+        $columns['count_down_unhandled'] = 'SUM(CASE WHEN state.soft_state = 1 
+        AND state.is_handled = "n" THEN  1 ELSE 0 END)';
         // dimension is the last key here
         $groupByValues[$dimension] .= ' WITH ROLLUP';
 

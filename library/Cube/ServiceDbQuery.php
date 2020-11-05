@@ -5,7 +5,8 @@ namespace Icinga\Module\Cube;
 use Icinga\Module\Cube\Common\IcingaDb;
 use ipl\Sql\Select;
 
-class ServiceDbQuery {
+class ServiceDbQuery
+{
 
     use IcingaDb;
 
@@ -27,7 +28,8 @@ class ServiceDbQuery {
                 )
                 ->join(
                     "customvar {$dimension}",
-                    "{$dimension}.id = {$dimension}_junction.customvar_id AND {$dimension}.name = \"{$dimension}\""
+                    "{$dimension}.id = {$dimension}_junction.customvar_id 
+                    AND {$dimension}.name = \"{$dimension}\""
                 );
 
             $columns[$dimension] = $dimension . '.value';
@@ -37,11 +39,14 @@ class ServiceDbQuery {
         $columns['cnt'] = 'SUM(1)';
         $columns['count_ok'] = 'SUM(CASE WHEN state.soft_state = 0 THEN  1 ELSE 0 END)';
         $columns['count_warning'] = 'SUM(CASE WHEN state.soft_state = 1 THEN  1 ELSE 0 END)';
-        $columns['count_warning_unhandled'] = 'SUM(CASE WHEN state.soft_state = 1 AND state.is_handled = "n" THEN  1 ELSE 0 END)';
+        $columns['count_warning_unhandled'] = 'SUM(CASE WHEN state.soft_state = 1 
+        AND state.is_handled = "n" THEN  1 ELSE 0 END)';
         $columns['count_critical'] = 'SUM(CASE WHEN state.soft_state = 2 THEN  1 ELSE 0 END)';
-        $columns['count_critical_unhandled'] = 'SUM(CASE WHEN state.soft_state = 2 AND state.is_handled = "n" THEN  1 ELSE 0 END)';
+        $columns['count_critical_unhandled'] = 'SUM(CASE WHEN state.soft_state = 2 
+        AND state.is_handled = "n" THEN  1 ELSE 0 END)';
         $columns['count_unknown'] = 'SUM(CASE WHEN state.soft_state = 3 THEN  1 ELSE 0 END)';
-        $columns['count_unknown_unhandled'] = 'SUM(CASE WHEN state.soft_state = 3 AND state.is_handled = "n" THEN  1 ELSE 0 END)';
+        $columns['count_unknown_unhandled'] = 'SUM(CASE WHEN state.soft_state = 3 
+        AND state.is_handled = "n" THEN  1 ELSE 0 END)';
         // dimension is the last key here
         $groupByValues[$dimension] .= ' WITH ROLLUP';
 
