@@ -106,7 +106,8 @@ abstract class MonitoringCube extends BaseCube
         return $urlParams;
     }
 
-    protected function preparedUrl(array $paramToAdd) {
+    protected function preparedUrl(array $paramToAdd)
+    {
         $dimensions = $this->getDimensions();
         $key = array_search(array_values(array_flip($paramToAdd))[0], $dimensions);
 

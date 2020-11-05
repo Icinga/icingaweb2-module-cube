@@ -153,7 +153,7 @@ class CubeSettings extends BaseHtmlElement
         unset($slices[$dimension]);
         $dimensions = $this->getDimensionsWithoutSlices();
         $dimensions[] = $dimension;
-        $allDimensions = array_merge($dimensions,array_keys($slices));
+        $allDimensions = array_merge($dimensions, array_keys($slices));
 
         return $this->getBaseUrl()->setParam(
             'dimensions',
