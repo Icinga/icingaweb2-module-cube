@@ -20,7 +20,7 @@ class CubeSettings extends BaseHtmlElement
     /** @var Url */
     protected $baseUrl;
 
-    /** @var array */
+    /** @var array all dimensions including slice*/
     protected $dimensions = [];
 
     /** @var string */
@@ -30,33 +30,11 @@ class CubeSettings extends BaseHtmlElement
 
     protected $tag = 'div';
 
-    /** @var array */
+    /** @var array sliced dimensions*/
     protected $slices = [];
 
-    /**
-     * @var string current dimension name
-     */
-    protected $dimensionName;
-
-    /**
-     * Get current dimension name
-     *
-     * @return string
-     */
-    public function getDimensionName()
-    {
-        return $this->dimensionName;
-    }
-
-    /**
-     * Set current dimension name
-     *
-     * @param string $dimensionName
-     */
-    public function setDimensionName($dimensionName)
-    {
-        $this->dimensionName = $dimensionName;
-    }
+    /** @var array dimensions that are not sliced yet*/
+    protected $dimensionsWithoutSlices = [];
 
     /**
      * @return Url
@@ -81,7 +59,7 @@ class CubeSettings extends BaseHtmlElement
     /**
      * Get dimensions
      *
-     * @return array
+     * @return array all url dimensions including slices
      */
     public function getDimensions()
     {
@@ -135,118 +113,143 @@ class CubeSettings extends BaseHtmlElement
     }
 
     /**
-     * @return array
+     * @return array url slice dimensions
      */
     public function getSlices()
     {
         return $this->slices;
     }
 
+    public function setDimensionsWithoutSlices($dimensionsWithoutSlices)
+    {
+        $this->dimensionsWithoutSlices = $dimensionsWithoutSlices;
+
+        return $this;
+    }
+
+    /**
+     * Check if the given dimension is sliced
+     *
+     * @param string $dimension
+     *
+     * @return bool
+     */
+    public function isSlice($dimension)
+    {
+        return array_key_exists($dimension, $this->getSlices());
+    }
+
+    /**
+     * @return array url dimensions that are not sliced yet
+     */
+    public function getDimensionsWithoutSlices()
+    {
+        return $this->dimensionsWithoutSlices;
+    }
+
+    private function prepareSliceCancelUrl($dimension)
+    {
+        $slices = $this->getSlices();
+        unset($slices[$dimension]);
+        $dimensions = $this->getDimensionsWithoutSlices();
+        $dimensions[] = $dimension;
+        $allDimensions = array_merge($dimensions,array_keys($slices));
+
+        return $this->getBaseUrl()->setParam(
+            'dimensions',
+            implode(',', $allDimensions)
+        )->without($dimension);
+    }
 
     /**
      * @param int $indexToMove index value of array value that has to be moved
      *
      * @param boolean $isDirectionUp move direction
      *
-     * @return array swapped array with keys and values
+     * @return array swapped array
      */
     private function swapArray($indexToMove, $isDirectionUp)
     {
-        $urlDimensions = $this->getDimensions();
+        $urlDimensions = array_merge($this->getDimensionsWithoutSlices(), array_keys($this->getSlices()));
         $otherIndex = $isDirectionUp ? $indexToMove - 1 : $indexToMove + 1;
         if (isset($urlDimensions[$otherIndex])) {
             $tempVal = $urlDimensions[$otherIndex];
             $urlDimensions[$otherIndex] = $urlDimensions[$indexToMove];
             $urlDimensions[$indexToMove] = $tempVal;
         }
-        return array_combine($urlDimensions, $urlDimensions);
+        return  $urlDimensions;
     }
 
     protected function assemble()
     {
-        // Combine for key access
-        $allDimensions = array_combine($this->getDimensions(), $this->getDimensions());
-        $indexCounter = 0;
+        $allDimensions = array_merge($this->getDimensionsWithoutSlices(), array_keys($this->getSlices()));
         $content = [];
         $slicedContent = [];
 
-        foreach ($allDimensions as $dimension) {
+        foreach ($allDimensions as $key => $dimension) {
             $dimensions = $allDimensions;
             // add all other dimensions to link except the current one
-            unset($dimensions[$dimension]);
-            $isSliced = false;
+            unset($dimensions[$key]);
 
-            $this->setDimensionName($dimension);
-
-            $flippedArray = array_flip($this->getSlices());
-            if ($value = array_search($dimension, $flippedArray)) {
-                $isSliced = true;
-                $sliceName = 'Slice/Filter: ' . $flippedArray[$value] . ' = ' . $value;
-                $this->setDimensionName($sliceName);
+            $dimensionName = $dimension;
+            if ($this->isSlice($dimension)) {
+                $dimensionName = 'Slice/Filter: ' . $dimension . ' = ' . $this->getSlices()[$dimension];
             }
 
             $element = Html::tag('div');
             // if the given dimension is included in slice values, set cancel link without this dimension
             $element->add(new Link(
                 new Icon('cancel'),
-                $cancelUrl = $isSliced
-                    ? $this->getBaseUrl()->without($dimension)
+                $cancelUrl = $this->isSlice($dimension)
+                    ? $this->prepareSliceCancelUrl($dimension)
                     : $this->getBaseUrl()->with([$this->getDimensionsParam() => implode(',', $dimensions)]),
                 ['class' => 'cube-settings-btn', 'title' => 'Remove dimension "' . $dimension . '"' ]
             ));
 
-            if (! $isSliced && $indexCounter && count($allDimensions) - count($this->getSlices()) > 1) {
+            if ($this->isSlice($dimension)) {
+                $element->add(Html::tag('span', ['class' => 'dimension-name'], $dimensionName));
+                $slicedContent[] = $element;
+                continue;
+            }
+
+            if ($key) {
+                $lastArrowUpClass = $key == count($allDimensions) - 1 || $this->isSlice($allDimensions[$key + 1])
+                    ? ' last-up-arrow'
+                    : null;
                 $element->add(new Link(
                     new Icon('angle-double-up'),
                     $this->getBaseUrl()->with(
                         [
                             $this->getDimensionsParam()
-                            => implode(',', $this->swapArray($indexCounter, true))
+                            => implode(',', $this->swapArray($key, true))
                         ]
                     ),
-                    ['class' => 'cube-settings-btn', 'title' => 'Move dimension "' . $dimension . '" up' ]
+                    [
+                        'class' => 'cube-settings-btn' . $lastArrowUpClass,
+                        'title' => 'Move dimension "' . $dimension . '" up'
+                    ]
                 ));
-            } else {
-                $element->add(Html::tag('span', ['class' => 'cube-settings-btn']));
             }
 
-            // set arrow down if not last,not first, not sliced and difference of all dimension
-            // and sliced is bigger then 1
-            // because there is no need to set arrow just for one list
-            if (! $isSliced
-                && $indexCounter != count($allDimensions) - 1
-                && count($allDimensions) > 1
-                && count($allDimensions) - count($this->getSlices()) > 1
-            ) {
+            if ($key != count($allDimensions) - 1 && ! $this->isSlice($allDimensions[$key + 1])) {
                 $element->add(new Link(
                     new Icon('angle-double-down'),
                     $this->getBaseUrl()->with(
                         [
                             $this->getDimensionsParam()
-                            => implode(',', $this->swapArray($indexCounter, false))
+                            => implode(',', $this->swapArray($key, false))
                         ]
                     ),
                     ['class' => 'cube-settings-btn', 'title' => 'Move dimension "' . $dimension . '" down']
                 ));
-            } else {
-                $element->add(Html::tag('span', ['class' => 'cube-settings-btn']));
             }
 
-            $element->add(Html::tag('span', ['class' => 'dimension-name'], $this->getDimensionName()));
+            $element->add(Html::tag('span', ['class' => 'dimension-name'], $dimensionName));
 
-            // Separate sliced elements, so we can add these at the end of the list
-            if ($isSliced) {
-                $slicedContent[] = $element;
-            } else {
-                $content[] = $element;
-            }
-
-            $indexCounter++;
+            $content[] = $element;
         }
         // Add sliced content at the end of the list
-        while (! empty($slicedContent)) {
-            $content[] = array_pop($slicedContent);
-        }
+        $content = array_merge($content, $slicedContent);
 
         $this->add(Html::tag('ul', ['class' => 'dimension-list'], Html::wrapEach($content, 'li')));
     }
