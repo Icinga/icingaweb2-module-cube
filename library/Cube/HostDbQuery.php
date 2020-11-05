@@ -58,6 +58,4 @@ class HostDbQuery
 
         return $this->getDb()->select($select)->fetchAll();
     }
-
-
 }
