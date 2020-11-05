@@ -106,6 +106,16 @@ abstract class MonitoringCube extends BaseCube
         return $urlParams;
     }
 
+    protected function preparedUrl(array $paramToAdd) {
+        $dimensions = $this->getDimensions();
+        $key = array_search(array_values(array_flip($paramToAdd))[0], $dimensions);
+
+        unset($dimensions[$key]);
+
+        $dimensions[] = array_values(array_flip($paramToAdd))[0];
+        return Url::fromRequest()->setParam('dimensions', implode(',', $dimensions))->addParams($paramToAdd);
+    }
+
     /**
      * Render dimension
      *
@@ -143,7 +153,7 @@ abstract class MonitoringCube extends BaseCube
                                     ->add(Html::tag('span', ' ('. $dimension->cnt. ')')),
                                 new Link(
                                     '',
-                                    Url::fromRequest()->addParams([$header => $dimension->$header]),
+                                    $this->preparedUrl([$header => $dimension->$header]),
                                     [
                                         'class'            => 'icon-filter',
                                         'data-base-target' => '_self',
@@ -200,7 +210,7 @@ abstract class MonitoringCube extends BaseCube
 
                         new Link(
                             '',
-                            Url::fromRequest()->addParams([$header => $measure->$header]),
+                            $this->preparedUrl([$header => $measure->$header]),
                             ['class' => 'icon-filter', 'data-base-target' => '_self', 'title' => 'Slice this cube']
                         )
                     ]
