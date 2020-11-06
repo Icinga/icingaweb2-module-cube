@@ -8,6 +8,7 @@ use Icinga\Module\Cube\Common\IcingaDb;
 use Icinga\Module\Cube\CubeSettings;
 use Icinga\Module\Cube\HostCube;
 use Icinga\Module\Cube\HostDbQuery;
+use Icinga\Module\Cube\NavigationCard;
 use Icinga\Module\Cube\SelectDimensionForm;
 use Icinga\Module\Cube\ServiceCube;
 use Icinga\Module\Cube\ServiceDbQuery;
@@ -58,29 +59,13 @@ class IcingadbController extends CompatController
                 $this->slices[$dimension] = $this->params->get($dimension);
             }
         }
-        // prepare header string for slices
-        $sliceStr = $this->dimensionsWithoutSlices === [] || $this->slices === [] ? '' : ', ';
-        foreach ($this->slices as $key => $slice) {
-            if ($key !== array_keys($this->slices)[0]) {
-                $sliceStr .= ', ';
-            }
-            $sliceStr .= $key . ' = ' . $slice;
-        }
-
-        $header = Html::tag(
-            'h1',
-            ['class' => 'dimension-header'],
-            'Cube: ' . implode(' -> ', $this->dimensionsWithoutSlices) . $sliceStr
-        );
-        $this->addControl($header);
-
-        $this->addControl($this->showSettings());
-
         //$this->setAutorefreshInterval(15);
     }
 
     public function hostsAction()
     {
+        $this->addControl($this->getHeader());
+        $this->addControl($this->showSettings());
         $this->addTabs('hosts');
         $this->prepare('host');
 
@@ -96,6 +81,8 @@ class IcingadbController extends CompatController
 
     public function servicesAction()
     {
+        $this->addControl($this->getHeader());
+        $this->addControl($this->showSettings());
         $this->addTabs('services');
         $this->prepare('service');
 
@@ -108,6 +95,57 @@ class IcingadbController extends CompatController
         }
     }
 
+    public function hostsDetailsAction()
+    {
+        $this->setTitle('Icingadb Cube Details');
+
+        $headerStr = null;
+
+        foreach ($this->slices as $dimension => $value) {
+            if($headerStr) {
+                $headerStr .= ', ';
+            }
+            $headerStr .= $dimension . ' = ' . $value;
+        }
+        $this->addControl(Html::tag('h1', ['class' => 'dimension-header'], $headerStr));
+
+        $rs = (new HostDbQuery)->getResult($this->urlDimensions, $this->slices);
+
+        $cnt = (int) end($rs)->cnt;
+
+
+
+        $paramsWithPrefix = [];
+        foreach ($this->slices as $dimension => $slice) {
+            $paramsWithPrefix['host.vars.' . $dimension] = $slice;
+        }
+
+        $url = Url::fromPath('icingadb/hosts')->with($paramsWithPrefix);
+
+        $hostStatus = (new NavigationCard())
+            ->setTitle('show hosts status')
+            ->setDescription('This shows all matching hosts and their current state in the monitoring module')
+            ->setIcon('host')
+            ->setUrl($url);
+        $this->addContent($hostStatus);
+
+
+        $title = "modify $cnt hosts";
+        $description = 'This allows you to modify properties for all chosen hosts at once';
+        if($cnt === 1) {
+            $title = 'modify a host';
+            $description = 'This allows you to modify properties for [host->name]';
+        }
+
+        $modify = (new NavigationCard())
+            ->setTitle($title)
+            ->setDescription($description)
+            ->setIcon('wrench')
+            ->setUrl('edit page'); //TODO
+
+        $this->addContent($modify);
+    }
+
     protected function cubeSettings()
     {
         return (new CubeSettings())
@@ -115,6 +153,23 @@ class IcingadbController extends CompatController
             ->setSlices($this->slices)
             ->setDimensions($this->urlDimensions)
             ->setDimensionsWithoutSlices($this->dimensionsWithoutSlices);
+    }
+
+    protected function getHeader()
+    {
+        $sliceStr = $this->dimensionsWithoutSlices === [] || $this->slices === [] ? '' : ', ';
+        foreach ($this->slices as $key => $slice) {
+            if ($key !== array_keys($this->slices)[0]) {
+                $sliceStr .= ', ';
+            }
+            $sliceStr .= $key . ' = ' . $slice;
+        }
+
+        return Html::tag(
+            'h1',
+            ['class' => 'dimension-header'],
+            'Cube: ' . implode(' -> ', $this->dimensionsWithoutSlices) . $sliceStr
+        );
     }
 
     protected function showSettings()
