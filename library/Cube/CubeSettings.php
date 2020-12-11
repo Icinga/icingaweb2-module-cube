@@ -157,8 +157,8 @@ class CubeSettings extends BaseHtmlElement
 
         return $this->getBaseUrl()->setParam(
             'dimensions',
-            implode(',', $allDimensions)
-        )->without($dimension);
+            DimensionParams::update($allDimensions)->getParams()
+        )->without(DimensionParams::update(rawurlencode($dimension))->getParams());
     }
 
     /**
@@ -177,6 +177,7 @@ class CubeSettings extends BaseHtmlElement
             $urlDimensions[$otherIndex] = $urlDimensions[$indexToMove];
             $urlDimensions[$indexToMove] = $tempVal;
         }
+
         return  $urlDimensions;
     }
 
@@ -202,7 +203,11 @@ class CubeSettings extends BaseHtmlElement
                 new Icon('cancel'),
                 $cancelUrl = $this->isSlice($dimension)
                     ? $this->prepareSliceCancelUrl($dimension)
-                    : $this->getBaseUrl()->with([$this->getDimensionsParam() => implode(',', $dimensions)]),
+                    : $this->getBaseUrl()->with(
+                        [
+                            $this->getDimensionsParam() => DimensionParams::fromArray($dimensions)->getParams()
+                        ]
+                    ),
                 ['class' => 'cube-settings-btn', 'title' => 'Remove dimension "' . $dimension . '"' ]
             ));
 
@@ -221,7 +226,7 @@ class CubeSettings extends BaseHtmlElement
                     $this->getBaseUrl()->with(
                         [
                             $this->getDimensionsParam()
-                            => implode(',', $this->swapArray($key, true))
+                            => DimensionParams::fromArray($this->swapArray($key, true))->getParams()
                         ]
                     ),
                     [
@@ -237,7 +242,7 @@ class CubeSettings extends BaseHtmlElement
                     $this->getBaseUrl()->with(
                         [
                             $this->getDimensionsParam()
-                            => implode(',', $this->swapArray($key, false))
+                            => DimensionParams::fromArray($this->swapArray($key, false))->getParams()
                         ]
                     ),
                     ['class' => 'cube-settings-btn', 'title' => 'Move dimension "' . $dimension . '" down']
