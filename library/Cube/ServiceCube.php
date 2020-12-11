@@ -146,4 +146,10 @@ class ServiceCube extends MonitoringCube
     {
         return 'icingadb/services';
     }
+
+
+    protected function getDetailPath()
+    {
+        return 'services-details';
+    }
 }
