@@ -51,6 +51,13 @@ class HostCube extends MonitoringCube
         return 'icingadb/hosts';
     }
 
+
+    protected function getDetailPath()
+    {
+        return 'hosts-details';
+    }
+
+
     protected function getParamUrlPrefix()
     {
         return 'host.vars.';
@@ -85,20 +92,20 @@ class HostCube extends MonitoringCube
      */
     protected function prepareMeasureCountDetails($measure)
     {
-        if ($measure->count_down > 0) {
-            return  Html::tag(
-                'span',
-                ['class' => 'others'],
-                [
-                    new Link(
-                        Html::tag('span', ['class' => 'ok'], $measure->count_up),
-                        $this->url->with(array_merge($this->getUrlParams($measure), $this->getStateInfo(0))),
-                        ['data-base-target' => '_next']
-                    )
-                ]
-            );
+        if ($measure->count_down === 0 || $measure->count_up === 0) {
+            return null;
         }
 
-        return null;
+        return  Html::tag(
+            'span',
+            ['class' => 'others'],
+            [
+                new Link(
+                    Html::tag('span', ['class' => 'ok'], $measure->count_up),
+                    $this->url->with(array_merge($this->getUrlParams($measure), $this->getStateInfo(0))),
+                    ['data-base-target' => '_next']
+                )
+            ]
+        );
     }
 }
