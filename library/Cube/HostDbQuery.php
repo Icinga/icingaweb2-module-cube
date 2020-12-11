@@ -4,6 +4,7 @@ namespace Icinga\Module\Cube;
 
 use Icinga\Module\Cube\Common\IcingaDb;
 use ipl\Sql\Select;
+use PDO;
 
 class HostDbQuery
 {
@@ -13,6 +14,7 @@ class HostDbQuery
 
     public function getResult($urlDimensions, $slices = null)
     {
+
         $select = (new Select())
             ->from('host h')
             ->join(
@@ -22,18 +24,22 @@ class HostDbQuery
 
         $columns = [];
         foreach ($urlDimensions as $dimension) {
+            $dimensionJunction = $this->getDb()->quoteIdentifier($dimension . '_junction');
+            $dim = $this->getDb()->quoteIdentifier($dimension);
+
             $select
                 ->join(
-                    "host_customvar {$dimension}_junction",
-                    "{$dimension}_junction.host_id = h.id"
+                    "host_customvar {$dimensionJunction}",
+                    "{$dimensionJunction}.host_id = h.id"
                 )
                 ->join(
-                    "customvar {$dimension}",
-                    "{$dimension}.id = {$dimension}_junction.customvar_id 
-                    AND {$dimension}.name = \"{$dimension}\""
+                    "customvar {$dim}",
+                    "{$dim}.id = {$dimensionJunction}.customvar_id 
+                    AND {$dim}.name = \"{$dimension}\""
                 );
 
-            $columns[$dimension] = $dimension . '.value';
+           $columns[$dim] = $dim . '.value';
+
         }
 
         $groupByValues = $columns;
@@ -43,7 +49,7 @@ class HostDbQuery
         $columns['count_down_unhandled'] = 'SUM(CASE WHEN state.soft_state = 1 
         AND state.is_handled = "n" THEN  1 ELSE 0 END)';
         // dimension is the last key here
-        $groupByValues[$dimension] .= ' WITH ROLLUP';
+        $groupByValues[$dim] .= ' WITH ROLLUP';
 
         $select
             ->columns($columns)
@@ -52,10 +58,47 @@ class HostDbQuery
         if (! empty($slices)) {
             foreach ($slices as $key => $value) {
                 $select
-                    ->where("{$key}.value = '\"{$value}\"'");
+                    ->where("{$this->getDb()->quoteIdentifier($key)}.value = '\"{$value}\"'");
             }
         }
 
         return $this->getDb()->select($select)->fetchAll();
+    }
+
+    /**
+     * @param $slices
+     *
+     * @return array host name
+     */
+    public function getHostNames($slices)
+    {
+
+        $select = (new Select())
+            ->from('host h');
+
+        foreach ($slices as $dimension => $value) {
+            $dimensionJunction = $this->getDb()->quoteIdentifier($dimension . '_junction');
+            $dim = $this->getDb()->quoteIdentifier($dimension);
+
+            $select
+                ->join(
+                    "host_customvar {$dimensionJunction}",
+                    "{$dimensionJunction}.host_id = h.id"
+                )
+                ->join(
+                    "customvar {$dim}",
+                    "{$dim}.id = {$dimensionJunction}.customvar_id 
+                    AND {$dim}.name = \"{$dimension}\""
+                );
+        }
+        $select
+            ->columns('h.name');
+             foreach ($slices as $dimension => $value) {
+                 $dim = $this->getDb()->quoteIdentifier($dimension);
+                 $select
+                     ->where("{$dim}.value = '\"{$value}\"'");
+             }
+
+        return $this->getDb()->select($select)->fetchAll(PDO::FETCH_COLUMN, 0);
     }
 }
