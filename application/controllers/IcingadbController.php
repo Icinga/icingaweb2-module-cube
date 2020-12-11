@@ -3,9 +3,11 @@
 namespace Icinga\Module\Cube\Controllers;
 
 use GuzzleHttp\Psr7\ServerRequest;
+use Icinga\Application\Hook;
 use Icinga\Module\Cube\Common\AddTabs;
 use Icinga\Module\Cube\Common\IcingaDb;
 use Icinga\Module\Cube\CubeSettings;
+use Icinga\Module\Cube\DimensionParams;
 use Icinga\Module\Cube\HostCube;
 use Icinga\Module\Cube\HostDbQuery;
 use Icinga\Module\Cube\NavigationCard;
@@ -35,28 +37,46 @@ class IcingadbController extends CompatController
      */
     protected static $DIMENSION_LIMIT = 3;
 
+    /**
+     * @var array slices
+     */
     protected $slices = [];
 
+
+    /** decoded dimensions from url
+     *
+     * @var array
+     *
+     */
     protected $urlDimensions;
 
+    /** true if url param showsettings is set
+     *
+     * @var bool
+     */
     protected $isSetShowSettings;
 
+    /** dimensions without slices
+     * @var
+     */
     protected $dimensionsWithoutSlices;
 
     public function init()
     {
-        $this->isSetShowSettings = $this->params->get('showsettings');
-        //$urlDimensions is null or string
-        $this->urlDimensions = array_filter(
-            Str::trimSplit($this->params->get('dimensions'))
-        );
+        $this->isSetShowSettings = (bool)$this->params->get('showsettings');
 
+        //double decoding 1x with params->get(), 1x with DimensionParam
+        // we need this to ignore the coma in a string, when making from string an array separated with coma
+        $this->urlDimensions = DimensionParams::fromString($this->params->get('dimensions'))->getDimensions();
         $this->dimensionsWithoutSlices = $this->urlDimensions;
         // get slices
         foreach ($this->urlDimensions as $key => $dimension) {
-            if ($this->params->has($dimension)) {
+            // because params are double encoded
+            $doubleEncodedDimension = DimensionParams::update(rawurlencode($dimension))->getParams();
+
+            if ($value = $this->params->get($doubleEncodedDimension)) {
                 unset($this->dimensionsWithoutSlices[$key]);
-                $this->slices[$dimension] = $this->params->get($dimension);
+                $this->slices[$dimension] = $value;
             }
         }
         //$this->setAutorefreshInterval(15);
@@ -71,11 +91,13 @@ class IcingadbController extends CompatController
 
 
         if (! empty($this->urlDimensions)) {
-            $this->addContent((new HostCube(
-                (new HostDbQuery)->getResult($this->urlDimensions, $this->slices),
-                $this->urlDimensions,
-                $this->slices
-            )));
+            $this->addContent(
+                (new HostCube(
+                    (new HostDbQuery)->getResult($this->urlDimensions, $this->slices),
+                    $this->urlDimensions,
+                    $this->slices)
+                )
+            );
         }
     }
 
@@ -97,8 +119,16 @@ class IcingadbController extends CompatController
 
     public function hostsDetailsAction()
     {
-        $this->setTitle('Icingadb Cube Details');
+        $this->prepareDetailPage((new HostDbQuery()));
+    }
 
+    public function servicesDetailsAction()
+    {
+        $this->prepareDetailPage((new ServiceDbQuery()));
+    }
+
+    public function prepareDetailPage($db) {
+        $this->setTitle('Icingadb Cube Details');
         $headerStr = null;
 
         foreach ($this->slices as $dimension => $value) {
@@ -109,41 +139,16 @@ class IcingadbController extends CompatController
         }
         $this->addControl(Html::tag('h1', ['class' => 'dimension-header'], $headerStr));
 
-        $rs = (new HostDbQuery)->getResult($this->urlDimensions, $this->slices);
+        foreach (Hook::all('cube/Icingadb') as $hook) {
+            $element = $hook->prepareActionLinks(
+                ($db),
+                $this->slices
+            );
+            if ($element) {
+                $this->addContent($element);
+            }
 
-        $cnt = (int) end($rs)->cnt;
-
-
-
-        $paramsWithPrefix = [];
-        foreach ($this->slices as $dimension => $slice) {
-            $paramsWithPrefix['host.vars.' . $dimension] = $slice;
         }
-
-        $url = Url::fromPath('icingadb/hosts')->with($paramsWithPrefix);
-
-        $hostStatus = (new NavigationCard())
-            ->setTitle('show hosts status')
-            ->setDescription('This shows all matching hosts and their current state in the monitoring module')
-            ->setIcon('host')
-            ->setUrl($url);
-        $this->addContent($hostStatus);
-
-
-        $title = "modify $cnt hosts";
-        $description = 'This allows you to modify properties for all chosen hosts at once';
-        if($cnt === 1) {
-            $title = 'modify a host';
-            $description = 'This allows you to modify properties for [host->name]';
-        }
-
-        $modify = (new NavigationCard())
-            ->setTitle($title)
-            ->setDescription($description)
-            ->setIcon('wrench')
-            ->setUrl('edit page'); //TODO
-
-        $this->addContent($modify);
     }
 
     protected function cubeSettings()
@@ -209,23 +214,31 @@ class IcingadbController extends CompatController
 
         // remove already selected items from the option list
         foreach ($this->urlDimensions as $item) {
-            if (($key = array_search($item, $dimensions)) !== false) {
+            if (($key = array_search($item, $dimensions))) {
                 unset($dimensions[$key]);
             }
         }
 
-        $urlDimensionsAsString = implode(',', $this->urlDimensions);
+        $hasNoDimensions = empty($this->urlDimensions);
 
         return  (new SelectDimensionForm())
-            ->on(SelectDimensionForm::ON_SUCCESS, function ($selectForm) use ($urlDimensionsAsString) {
-                if (empty($urlDimensionsAsString)) {
-                    // get the selected value
-                    $newUrlDimensions = $selectForm->getValue('dimensions');
-                } else {
-                    $newUrlDimensions = $urlDimensionsAsString . ',' . $selectForm->getValue('dimensions');
+            ->on(SelectDimensionForm::ON_SUCCESS, function ($selectForm) use ($hasNoDimensions) {
+                if (($hasNoDimensions)) {
+                    // get selected value
+                    // double encoding 1x with setParam, 1x with DimensionParam
+                    $this->redirectNow(
+                        Url::fromRequest()->setParam(
+                            'dimensions',
+                            DimensionParams::update([$selectForm->getValue('dimensions')])->getParams())
+                    );
                 }
 
-                $this->redirectNow(Url::fromRequest()->with('dimensions', $newUrlDimensions));
+                $this->redirectNow(
+                    Url::fromRequest()->setParam(
+                        'dimensions',
+                        DimensionParams::fromUrl(Url::fromRequest())
+                            ->add($selectForm->getValue('dimensions'))->getParams())
+                );
             })
             ->setDimensions($dimensions)
             ->handleRequest(ServerRequest::fromGlobals());
