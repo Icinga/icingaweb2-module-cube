@@ -4,12 +4,19 @@ namespace Icinga\Module\Cube;
 
 use Icinga\Module\Cube\Common\IcingaDb;
 use ipl\Sql\Select;
+use mysql_xdevapi\Exception;
 
 class ServiceDbQuery
 {
 
     use IcingaDb;
 
+    /**
+     * @param array $urlDimensions
+     * @param null $slices
+     * @return array
+     * @throws \Icinga\Exception\ConfigurationError
+     */
     public function getResult($urlDimensions, $slices = null)
     {
         $select = (new Select())
@@ -21,18 +28,21 @@ class ServiceDbQuery
 
         $columns = [];
         foreach ($urlDimensions as $dimension) {
+            $dimensionJunction = $this->getDb()->quoteIdentifier($dimension . '_junction');
+            $dim = $this->getDb()->quoteIdentifier($dimension);
+
             $select
                 ->join(
-                    "service_customvar {$dimension}_junction",
-                    "{$dimension}_junction.service_id = s.id"
+                    "service_customvar {$dimensionJunction}",
+                    "{$dimensionJunction}.service_id = s.id"
                 )
                 ->join(
-                    "customvar {$dimension}",
-                    "{$dimension}.id = {$dimension}_junction.customvar_id 
-                    AND {$dimension}.name = \"{$dimension}\""
+                    "customvar {$dim}",
+                    "{$dim}.id = {$dimensionJunction}.customvar_id 
+                    AND {$dim}.name = \"{$dimension}\""
                 );
 
-            $columns[$dimension] = $dimension . '.value';
+            $columns[$dim] = $dimension . '.value';
         }
 
         $groupByValues = $columns;
@@ -48,7 +58,7 @@ class ServiceDbQuery
         $columns['count_unknown_unhandled'] = 'SUM(CASE WHEN state.soft_state = 3 
         AND state.is_handled = "n" THEN  1 ELSE 0 END)';
         // dimension is the last key here
-        $groupByValues[$dimension] .= ' WITH ROLLUP';
+        $groupByValues[$dim] .= ' WITH ROLLUP';
 
         $select
             ->columns($columns)
@@ -57,7 +67,7 @@ class ServiceDbQuery
         if (!empty($slices)) {
             foreach ($slices as $key => $value) {
                 $select
-                    ->where("{$key}.value = '\"{$value}\"'");
+                    ->where("{$this->getDb()->quoteIdentifier($key)}.value = '\"{$value}\"'");
             }
         }
 
