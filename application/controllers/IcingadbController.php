@@ -79,7 +79,8 @@ class IcingadbController extends CompatController
                 $this->slices[$dimension] = $value;
             }
         }
-        //$this->setAutorefreshInterval(15);
+
+        $this->setAutorefreshInterval(15);
     }
 
     public function hostsAction()
@@ -92,10 +93,12 @@ class IcingadbController extends CompatController
 
         if (! empty($this->urlDimensions)) {
             $this->addContent(
-                (new HostCube(
-                    (new HostDbQuery)->getResult($this->urlDimensions, $this->slices),
-                    $this->urlDimensions,
-                    $this->slices)
+                (
+                    new HostCube(
+                        (new HostDbQuery)->getResult($this->urlDimensions, $this->slices),
+                        $this->urlDimensions,
+                        $this->slices
+                    )
                 )
             );
         }
@@ -127,12 +130,13 @@ class IcingadbController extends CompatController
         $this->prepareDetailPage((new ServiceDbQuery()));
     }
 
-    public function prepareDetailPage($db) {
+    public function prepareDetailPage($db)
+    {
         $this->setTitle('Icingadb Cube Details');
         $headerStr = null;
 
         foreach ($this->slices as $dimension => $value) {
-            if($headerStr) {
+            if ($headerStr) {
                 $headerStr .= ', ';
             }
             $headerStr .= $dimension . ' = ' . $value;
@@ -147,7 +151,6 @@ class IcingadbController extends CompatController
             if ($element) {
                 $this->addContent($element);
             }
-
         }
     }
 
@@ -229,7 +232,8 @@ class IcingadbController extends CompatController
                     $this->redirectNow(
                         Url::fromRequest()->setParam(
                             'dimensions',
-                            DimensionParams::update([$selectForm->getValue('dimensions')])->getParams())
+                            DimensionParams::update([$selectForm->getValue('dimensions')])->getParams()
+                        )
                     );
                 }
 
@@ -237,7 +241,8 @@ class IcingadbController extends CompatController
                     Url::fromRequest()->setParam(
                         'dimensions',
                         DimensionParams::fromUrl(Url::fromRequest())
-                            ->add($selectForm->getValue('dimensions'))->getParams())
+                            ->add($selectForm->getValue('dimensions'))->getParams()
+                    )
                 );
             })
             ->setDimensions($dimensions)

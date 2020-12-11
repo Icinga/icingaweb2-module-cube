@@ -35,7 +35,8 @@ class IcingadbStatus extends IcingadbHook
             ->setUrl($url);
     }
 
-    private function prepareUrl($type, $slices) {
+    private function prepareUrl($type, $slices)
+    {
         $paramsWithPrefix = [];
         foreach ($slices as $dimension => $slice) {
             $paramsWithPrefix[$type . '.vars.' . $dimension] = $slice;

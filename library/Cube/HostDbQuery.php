@@ -38,8 +38,7 @@ class HostDbQuery
                     AND {$dim}.name = \"{$dimension}\""
                 );
 
-           $columns[$dim] = $dim . '.value';
-
+            $columns[$dim] = $dim . '.value';
         }
 
         $groupByValues = $columns;
@@ -91,13 +90,12 @@ class HostDbQuery
                     AND {$dim}.name = \"{$dimension}\""
                 );
         }
-        $select
-            ->columns('h.name');
-             foreach ($slices as $dimension => $value) {
-                 $dim = $this->getDb()->quoteIdentifier($dimension);
-                 $select
-                     ->where("{$dim}.value = '\"{$value}\"'");
-             }
+        $select->columns('h.name');
+        foreach ($slices as $dimension => $value) {
+            $dim = $this->getDb()->quoteIdentifier($dimension);
+            $select
+                ->where("{$dim}.value = '\"{$value}\"'");
+        }
 
         return $this->getDb()->select($select)->fetchAll(PDO::FETCH_COLUMN, 0);
     }

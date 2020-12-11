@@ -5,16 +5,8 @@ namespace Icinga\Module\Cube;
 use dipl\Html\Icon;
 use ipl\Html\BaseHtmlElement;
 use ipl\Html\Html;
-use ipl\Web\Url;
 use ipl\Web\Widget\Link;
 
-/**
- * Class CubeSettings
- *
- * Create cube settings (up and down arrows and cancel button for dimension)
- *
- * @package Icinga\Module\Cube
- */
 class NavigationCard extends BaseHtmlElement
 {
     protected $defaultAttributes = ['class' => 'action-links'];
@@ -111,27 +103,28 @@ class NavigationCard extends BaseHtmlElement
 
     public function setTitle($title)
     {
-       $this->title = $title;
+        $this->title = $title;
 
-       return $this;
+        return $this;
     }
 
 
     protected function assemble()
     {
-       $this->add(html::tag('li', [],
-
-               new Link(
-               [
-                   new Icon($this->getIcon()),
-                   html::tag('span', ['class' => 'title'], $this->getTitle()),
-                   html::tag('p', [], $this->getDescription())
-               ],
-               $this->getUrl(),
-               [
-                   'data-base-target' => '_self',
-               ])
-           )
-       );
+        $this->add(
+            html::tag(
+                'li',
+                [],
+                new Link(
+                    [
+                        new Icon($this->getIcon()),
+                        html::tag('span', ['class' => 'title'], $this->getTitle()),
+                        html::tag('p', [], $this->getDescription())
+                    ],
+                    $this->getUrl(),
+                    ['data-base-target' => '_self']
+                )
+            )
+        );
     }
 }
