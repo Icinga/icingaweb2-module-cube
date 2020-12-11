@@ -59,6 +59,11 @@ abstract class MonitoringCube extends BaseCube
     abstract protected function getPath();
 
     /**
+     * @return string type depending on the host or service
+     */
+    abstract protected function getDetailPath();
+
+    /**
      * @var string Url prefix depending on the host or service
      */
     abstract protected function getParamUrlPrefix();
@@ -106,15 +111,35 @@ abstract class MonitoringCube extends BaseCube
         return $urlParams;
     }
 
+    protected function getUrlParamsWithoutPrefix($dimension)
+    {
+        $dimensionArr = get_object_vars($dimension);
+        $urlParams = [];
+
+        foreach ($this->getDimensions() as $value) {
+            if (isset($dimensionArr[$value]) && $dimensionArr[$value] !== null) {
+                $urlParams[DimensionParams::update($value)->getParams()] = $dimensionArr[$value];
+            }
+        }
+
+        return $urlParams;
+    }
+
     protected function preparedUrl(array $paramToAdd)
     {
         $dimensions = $this->getDimensions();
         $key = array_search(array_values(array_flip($paramToAdd))[0], $dimensions);
 
         unset($dimensions[$key]);
+        $key = array_keys($paramToAdd)[0];
+        $val =  array_values($paramToAdd)[0];
 
+        $new[DimensionParams::update($key)->getParams()] = $val;
         $dimensions[] = array_values(array_flip($paramToAdd))[0];
-        return Url::fromRequest()->setParam('dimensions', implode(',', $dimensions))->addParams($paramToAdd);
+
+        return Url::fromRequest()
+            ->setParam('dimensions', DimensionParams::update($dimensions)->getParams())
+            ->addParams($new);
     }
 
     /**
@@ -144,14 +169,17 @@ abstract class MonitoringCube extends BaseCube
                             [
                                 (new Link(
                                     $dimension->$header,
-                                    $this->url->with($this->getUrlParams($dimension)),
+                                    Url::fromPath('cube/icingadb/' . $this->getDetailPath())
+                                        ->setParam(
+                                            'dimensions',
+                                            DimensionParams::update($this->getDimensions())->getParams()
+                                        )->addParams($this->getUrlParamsWithoutPrefix($dimension)),
                                     [
                                         'class' => 'cube-link',
                                         'data-base-target' => '_next',
                                         'title' => 'Show details for ' . $header . ': ' . $dimension->$header
                                     ]
-                                ))
-                                    ->add(Html::tag('span', ' ('. $dimension->cnt. ')')),
+                                ))->add(Html::tag('span', ' ('. $dimension->cnt. ')')),
                                 new Link(
                                     '',
                                     $this->preparedUrl([$header => $dimension->$header]),
@@ -185,7 +213,6 @@ abstract class MonitoringCube extends BaseCube
     public function renderMeasure($measure, $header)
     {
         $measureInfo = $this->createMeasureInfo($measure, $header);
-
         // TODO fix: add multiple critical classes to an element
         if ($measureInfo->hasProblem() && $this->getParentDimension()) {
             $this->getParentDimension()->addAttributes(['class'=> $measureInfo->getMeasureCssClasses()]);
@@ -201,14 +228,17 @@ abstract class MonitoringCube extends BaseCube
                     [
                         (new Link(
                             $measure->$header,
-                            $this->url->with($this->getUrlParams($measure)),
+                            Url::fromPath('cube/icingadb/' . $this->getDetailPath())
+                                ->setParam(
+                                    'dimensions',
+                                    DimensionParams::update($this->getDimensions())->getParams()
+                                )->addParams($this->getUrlParamsWithoutPrefix($measure)),
                             [
                                 'class' => 'cube-link',
                                 'data-base-target' => '_next',
                                 'title' => 'Show details for ' . $header . ': ' . $measure->$header
                             ]
                         )),
-
                         new Link(
                             '',
                             $this->preparedUrl([$header => $measure->$header]),
