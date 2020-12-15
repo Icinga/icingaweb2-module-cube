@@ -33,6 +33,8 @@ class ServiceCube extends MonitoringCube
             if ($measure->count_critical_unhandled === 0) {
                 $measureLabelUrlSuffix = $this->getStateInfo(2, true);
                 $measureClasses[] = 'handled';
+            } else {
+                $measureLabel = 'count_critical_unhandled';
             }
         } elseif ($measure->count_warning > 0) {
             $measureLabel = 'count_warning';
@@ -41,6 +43,8 @@ class ServiceCube extends MonitoringCube
             if ($measure->count_warning_unhandled === 0) {
                 $measureLabelUrlSuffix = $measureLabelUrlSuffix = $this->getStateInfo(1, true);
                 $measureClasses[] = 'handled';
+            } else {
+                $measureLabel = 'count_warning_unhandled';
             }
         } elseif ($measure->count_unknown > 0) {
             $measureLabel = 'count_unknown';
@@ -49,6 +53,8 @@ class ServiceCube extends MonitoringCube
             if ($measure->count_unknown_unhandled === 0) {
                 $measureLabelUrlSuffix = $measureLabelUrlSuffix = $this->getStateInfo(3, true);
                 $measureClasses[] = 'handled';
+            } else {
+                $measureLabel = 'count_unknown_unhandled';
             }
         } else {
             $measureLabelUrlSuffix = $measureLabelUrlSuffix = $this->getStateInfo(0);
@@ -76,40 +82,24 @@ class ServiceCube extends MonitoringCube
     {
         $el = Html::tag('span', ['class' => 'others']);
 
-        if ($measure->count_warning > 0 && $this->measureLabel !== 'count_warning') {
-            $measureLabelUrlSuffix = $measure->count_warning_unhandled > 0
-                ? $this->getStateInfo(1, false)
-                : $this->getStateInfo(1, true);
-
-            $el->add(new Link(
-                Html::tag('span', ['class' => 'warning'], $measure->count_warning),
-                $this->url->with(array_merge($this->getUrlParams($measure), $measureLabelUrlSuffix)),
-                ['data-base-target' => '_next']
-            ));
-        }
-
-        if ($measure->count_unknown > 0 && $this->measureLabel !== 'count_unknown') {
-            $measureLabelUrlSuffix = $measure->count_warning_unhandled > 0
-                ? $this->getStateInfo(3, false)
-                : $this->getStateInfo(3, true);
-            $el->add(new Link(
-                Html::tag('span', ['class' => 'unknown'], $measure->count_unknown),
-                $this->url->with(array_merge($this->getUrlParams($measure), $measureLabelUrlSuffix)),
-                ['data-base-target' => '_next']
-            ));
-        }
-
-        if ($el->isEmpty()) {
-            return null;
-        }
-
         if ($measure->count_ok > 0) {
-            $measureLabelUrlSuffix = $this->getStateInfo(0);
-            $el->add(new Link(
-                Html::tag('span', ['class' => 'ok'], $measure->count_ok),
-                $this->url->with(array_merge($this->getUrlParams($measure), $measureLabelUrlSuffix)),
-                ['data-base-target' => '_next']
-            ));
+            if ($measure->cnt === $measure->count_ok) {
+                return null;
+            }
+
+            $this->createCountSpan($measure, 'ok', $el);
+        }
+
+        if ($measure->count_warning > 0) {
+            $this->createCountSpan($measure, 'warning', $el);
+        }
+
+        if ($measure->count_critical > 0) {
+            $this->createCountSpan($measure, 'critical', $el);
+        }
+
+        if ($measure->count_unknown > 0) {
+            $this->createCountSpan($measure, 'unknown', $el);
         }
 
         return $el;
@@ -119,6 +109,10 @@ class ServiceCube extends MonitoringCube
      * Set given params in an array
      *
      * @param int $state
+     *  state 1 = ok |
+     *  state 2 = warning |
+     *  state 3 = critical |
+     *  state 4 = unknown
      *
      * @param null|bool $isHandled
      *
@@ -137,6 +131,57 @@ class ServiceCube extends MonitoringCube
         return $stateInfo;
     }
 
+    private function createCountSpan($measure, $state, &$el)
+    {
+        if($state === 'ok' || $state === 0) {
+            $measureLabelUrlSuffix = $this->getStateInfo(0);
+            $el->add(new Link(
+                Html::tag('span', ['class' => 'ok'], $measure->count_ok),
+                $this->url->with(array_merge($this->getUrlParams($measure), $measureLabelUrlSuffix)),
+                ['data-base-target' => '_next']
+            ));
+            return;
+        }
+
+        $stateArr = [
+            1 => 'warning',
+            2 => 'critical',
+            3 => 'unknown'
+        ];
+
+        if (is_string($state)) {
+            if ($stateAsNr = array_search($state, $stateArr)) {
+                $stateAsString = $stateArr[$stateAsNr];
+            }
+        } else {
+            $stateAsNr = $state;
+            $stateAsString = $stateArr[$stateAsNr];
+        }
+
+        $countAll = 'count_' . $stateAsString;
+        $unhandled = 'count_' . $stateAsString . '_unhandled';
+
+        if ($this->measureLabel !== $countAll) {
+            $measureLabelUrlSuffix = $this->getStateInfo($stateAsNr, true);
+
+            $el->add(new Link(
+                Html::tag('span', ['class' => "{$stateAsString} handled"], $measure->$countAll - $measure->$unhandled),
+                $this->url->with(array_merge($this->getUrlParams($measure), $measureLabelUrlSuffix)),
+                ['data-base-target' => '_next']
+            ));
+
+            if ($this->measureLabel !== $unhandled) {
+                $measureLabelUrlSuffix = $this->getStateInfo($stateAsNr, false);
+
+                $el->add(new Link(
+                    Html::tag('span', ['class' => "{$stateAsString}"], $measure->$countAll),
+                    $this->url->with(array_merge($this->getUrlParams($measure), $measureLabelUrlSuffix)),
+                    ['data-base-target' => '_next']
+                ));
+            }
+        }
+    }
+
     protected function getParamUrlPrefix()
     {
         return 'service.vars.';
@@ -146,7 +191,6 @@ class ServiceCube extends MonitoringCube
     {
         return 'icingadb/services';
     }
-
 
     protected function getDetailPath()
     {
