@@ -133,7 +133,7 @@ class ServiceCube extends MonitoringCube
 
     private function createCountSpan($measure, $state, &$el)
     {
-        if($state === 'ok' || $state === 0) {
+        if ($state === 'ok' || $state === 0) {
             $measureLabelUrlSuffix = $this->getStateInfo(0);
             $el->add(new Link(
                 Html::tag('span', ['class' => 'ok'], $measure->count_ok),
