@@ -129,7 +129,7 @@ abstract class Cube
         $last = $found = null;
         $positions = array_keys($this->dimensions);
 
-        while (list($k, $v) = each($positions)) {
+        foreach ($positions as $k => $v) {
             if ($v === $name) {
                 $found = $k;
                 break;
