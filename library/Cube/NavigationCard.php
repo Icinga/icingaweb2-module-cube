@@ -2,7 +2,7 @@
 // Icinga Web 2 Cube Module | (c) 2020 Icinga GmbH | GPLv2
 namespace Icinga\Module\Cube;
 
-use dipl\Html\Icon;
+use ipl\Web\Widget\Icon;
 use ipl\Html\BaseHtmlElement;
 use ipl\Html\Html;
 use ipl\Web\Widget\Link;
