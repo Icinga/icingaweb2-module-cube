@@ -139,9 +139,17 @@ class CustomVarDimension implements Dimension
         $name = $this->safeVarname($this->varName);
         /** @var $cube IdoCube */
         $alias = $cube->db()->quoteIdentifier(['c_' . $name]);
+
+        if ($cube->isPgsql()) {
+            $on = "LOWER($alias.varname) = ?";
+            $name = strtolower($name);
+        } else {
+            $on = $alias . '.varname = ? COLLATE latin1_general_ci';
+        }
+
         $cube->innerQuery()->joinLeft(
             array($alias => $cube->tableName('icinga_customvariablestatus')),
-            $cube->db()->quoteInto($alias . '.varname = ?', $name)
+            $cube->db()->quoteInto($on, $name)
             . ' AND ' . $alias . '.object_id = ' . $objectId,
             array()
         )->group($alias . '.varvalue');
