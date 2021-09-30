@@ -18,9 +18,10 @@ class IdoHostStatusCube extends IdoCube
     public function getAvailableFactColumns()
     {
         return array(
-            'hosts_cnt'           => 'COUNT(*)',
-            'hosts_down'           => 'SUM(CASE WHEN hs.current_state = 1 THEN 1 ELSE 0 END)',
-            'hosts_unhandled_down' => 'SUM(CASE WHEN hs.current_state = 1'
+            'hosts_cnt'            => 'SUM(CASE WHEN hs.has_been_checked = 1 THEN 1 ELSE 0 END)',
+            'hosts_down'           => 'SUM(CASE WHEN hs.has_been_checked = 1 AND hs.current_state = 1'
+                . ' THEN 1 ELSE 0 END)',
+            'hosts_unhandled_down' => 'SUM(CASE WHEN hs.has_been_checked = 1 AND hs.current_state = 1'
                 . ' AND hs.problem_has_been_acknowledged = 0 AND hs.scheduled_downtime_depth = 0'
                 . ' THEN 1 ELSE 0 END)',
             'hosts_unreachable'           => 'SUM(CASE WHEN hs.current_state = 2 THEN 1 ELSE 0 END)',
