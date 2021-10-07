@@ -12,7 +12,7 @@ div.cube {
   div.cube-dimension0 > .header {
     font-size: 1.2em;
     font-weight: bold;
-    border-bottom: 1px solid black;
+    border-bottom: 1px solid @black;
   }
 
   div.cube-dimension1 {
@@ -29,7 +29,7 @@ div.cube {
     padding: 0.2em;
     margin-top: 0.3em;
     overflow: hidden;
-    border: 1px solid white;
+    border: 1px solid @text-color;
   }
 
   div.cube-dimension1 > .header {
@@ -50,7 +50,7 @@ div.cube {
     > .header {
       display: flex;
       text-align: center;
-      color: white;
+      color: @text-color;
       margin-bottom: 1em;
 
       > a:first-child {
@@ -87,11 +87,11 @@ div.cube {
     > .body {
       text-align: center;
 
-      span.sum {
+      span.sum{
         font-size: 3em;
         display: block;
         text-align: center;
-        color: white;
+        color: @text-color;
       }
     }
   }
@@ -100,7 +100,7 @@ div.cube {
     display: inline;
     border-radius: 0.1em;
     padding: 0.05em 0.2em;
-    color: white;
+    color: @text-color;
     font-size: 3em;
   }
 
@@ -244,8 +244,8 @@ fieldset.dimensions {
   }
 
   input[type=submit][disabled] {
-    color: white;
-    background-color: white;
+    color: @gray-light;
+    background-color: @disabled-gray;
     cursor: auto;
   }
 
@@ -293,8 +293,8 @@ ul.action-links {
   }
 
   li.error {
-    background-color: @colorCritical;
-    color: white;
+    background-color: @color-critical;
+    color: @text-color;
     padding: 1em;
     font-weight: bold;
     text-align: center;
@@ -306,10 +306,12 @@ ul.action-links {
     padding: 0.5em 1em;
     display: block;
     text-decoration: none;
+    color: @gray;
 
     .title {
       margin-left: 5em;
       font-weight: bold;
+      color: @text-color;
     }
 
     p {
@@ -322,8 +324,7 @@ ul.action-links {
       display: inline-block;
     }
     &:hover {
-      background: @text-color;
-      color: white;
+      background: @tr-hover-color;
       text-decoration: none;
     }
   }
@@ -342,9 +343,9 @@ form input[type=submit] {
   margin-top: 0.5em;
 
   &:disabled {
-    border-color: @gray-light;
+    border-color: @disabled-gray;
     background-color: @gray-light;
-    color: #fff;
+    color: @text-color;
   }
 }
 
@@ -385,7 +386,7 @@ form ul.form-errors {
         background: @color-critical;
         font-weight: bold;
         padding: 0.5em 1em;
-        color: white;
+        color: @text-color;
     }
 }
 
@@ -394,7 +395,7 @@ select::-ms-expand, input::-ms-expand, textarea::-ms-expand { /* for IE 11 */
 }
 
 select {
-    border: 1px solid #ddd;
+    border: 1px solid @gray;
     cursor: pointer;
     background: none;
 }
@@ -410,7 +411,7 @@ input[type=text], input[type=password], textarea, select {
     border-color: transparent;
     border-bottom-color: @gray-lighter;
     border-width: 1px 1px 1px 3px;
-    background-color: white;
+    background-color: @low-sat-blue;
 
     &.search {
         background: transparent url("../img/icons/search.png") no-repeat scroll 0.5em center / 1em 1em;
@@ -445,7 +446,7 @@ select::-moz-focus-inner { border: 0; }
 
 select:-moz-focusring {
     color: transparent;
-    text-shadow: 0 0 0 #000;
+    text-shadow: 0 0 0 @black;
 }
 
 select, input[type=text], textarea {
@@ -462,18 +463,18 @@ select, input[type=text], textarea {
 }
 
 select[value=""] {
-    color: blue;
-    border: 1px solid #666;
-    background-color: white;
+    color: @icinga-blue;
+    border: 1px solid @gray-semilight;
+    background-color: @low-sat-blue;
 }
 
 select option {
     color: inherit;
     padding-left: 0.5em;
-    background-color: white;
+    background-color: @low-sat-blue;
 }
 
 select option[value=""] {
-    color: #aaa;
-    background-color: white;
+    color: @gray;
+    background-color: @low-sat-blue;
 }
