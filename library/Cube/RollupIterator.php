@@ -45,29 +45,6 @@ class RollupIterator implements IteratorAggregate
     }
 
     /**
-     * decode the given data with json_decode() and cast it into an object
-     *
-     * @param $data
-     *
-     * @return object
-     */
-    private function decode($data)
-    {
-        $arr = [];
-        foreach ($data as $key => $d) {
-            $res = json_decode($d, true);
-
-            if (is_bool($res)) {
-                $res = $res ? 'true' : 'false';
-            }
-
-            $arr[$key] = $res;
-        }
-
-        return (object) $arr;
-    }
-
-    /**
      * Checks if given data is affected by slice
      *
      * @param object $data
@@ -107,14 +84,13 @@ class RollupIterator implements IteratorAggregate
         $pending = new TreeNode();
         $tiers = new SplStack();
 
+
         // if all given dimensions were sliced, there is nothing left to render
         if (array_keys($this->cube->getSlices()) === array_values($this->cube->getDimensions())) {
             return new TreeNodeIterator(new TreeNode());
         }
 
         foreach ($this->data as $data) {
-            $data = $this->decode($data);
-
             // slice affected data should be skipped
             if ($this->isAffectedBySlice($data)) {
                 continue;

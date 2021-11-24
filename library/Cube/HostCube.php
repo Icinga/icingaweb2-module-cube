@@ -2,6 +2,7 @@
 // Icinga Web 2 Cube Module | (c) 2020 Icinga GmbH | GPLv2
 namespace Icinga\Module\Cube;
 
+use Icinga\Module\Icingadb\Model\Host;
 use ipl\Html\Html;
 use ipl\Web\Widget\Link;
 
@@ -54,7 +55,7 @@ class HostCube extends MonitoringCube
 
     protected function getDetailPath()
     {
-        return 'hosts-details';
+        return 'hosts/details';
     }
 
 
@@ -83,6 +84,28 @@ class HostCube extends MonitoringCube
         }
 
         return $stateInfo;
+    }
+
+    /**
+     * @return \Generator
+     * @throws \Icinga\Exception\ConfigurationError
+     */
+    public function listAvailableDimensions()
+    {
+        $query = Host::on($this->getDb());
+
+        $this->applyIcingaDbRestrictions($query);
+
+        $query->getSelectBase()
+            ->columns('customvar.name as varname')
+            ->join('host_customvar', 'host_customvar.host_id = host.id')
+            ->join('customvar', 'customvar.id = host_customvar.customvar_id')
+            ->groupBy('customvar.name')
+            ->orderBy('customvar.name');
+
+        foreach ($query as $row) {
+            yield $row->varname;
+        }
     }
 
     /**

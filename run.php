@@ -3,3 +3,4 @@
 
 $this->provideHook('cube/Actions', 'Cube/MonitoringActions');
 $this->provideHook('cube/Icingadb', 'Cube/IcingadbStatus');
+$this->provideHook('icingadb/icingadbSupport');

@@ -5,8 +5,12 @@ namespace Icinga\Module\Cube\Web;
 
 use Exception;
 use Icinga\Application\Hook;
+use Icinga\Application\Modules\Module;
+use Icinga\Module\Cube\BaseCube;
 use Icinga\Module\Cube\Cube;
 use Icinga\Module\Cube\Hook\ActionsHook;
+use Icinga\Module\Cube\Hook\IcingadbHook;
+use Icinga\Module\Cube\ProvidedHook\Icingadb\IcingadbSupport;
 use Icinga\Web\View;
 
 /**
@@ -26,17 +30,23 @@ class ActionLinks
      *
      * This is what the Cube calls when rendering details
      *
-     * @param Cube $cube
+     * @param Cube|BaseCube $cube
      * @param View $view
      *
      * @return string
      */
-    public static function renderAll(Cube $cube, View $view)
+    public static function renderAll($cube, View $view)
     {
         $html = array();
 
-        /** @var ActionsHook $hook */
-        foreach (Hook::all('Cube/Actions') as $hook) {
+        if (! (Module::exists('icingadb') && IcingadbSupport::useIcingaDbAsBackend())) {
+            $hooks = Hook::all('Cube/Actions');
+        } else {
+            $hooks = Hook::all('Cube/Icingadb');
+        }
+
+            /** @var ActionsHook|IcingadbHook $hook */
+        foreach ($hooks as $hook) {
             try {
                 $hook->prepareActionLinks($cube, $view);
             } catch (Exception $e) {

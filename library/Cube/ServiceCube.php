@@ -2,6 +2,7 @@
 // Icinga Web 2 Cube Module | (c) 2020 Icinga GmbH | GPLv2
 namespace Icinga\Module\Cube;
 
+use Icinga\Module\Icingadb\Model\Service;
 use ipl\Html\Html;
 use ipl\Web\Widget\Link;
 
@@ -106,6 +107,29 @@ class ServiceCube extends MonitoringCube
     }
 
     /**
+     * @return \Generator
+     * @throws \Icinga\Exception\ConfigurationError
+     */
+    public function listAvailableDimensions()
+    {
+        $query = Service::on($this->getDb());
+
+        $this->applyIcingaDbRestrictions($query);
+
+        $query->getSelectBase()
+            ->columns('customvar.name as varname')
+            ->join('service_customvar', 'service_customvar.service_id = service.id')
+            ->join('customvar', 'customvar.id = service_customvar.customvar_id')
+            ->groupBy('customvar.name')
+            ->orderBy('customvar.name');
+
+        foreach ($query as $row) {
+            yield $row->varname;
+        }
+    }
+
+
+    /**
      * Set given params in an array
      *
      * @param int $state
@@ -194,6 +218,6 @@ class ServiceCube extends MonitoringCube
 
     protected function getDetailPath()
     {
-        return 'services-details';
+        return 'services/details';
     }
 }

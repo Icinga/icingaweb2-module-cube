@@ -3,6 +3,7 @@
 
 namespace Icinga\Module\Cube\Forms;
 
+use Icinga\Module\Cube\BaseCube;
 use Icinga\Module\Cube\Cube;
 use Icinga\Module\Cube\Dimension;
 use Icinga\Module\Cube\DimensionParams;
@@ -12,11 +13,11 @@ use Icinga\Web\Notification;
 class DimensionsForm extends Form
 {
     /**
-     * @var Cube
+     * @var Cube|BaseCube
      */
     private $cube;
 
-    public function setCube(Cube $cube)
+    public function setCube($cube)
     {
         $this->cube = $cube;
         return $this;
