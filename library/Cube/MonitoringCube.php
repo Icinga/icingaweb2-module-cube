@@ -3,11 +3,9 @@
 namespace Icinga\Module\Cube;
 
 use Icinga\Module\Cube\Common\IcingaDb;
-use Icinga\Module\Cube\Icingadb\IcingadbCube;
 use Icinga\Module\Icingadb\Common\Auth;
 use ipl\Html\Html;
 use ipl\Html\HtmlElement;
-use ipl\Sql\Connection;
 use ipl\Web\Url;
 use ipl\Web\Widget\Link;
 
@@ -37,9 +35,6 @@ abstract class MonitoringCube extends BaseCube
      * @var HtmlElement Parent dimension of current measure
      */
     protected $parentDimension;
-
-//    /** @var IcingaDb */
-//    protected $backend;
 
     /**
      * To get all needed information like class name, count, etc
@@ -134,32 +129,6 @@ abstract class MonitoringCube extends BaseCube
 
         return $urlParams;
     }
-//
-//    /**
-//     * We can steal the DB connection directly from a Monitoring backend
-//     *
-//     * @param IcingaDb $backend
-//     * @return $this
-//     */
-//    public function setBackend(Connection $backend)
-//    {
-//        $this->backend = $backend;
-//
-//        return $this;
-//    }
-//
-//    /**
-//     * Provice access to our DB resource
-//     *
-//     * This lazy-loads the default monitoring backend in case no DB has been
-//     * given
-//     *
-//     * @return Connection
-//     */
-//    public function db()
-//    {
-//        return $this->getDb();
-//    }
 
     protected function preparedUrl(array $paramToAdd)
     {
@@ -260,7 +229,6 @@ abstract class MonitoringCube extends BaseCube
         if ($measureInfo->hasProblem() && $this->getParentDimension()) {
             $this->getParentDimension()->addAttributes(['class'=> $measureInfo->getMeasureCssClasses()]);
         }
-//        var_dump(Url::fromPath('cube/' . $this->getDetailPath()));die;
 
         return Html::tag(
             'div',
