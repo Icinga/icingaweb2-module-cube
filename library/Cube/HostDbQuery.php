@@ -90,7 +90,7 @@ class HostDbQuery
             $query->getSelectBase()
                 ->join(
                     "host_customvar {$dimensionJunction}",
-                    "{$dimensionJunction}.host_id = h.id"
+                    "{$dimensionJunction}.host_id = host.id"
                 )
                 ->join(
                     "customvar {$dimension}",
@@ -100,8 +100,13 @@ class HostDbQuery
         }
 
         foreach ($slices as $dimension => $value) {
-            $query->getSelectBase()
-                ->where("{$dimension}.value = '\"{$value}\"'");
+            if ($value === 'true' || $value === 'false') {
+                $query->getSelectBase()
+                    ->where("{$dimension}.value = '{$value}'");
+            } else {
+                $query->getSelectBase()
+                    ->where("{$dimension}.value = '\"{$value}\"'");
+            }
         }
 
         foreach ($query as $row) {
