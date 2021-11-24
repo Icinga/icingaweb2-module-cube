@@ -20,6 +20,9 @@ class ServicesController extends Controller
         $this->renderCube();
     }
 
+    /**
+     * @return IdoServiceStatusCube|ServiceCube
+     */
     protected function getCube()
     {
         if (!(Module::exists('icingadb') && IcingadbSupport::useIcingaDbAsBackend())) {
