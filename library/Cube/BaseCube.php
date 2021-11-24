@@ -21,6 +21,11 @@ abstract class BaseCube extends BaseHtmlElement
     protected $data;
 
     /**
+     * @var HostDbQuery|ServiceDbQuery
+     */
+    protected $query;
+
+    /**
      * @var array dimensions given in the url
      */
     protected $dimensions;
@@ -35,9 +40,10 @@ abstract class BaseCube extends BaseHtmlElement
      */
     protected $slices;
 
-    public function __construct($data, array $dimensions, array $slices = null)
+    public function __construct($query, array $dimensions, array $slices = null)
     {
-        $this->data = $data;
+        $this->query = $query;
+        $this->data = $query->getResult($dimensions, $slices);
         $this->dimensions = $dimensions;
         $this->slices = $slices;
         $this->init();
@@ -120,6 +126,16 @@ abstract class BaseCube extends BaseHtmlElement
     public function getData()
     {
         return $this->data;
+    }
+
+    /**
+     * Get the query
+     *
+     * @return HostDbQuery|ServiceDbQuery
+     */
+    public function getQuery()
+    {
+        return $this->query;
     }
 
     /**

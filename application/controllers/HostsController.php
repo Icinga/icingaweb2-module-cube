@@ -45,7 +45,7 @@ class HostsController extends Controller
         }
 
         return (new HostCube(
-            (new HostDbQuery())->getResult($urlDimensions, $slices),
+            new HostDbQuery(),
             $urlDimensions,
             $slices
         ));

@@ -42,7 +42,7 @@ class ServicesController extends Controller
         }
 
         return (new ServiceCube(
-            (new ServiceDbQuery())->getResult($urlDimensions, $slices),
+            new ServiceDbQuery(),
             $urlDimensions,
             $slices
         ));
