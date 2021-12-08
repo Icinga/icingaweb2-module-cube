@@ -107,4 +107,18 @@ class IdoHostStatusCube extends IdoCube
 
         return $select;
     }
+
+    /**
+     * @return array
+     */
+    public function getHostNames()
+    {
+        $this->finalizeInnerQuery();
+        $query = $this->innerQuery()
+            ->reset('columns')
+            ->columns(array('host' => 'o.name1'))
+            ->reset('group');
+
+        return $this->db()->fetchCol($query);
+    }
 }
