@@ -65,18 +65,34 @@ div.cube {
 
     &.critical {
       background: @color-critical;
+
+      &.handled {
+        background: @color-critical-handled;
+      }
     }
 
     &.warning {
       background: @color-warning;
+
+      &.handled {
+        background: @color-warning-handled;
+      }
     }
 
     &.unknown {
       background: @color-unknown;
+
+      &.handled {
+        background: @color-unknown-handled;
+      }
     }
 
     &.unreachable {
       background: @color-unreachable;
+
+      &.handled {
+        background: @color-unreachable-handled;
+      }
     }
 
     &.ok {
@@ -107,6 +123,16 @@ div.cube {
       margin-left: 0.2em;
       margin-top: 0.8em;
       font-size: 1em;
+    }
+  }
+
+  .icingadbOthers {
+    margin-top: 0.95em;
+  }
+
+  .icingaDbObjects {
+    &:hover {
+      color: white;
     }
   }
 
