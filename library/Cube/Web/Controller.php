@@ -5,9 +5,6 @@ namespace Icinga\Module\Cube\Web;
 
 use Icinga\Module\Cube\DimensionParams;
 use Icinga\Module\Cube\Forms\DimensionsForm;
-use Icinga\Application\Modules\Module;
-use Icinga\Module\Cube\BaseCube;
-use Icinga\Module\Cube\ProvidedHook\Icingadb\IcingadbSupport;
 use Icinga\Web\Controller as WebController;
 use Icinga\Web\View;
 use Icinga\Web\Widget\Tabextension\DashboardAction;
@@ -17,13 +14,13 @@ abstract class Controller extends WebController
     /** @var View This helps IDEs to understand that this is not ZF view */
     public $view;
 
-    /** @var \Icinga\Module\Cube\Cube|BaseCube */
+    /** @var \Icinga\Module\Cube\Cube */
     protected $cube;
 
     /**
      * Return this controllers' cube
      *
-     * @return \Icinga\Module\Cube\Cube|BaseCube
+     * @return \Icinga\Module\Cube\Cube
      */
     abstract protected function getCube();
 
@@ -39,15 +36,14 @@ abstract class Controller extends WebController
             'url'   => $this->getRequest()->getUrl()
         ])->activate('details');
 
+        $this->cube->chooseFacts(array_keys($this->cube->getAvailableFactColumns()));
+        $vars = DimensionParams::fromString($this->params->shift('dimensions', ''))->getDimensions();
         $wantNull = $this->params->shift('wantNull');
-        if (! (Module::exists('icingadb') && IcingadbSupport::useIcingaDbAsBackend())) {
-            $this->cube->chooseFacts(array_keys($this->cube->getAvailableFactColumns()));
-            $vars = DimensionParams::fromString($this->params->shift('dimensions', ''))->getDimensions();
-            foreach ($vars as $var) {
-                $this->cube->addDimensionByName($var);
-                if ($wantNull) {
-                    $this->cube->getDimension($var)->wantNull();
-                }
+
+        foreach ($vars as $var) {
+            $this->cube->addDimensionByName($var);
+            if ($wantNull) {
+                $this->cube->getDimension($var)->wantNull();
             }
         }
 
@@ -69,15 +65,15 @@ abstract class Controller extends WebController
     {
         // Hint: order matters, we are shifting!
         $showSettings = $this->params->shift('showSettings');
-        if (! (Module::exists('icingadb') && IcingadbSupport::useIcingaDbAsBackend())) {
-            $this->cube->chooseFacts(array_keys($this->cube->getAvailableFactColumns()));
-            $vars = DimensionParams::fromString($this->params->shift('dimensions', ''))->getDimensions();
-            $wantNull = $this->params->shift('wantNull');
-            foreach ($vars as $var) {
-                $this->cube->addDimensionByName($var);
-                if ($wantNull) {
-                    $this->cube->getDimension($var)->wantNull();
-                }
+
+        $this->cube->chooseFacts(array_keys($this->cube->getAvailableFactColumns()));
+        $vars = DimensionParams::fromString($this->params->shift('dimensions', ''))->getDimensions();
+        $wantNull = $this->params->shift('wantNull');
+
+        foreach ($vars as $var) {
+            $this->cube->addDimensionByName($var);
+            if ($wantNull) {
+                $this->cube->getDimension($var)->wantNull();
             }
         }
 
