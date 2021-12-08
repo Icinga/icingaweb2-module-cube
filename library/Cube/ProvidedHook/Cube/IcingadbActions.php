@@ -4,21 +4,24 @@
 namespace Icinga\Module\Cube\ProvidedHook\Cube;
 
 use Icinga\Module\Cube\BaseCube;
+use Icinga\Module\Cube\Cube;
+use Icinga\Module\Cube\Hook\ActionsHook;
 use Icinga\Module\Cube\Hook\IcingadbHook;
+use Icinga\Module\Cube\Icingadb\IcingadbServiceStatusCube;
 use Icinga\Module\Cube\ServiceCube;
 use Icinga\Web\View;
 
-class IcingadbStatus extends IcingadbHook
+class IcingadbActions extends ActionsHook
 {
 
     /**
-     * @param BaseCube $cube
+     * @param Cube $cube
      * @param View $view
      */
-    public function prepareActionLinks(BaseCube $cube, View $view)
+    public function prepareActionLinks(Cube $cube, View $view)
     {
         $type = 'host';
-        if ($cube instanceof ServiceCube) {
+        if ($cube instanceof IcingadbServiceStatusCube) {
             $type = 'service';
         }
 
@@ -26,7 +29,7 @@ class IcingadbStatus extends IcingadbHook
 
         $paramsWithPrefix = [];
         foreach ($cube->getSlices() as $dimension => $slice) {
-            $paramsWithPrefix[$type . '.vars.' . $dimension] = $slice;
+            $paramsWithPrefix[$type . '.vars.' . $dimension] = trim($slice, '"');
         }
 
         if ($type === 'host') {
