@@ -4,11 +4,9 @@
 namespace Icinga\Module\Cube\Controllers;
 
 use Icinga\Application\Modules\Module;
-use Icinga\Module\Cube\DimensionParams;
+use Icinga\Module\Cube\Icingadb\IcingadbServiceStatusCube;
 use Icinga\Module\Cube\Ido\IdoServiceStatusCube;
 use Icinga\Module\Cube\ProvidedHook\Icingadb\IcingadbSupport;
-use Icinga\Module\Cube\ServiceCube;
-use Icinga\Module\Cube\ServiceDbQuery;
 use Icinga\Module\Cube\Web\Controller;
 
 class ServicesController extends Controller
@@ -21,7 +19,7 @@ class ServicesController extends Controller
     }
 
     /**
-     * @return IdoServiceStatusCube|ServiceCube
+     * @return IdoServiceStatusCube|IcingadbServiceStatusCube
      */
     protected function getCube()
     {
@@ -29,25 +27,6 @@ class ServicesController extends Controller
             return new IdoServiceStatusCube();
         }
 
-        $slices = [];
-        $urlDimensions = DimensionParams::fromString($this->params->get('dimensions'))->getDimensions();
-
-        $dimensionsWithoutSlices = $urlDimensions;
-        // get slices
-        foreach ($urlDimensions as $key => $dimension) {
-            // because params are double encoded
-            $doubleEncodedDimension = DimensionParams::update(rawurlencode($dimension))->getParams();
-
-            if ($value = $this->params->get($doubleEncodedDimension)) {
-                unset($dimensionsWithoutSlices[$key]);
-                $slices[$dimension] = $value;
-            }
-        }
-
-        return (new ServiceCube(
-            new ServiceDbQuery(),
-            $urlDimensions,
-            $slices
-        ));
+        return new IcingadbServiceStatusCube();
     }
 }
