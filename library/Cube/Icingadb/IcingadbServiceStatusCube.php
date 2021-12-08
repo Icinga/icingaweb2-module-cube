@@ -3,69 +3,70 @@
 namespace Icinga\Module\Cube\Icingadb;
 
 use Icinga\Module\Cube\IcingadbCube;
-use Icinga\Web\Hook;
+use Icinga\Module\Icingadb\Model\Service;
+use ipl\Orm\Query;
 
 class IcingadbServiceStatusCube extends IcingadbCube
 {
-    public function __construct()
+    /**
+     * @return Query|\ipl\Sql\Select
+     */
+    public function prepareInnerQuery()
     {
-        $this->db = $this->getDb();
+        $query = Service::on($this->getDb())->with('state');
+        $query->disableDefaultSort();
+
+        $this->applyRestrictions($query);
+
+        $this->innerQuery = $query;
+
+        return $this->innerQuery;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getAvailableFactColumns()
+    {
+        return [
+            'services_cnt'           => 'SUM(1)',
+            'services_critical'           => 'SUM(CASE WHEN service_state.soft_state = 2 THEN  1 ELSE 0 END)',
+            'services_unhandled_critical' => 'SUM(CASE WHEN service_state.soft_state = 2'
+                . ' AND service_state.is_handled = "n" THEN  1 ELSE 0 END)',
+            'services_warning'           => 'SUM(CASE WHEN service_state.soft_state = 1 THEN  1 ELSE 0 END)',
+            'services_unhandled_warning' => 'SUM(CASE WHEN service_state.soft_state = 1'
+                . ' AND service_state.is_handled = "n" THEN  1 ELSE 0 END)',
+            'services_unknown'           => 'SUM(CASE WHEN service_state.soft_state = 3 THEN  1 ELSE 0 END)',
+            'services_unhandled_unknown' => 'SUM(CASE WHEN service_state.soft_state = 3'
+                . ' AND service_state.is_handled = "n" THEN  1 ELSE 0 END)',
+        ];
+    }
+
+    /**
+     * @return \Generator
+     * @throws \Icinga\Exception\ConfigurationError
+     */
+    public function listAvailableDimensions()
+    {
+        $query = Service::on($this->getDb());
+
+        $this->applyRestrictions($query);
+
+        $query->getSelectBase()
+            ->columns('customvar.name as varname')
+            ->join('service_customvar', 'service_customvar.service_id = service.id')
+            ->join('customvar', 'customvar.id = service_customvar.customvar_id')
+            ->groupBy('customvar.name')
+            ->orderBy('customvar.name');
+
+        foreach ($query as $row) {
+            yield $row->varname;
+        }
     }
 
     public function getRenderer()
     {
         return new IcingadbStatusCubeRenderer($this);
-    }
-
-    public function getDb()
-    {
-        $this->db = $this->icingadbServices()->getServiceStateQuery()->getDb();
-
-        return $this->db;
-    }
-
-    /**
-     * Returns IcingadbServices hook
-     *
-     * @return mixed|null
-     */
-    public function icingadbServices()
-    {
-        $icingadbServices = null;
-
-        foreach (Hook::all('Cube/IcingadbServices') as $hook) {
-            $icingadbServices = $hook;
-        }
-        return $icingadbServices;
-    }
-
-    public function getAvailableFactColumns()
-    {
-        return $this->icingadbServices()->getAvailableFactColumns();
-    }
-
-    /**
-     * This returns a list of all available Dimensions
-     *
-     * @return array
-     */
-    public function listAvailableDimensions()
-    {
-        return $this->icingadbServices()->listAvailableDimensions();
-    }
-
-    /**
-     * Prepares innfer query for obtaining facts
-     *
-     * @return \ipl\Orm\Query|\ipl\Sql\Select
-     */
-    public function prepareInnerQuery()
-    {
-        $query = $this->icingadbServices()->getServiceStateQuery();
-
-        $this->innerQuery = $query;
-
-        return $this->innerQuery;
     }
 
     /**
