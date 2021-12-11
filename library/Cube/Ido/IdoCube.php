@@ -100,33 +100,73 @@ abstract class IdoCube extends DbCube
         }
     }
 
+    /**
+     * Compose a monitoring restriction based on 'monitoring/filter/objects' filtering
+     *
+     * @return \Icinga\Data\Filter\Filter
+     */
     protected function getMonitoringRestriction()
     {
         $restriction = Filter::matchAny();
-        $restriction->setAllowedFilterColumns(array(
-            'host_name',
-            'hostgroup_name',
-            'instance_name',
-            'service_description',
-            'servicegroup_name',
-            function ($c) {
-                return preg_match('/^_(?:host|service)_/i', $c);
-            }
-        ));
+        $skipFilterColumns = array();
+
+        if ($this instanceof IdoServiceStatusCube) {
+            $restriction->setAllowedFilterColumns(array(
+                'instance_name',
+                'host_name',
+                'hostgroup_name',
+                'service_description',
+                'servicegroup_name',
+                function ($c) {
+                    return preg_match('/^_(?:host|service)_/i', $c);
+                }
+            ));
+        } else {
+            $restriction->setAllowedFilterColumns(array(
+                'instance_name',
+                'host_name',
+                'hostgroup_name',
+                function ($c) {
+                    return preg_match('/^_host_/i', $c);
+                }
+            ));
+
+            $skipFilterColumns = array(
+                'service_description',
+                'servicegroup_name',
+                function ($c) {
+                    return preg_match('/^_service_/i', $c);
+                }
+            );
+        }
 
         $filters = Auth::getInstance()->getUser()->getRestrictions('monitoring/filter/objects');
 
-        foreach ($filters as $filter) {
-            if ($filter === '*') {
-                return Filter::matchAny();
-            }
+        foreach ($filters as $filterString) {
             try {
-                $restriction->addFilter(Filter::fromQueryString($filter));
+                $filter = Filter::fromQueryString($filterString);
+
+                // Skip any services monitoring filters if hosts based cube
+                foreach ($skipFilterColumns as $skipColumn) {
+                    if (is_callable($skipColumn)) {
+                        if (call_user_func($skipColumn, $filter->getColumn())) {
+                            continue 2;
+                        }
+                    } elseif ($filter->getColumn() === $skipColumn) {
+                        continue 2;
+                    }
+                }
+
+                if ($filterString === '*') {
+                    return Filter::matchAny();
+                }
+
+                $restriction->addFilter($filter);
             } catch (QueryException $e) {
                 throw new ConfigurationError(
                     'Cannot apply restriction %s using the filter %s. You can only use the following columns: %s',
                     'monitoring/filter/objects',
-                    $filter,
+                    $filterString,
                     implode(', ', array(
                         'instance_name',
                         'host_name',
