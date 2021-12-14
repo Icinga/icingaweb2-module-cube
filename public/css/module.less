@@ -222,23 +222,27 @@ div.cube-dimension2.unreachable {
 fieldset.dimensions {
   margin: 0;
   padding: 0;
-  border: none;
 
   span {
     min-width: 18em;
     display: inline-block;
   }
+
   input[type=submit] {
     border: none;
     color: @text-color;
+    background: none;
     font-family: 'ifont';
-    font-weight: bold;
   }
 
   input[type=submit][disabled] {
     color: @disabled-gray;
     background-color: @body-bg-color;
     cursor: auto;
+  }
+
+  input[type=submit]:not([disabled]):hover {
+    color: @icinga-blue;
   }
 
   input[type=submit]:nth-of-type(2) {
