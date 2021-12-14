@@ -53,6 +53,7 @@ class DimensionsForm extends QuickForm
 
 
         $this->setSubmitLabel(false);
+        $this->addAttribs(['class' => 'icinga-controls']);
     }
 
     protected function addSlice($key, $value)
