@@ -3,6 +3,8 @@
 
 namespace Icinga\Module\Cube\Ido;
 
+use Icinga\Module\Cube\Ido\DataView\Hoststatus;
+
 class IdoHostStatusCube extends IdoCube
 {
     public function getRenderer()
@@ -83,7 +85,7 @@ class IdoHostStatusCube extends IdoCube
     {
         $this->requireBackend();
 
-        $view = $this->backend->select()->from('hoststatus');
+        $view = new Hoststatus($this->backend);
 
         $view->getQuery()->requireColumn('host_state');
 
