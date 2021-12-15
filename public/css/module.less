@@ -12,7 +12,7 @@ div.cube {
   div.cube-dimension0 > .header {
     font-size: 1.2em;
     font-weight: bold;
-    border-bottom: 1px solid black;
+    border-bottom: 1px solid @text-color;
   }
 
   div.cube-dimension1 {
@@ -29,7 +29,6 @@ div.cube {
     padding: 0.2em;
     margin-top: 0.3em;
     overflow: hidden;
-    border: 1px solid white;
   }
 
   div.cube-dimension1 > .header {
@@ -50,7 +49,7 @@ div.cube {
     > .header {
       display: flex;
       text-align: center;
-      color: white;
+      color: @text-color-on-icinga-blue;
       margin-bottom: 1em;
 
       > a:first-child {
@@ -86,13 +85,6 @@ div.cube {
 
     > .body {
       text-align: center;
-
-      span.sum {
-        font-size: 3em;
-        display: block;
-        text-align: center;
-        color: white;
-      }
     }
   }
 
@@ -100,7 +92,7 @@ div.cube {
     display: inline;
     border-radius: 0.1em;
     padding: 0.05em 0.2em;
-    color: white;
+    color: @text-color-on-icinga-blue;
     font-size: 3em;
   }
 
@@ -230,23 +222,27 @@ div.cube-dimension2.unreachable {
 fieldset.dimensions {
   margin: 0;
   padding: 0;
-  border: none;
 
   span {
     min-width: 18em;
     display: inline-block;
   }
+
   input[type=submit] {
     border: none;
     color: @text-color;
+    background: none;
     font-family: 'ifont';
-    font-weight: bold;
   }
 
   input[type=submit][disabled] {
-    color: white;
-    background-color: white;
+    color: @disabled-gray;
+    background-color: @body-bg-color;
     cursor: auto;
+  }
+
+  input[type=submit]:not([disabled]):hover {
+    color: @icinga-blue;
   }
 
   input[type=submit]:nth-of-type(2) {
@@ -293,8 +289,8 @@ ul.action-links {
   }
 
   li.error {
-    background-color: @colorCritical;
-    color: white;
+    background-color: @color-critical;
+    color: @text-color-on-icinga-blue;
     padding: 1em;
     font-weight: bold;
     text-align: center;
@@ -306,10 +302,12 @@ ul.action-links {
     padding: 0.5em 1em;
     display: block;
     text-decoration: none;
+    color: @gray;
 
     .title {
       margin-left: 5em;
       font-weight: bold;
+      color: @link-color;
     }
 
     p {
@@ -322,158 +320,27 @@ ul.action-links {
       display: inline-block;
     }
     &:hover {
-      background: @text-color;
-      color: white;
+      background: @tr-hover-color;
       text-decoration: none;
     }
   }
 }
 
-/** Form, stolen from Director **/
+/** Form **/
 
 .content form {
   margin-bottom: 2em;
 }
 
-
 form input[type=submit] {
-  .button();
-  border-width: 1px;
   margin-top: 0.5em;
-
-  &:disabled {
-    border-color: @gray-light;
-    background-color: @gray-light;
-    color: #fff;
-  }
-}
-
-form input[type=submit]:first-of-type {
-    border-width: 2px;
-}
-
-form input[type=submit].link-button {
-  color: @icinga-blue;
-  background: none;
-  border: none;
-  padding: 0;
-
-  text-align: left;
-
-  &:hover {
-    text-decoration: underline;
-  }
-}
-
-form p.description {
-  padding: 1em 1em;
-  margin: 0;
-  font-style: italic;
-  width: 100%;
-}
-
-input, select, select option, textarea {
-   -webkit-appearance: none;
-   -moz-appearance: none;
-   appearance: none;
-}
-
-form ul.form-errors {
-    margin-bottom: 0.5em;
-
-    ul.errors li {
-        background: @color-critical;
-        font-weight: bold;
-        padding: 0.5em 1em;
-        color: white;
-    }
-}
-
-select::-ms-expand, input::-ms-expand, textarea::-ms-expand { /* for IE 11 */
-    display: none;
 }
 
 select {
-    border: 1px solid #ddd;
-    cursor: pointer;
-    background: none;
-}
-
-input[type=text], input[type=password], textarea, select {
-    max-width: 36em;
-    min-width: 20em;
-    width: 100%;
-    line-height: 2em;
-    height: 2.4em;
-    padding-left: 0.5em;
-    border-style: solid;
-    border-color: transparent;
-    border-bottom-color: @gray-lighter;
-    border-width: 1px 1px 1px 3px;
-    background-color: white;
-
-    &.search {
-        background: transparent url("../img/icons/search.png") no-repeat scroll 0.5em center / 1em 1em;
-        padding-left: 2em;
-    }
-}
-
-select[multiple] {
-    height: auto;
-}
-
-select option {
-    height: 2em;
-    padding-top: 0.3em;
-}
-
-select[multiple=multiple] {
-  height: auto;
-}
-
-label {
-    line-height: 2em;
+  width: 100%;
 }
 
 form dl {
-    margin: 0;
-    padding: 0;
-}
-
-
-select::-moz-focus-inner { border: 0; }
-
-select:-moz-focusring {
-    color: transparent;
-    text-shadow: 0 0 0 #000;
-}
-
-select, input[type=text], textarea {
-    &:hover {
-        border-style: dotted solid dotted solid;
-        border-color: @gray-light;
-    }
-
-    &:focus, &:focus:hover {
-        border-style: solid;
-        border-color: @icinga-blue;
-        outline: none;
-    }
-}
-
-select[value=""] {
-    color: blue;
-    border: 1px solid #666;
-    background-color: white;
-}
-
-select option {
-    color: inherit;
-    padding-left: 0.5em;
-    background-color: white;
-}
-
-select option[value=""] {
-    color: #aaa;
-    background-color: white;
+  margin: 0;
+  padding: 0;
 }
