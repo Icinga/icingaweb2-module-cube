@@ -38,11 +38,14 @@ abstract class Controller extends WebController
         $this->cube->chooseFacts(array_keys($this->cube->getAvailableFactColumns()));
         $dimensions = $this->params->shift('dimensions');
         $wantNull = $this->params->shift('wantNull');
-        $vars = preg_split('/,/', $dimensions, -1, PREG_SPLIT_NO_EMPTY);
-        foreach ($vars as $var) {
-            $this->cube->addDimensionByName($var);
-            if ($wantNull) {
-                $this->cube->getDimension($var)->wantNull();
+
+        if ($dimensions) {
+            $vars = preg_split('/,/', $dimensions, -1, PREG_SPLIT_NO_EMPTY);
+            foreach ($vars as $var) {
+                $this->cube->addDimensionByName($var);
+                if ($wantNull) {
+                    $this->cube->getDimension($var)->wantNull();
+                }
             }
         }
 
@@ -68,11 +71,14 @@ abstract class Controller extends WebController
         $this->cube->chooseFacts(array_keys($this->cube->getAvailableFactColumns()));
         $dimensions = $this->params->shift('dimensions');
         $wantNull = $this->params->shift('wantNull');
-        $vars = preg_split('/,/', $dimensions, -1, PREG_SPLIT_NO_EMPTY);
-        foreach ($vars as $var) {
-            $this->cube->addDimensionByName($var);
-            if ($wantNull) {
-                $this->cube->getDimension($var)->wantNull();
+
+        if ($dimensions) {
+            $vars = preg_split('/,/', $dimensions, -1, PREG_SPLIT_NO_EMPTY);
+            foreach ($vars as $var) {
+                $this->cube->addDimensionByName($var);
+                if ($wantNull) {
+                    $this->cube->getDimension($var)->wantNull();
+                }
             }
         }
 
