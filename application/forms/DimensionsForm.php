@@ -5,10 +5,10 @@ namespace Icinga\Module\Cube\Forms;
 
 use Icinga\Module\Cube\Cube;
 use Icinga\Module\Cube\DimensionParams;
-use Icinga\Module\Cube\Web\Form\QuickForm;
-use Icinga\Module\Cube\Web\IconHelper;
+use Icinga\Web\Form;
+use Icinga\Web\Notification;
 
-class DimensionsForm extends QuickForm
+class DimensionsForm extends Form
 {
     /**
      * @var Cube
@@ -21,7 +21,7 @@ class DimensionsForm extends QuickForm
         return $this;
     }
 
-    public function setup()
+    public function createElements(array $formData)
     {
         $cube = $this->cube;
 
@@ -52,8 +52,6 @@ class DimensionsForm extends QuickForm
             $this->addSlice($key, $value);
         }
 
-
-        $this->setSubmitLabel(false);
         $this->addAttribs(['class' => 'icinga-controls']);
     }
 
@@ -61,16 +59,15 @@ class DimensionsForm extends QuickForm
     {
         $view = $this->getView();
 
-        $sha1Key = sha1($key);
-        $this->addElement('button', 'removeSlice_' . $sha1Key, array(
-            'label' => null,
-            'decorators' => array('ViewHelper'),
+        $sliceId = sha1($key);
+        $this->addElement('button', 'removeSlice_' . $sliceId, [
+            'label' => $view->icon('cancel'),
+            'decorators' => ['ViewHelper'],
             'value' => $key,
             'type' => 'submit',
             'escape' => false,
-            'name' => 'removeSlice',
-            'class' => 'dimension-control icon-cancel'
-        ));
+            'class' => 'dimension-control'
+        ]);
 
         $label = $view->escape(
             sprintf(
@@ -81,117 +78,133 @@ class DimensionsForm extends QuickForm
             )
         );
 
-        $this->addHtml(
-            '<span class="dimension-name">' . $label . '</span>',
-            array('name' => 'slice_' . $sha1Key)
-        );
+        $this->addElement('note', 'slice_' . $sliceId, [
+            'class' => 'dimension-name',
+            'value' => '<span class="dimension-name">' . $label . '</span>',
+            'decorators' => ['ViewHelper']
+        ]);
 
-        $this->addSimpleDisplayGroup(
-            array(
-                'removeSlice_' . $sha1Key,
-                'slice_' . $sha1Key,
-            ),
+        $this->addDisplayGroup(
+            [
+                'removeSlice_' . $sliceId,
+                'slice_' . $sliceId,
+            ],
             $key,
-            array('class' => 'dimensions')
+            [
+                'class' => 'dimensions',
+                'decorators'  => [
+                    'FormElements',
+                    'Fieldset'
+                ]
+            ]
         );
     }
 
     protected function addDimensionButtons($dimension, $pos, $total)
     {
-        $this->addHtml(
-            '<span class="dimension-name">' . $this->getView()->escape($dimension) . '</span>',
-            array('name' => 'dimension_' . $dimension)
-        );
-        $icons = IconHelper::instance();
-        $sha1 = sha1($dimension);
-        $this->addElement('button', 'removeDimension_' . $sha1, array(
-            'label' => null,
-            'decorators' => array('ViewHelper'),
+        $view = $this->getView();
+        $dimensionId = sha1($dimension);
+
+        $this->addElement('note', 'dimension_' . $dimensionId, [
+            'class' => 'dimension-name',
+            'value' => '<span class="dimension-name">' . $view->escape($dimension) . '</span>',
+            'decorators' => ['ViewHelper']
+        ]);
+
+        $this->addElement('button', 'removeDimension_' . $dimensionId, [
+            'label' => $view->icon('cancel'),
+            'decorators' => ['ViewHelper'],
             'title' => sprintf($this->translate('Remove dimension "%s"'), $dimension),
             'value' => $dimension,
             'type' => 'submit',
             'escape' => false,
-            'class' => 'dimension-control icon-cancel',
-            'name' => 'removeDimension'
-        ));
+            'class' => 'dimension-control'
+        ]);
 
         if ($pos > 0) {
-            $this->addElement('button', 'moveDimensionUp_' . $sha1, array(
-                'label' => null,
-                'decorators' => array('ViewHelper'),
+            $this->addElement('button', 'moveDimensionUp_' . $dimensionId, [
+                'label' => $view->icon('angle-double-up'),
+                'decorators' => ['ViewHelper'],
                 'title' => sprintf($this->translate('Move dimension "%s" up'), $dimension),
                 'value' => $dimension,
                 'type' => 'submit',
                 'escape' => false,
-                'class' => 'dimension-control icon-angle-double-up',
-                'name' => 'moveDimensionUp'
-            ));
+                'class' => 'dimension-control'
+            ]);
         }
 
         if ($pos + 1 !== $total) {
-            $this->addElement('button', 'moveDimensionDown_' . $sha1, array(
-                'label' => null,
-                'decorators' => array('ViewHelper'),
+            $this->addElement('button', 'moveDimensionDown_' . $dimensionId, [
+                'label' => $view->icon('angle-double-down'),
+                'decorators' => ['ViewHelper'],
                 'title' => sprintf($this->translate('Move dimension "%s" down'), $dimension),
                 'value' => $dimension,
                 'type' => 'submit',
                 'escape' => false,
-                'class' => 'dimension-control icon-angle-double-down',
-                'name' => 'moveDimensionDown'
-            ));
+                'class' => 'dimension-control'
+            ]);
         }
 
-        $this->addSimpleDisplayGroup(
-            array(
-                'removeDimension_' . $sha1,
-                'moveDimensionUp_' . $sha1,
-                'moveDimensionDown_' . $sha1,
-                'dimension_' . $dimension,
-            ),
-            $dimension,
-            array('class' => 'dimensions')
+        $this->addDisplayGroup(
+            [
+                'removeDimension_' . $dimensionId,
+                'moveDimensionUp_' . $dimensionId,
+                'moveDimensionDown_' . $dimensionId,
+                'dimension_' . $dimensionId,
+            ],
+            $dimensionId,
+            [
+                'class' => 'dimensions',
+                'decorators'  => [
+                    'FormElements',
+                    'Fieldset'
+                ]
+            ]
         );
     }
 
-    public function onRequest()
+    public function onSuccess()
     {
-        parent::onRequest();
-        if (! $this->hasBeenSent()) {
-            return;
-        }
+        $url = $this->getRequest()->getUrl();
 
-        $url = $this->getSuccessUrl();
-        $post = $this->getRequest()->getPost();
-        $this->populate($post);
-        $cube = $this->cube;
-        $dimension = null;
-
-        if ($dimension = $this->getSentValue('addDimension')) {
+        if ($dimension = $this->getValue('addDimension')) {
             $url->setParam('dimensions', DimensionParams::fromUrl($url)->add($dimension)->getParams());
-            $this->setSuccessUrl($url->without('addDimension'));
-            $this->redirectOnSuccess($this->translate('New dimension has been added'));
-        }
+            Notification::success($this->translate('New dimension has been added'));
+        } else {
+            $updateDimensions = false;
+            foreach ($this->cube->listDimensions() as $dimension) {
+                $dimensionId = sha1($dimension);
 
-        if (isset($post['removeDimension'])) {
-            $dimension = $post['removeDimension'];
-            $cube->removeDimension($dimension);
-        } elseif (isset($post['moveDimensionUp'])) {
-            $dimension = $post['moveDimensionUp'];
-            $cube->moveDimensionUp($dimension);
-        } elseif (isset($post['moveDimensionDown'])) {
-            $dimension = $post['moveDimensionDown'];
-            $cube->moveDimensionDown($dimension);
-        } elseif (isset($post['removeSlice'])) {
-            $dimension = $post['removeSlice'];
-            $url->getParams()->remove(rawurlencode($dimension));
-        }
-
-        if ($dimension) {
-            $dimensions = array_merge($cube->listDimensions(), $cube->listSlices());
-            if (! isset($post['removeSlice'])) {
-                $url->setParam('dimensions', DimensionParams::update($dimensions)->getParams());
+                switch (true) {
+                    case ($el = $this->getElement('removeDimension_' . $dimensionId)) && $el->isChecked():
+                        $this->cube->removeDimension($dimension);
+                        $updateDimensions = true;
+                        break 2;
+                    case ($el = $this->getElement('moveDimensionUp_' . $dimensionId)) && $el->isChecked():
+                        $this->cube->moveDimensionUp($dimension);
+                        $updateDimensions = true;
+                        break 2;
+                    case ($el = $this->getElement('moveDimensionDown_' . $dimensionId)) && $el->isChecked():
+                        $this->cube->moveDimensionDown($dimension);
+                        $updateDimensions = true;
+                        break 2;
+                }
             }
-            $this->redirectAndExit($url);
+
+            if ($updateDimensions) {
+                $dimensions = array_merge($this->cube->listDimensions(), $this->cube->listSlices());
+                $url->setParam('dimensions', DimensionParams::update($dimensions)->getParams());
+            } else {
+                foreach ($this->cube->listSlices() as $slice) {
+                    $sliceId = sha1($slice);
+
+                    if (($el = $this->getElement('removeSlice_' . $sliceId)) && $el->isChecked()) {
+                        $url->getParams()->remove(rawurlencode($slice));
+                    }
+                }
+            }
         }
+
+        $this->setRedirectUrl($url);
     }
 }

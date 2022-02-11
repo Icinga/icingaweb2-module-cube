@@ -4,8 +4,7 @@
 namespace Icinga\Module\Cube\Web;
 
 use Icinga\Module\Cube\DimensionParams;
-use Icinga\Module\Cube\Web\Form\FormLoader;
-use Icinga\Module\Cube\Web\Form\QuickForm;
+use Icinga\Module\Cube\Forms\DimensionsForm;
 use Icinga\Web\Controller as WebController;
 use Icinga\Web\View;
 
@@ -97,24 +96,12 @@ abstract class Controller extends WebController
         }
 
         if ($showSettings) {
-            $this->view->form = $this->loadForm('Dimensions')
-                ->setCube($this->cube)
-                ->handleRequest();
+            $this->view->form = (new DimensionsForm())->setCube($this->cube);
+            $this->view->form->handleRequest();
         } else {
             $this->setAutorefreshInterval(15);
         }
 
         $this->render('cube-index', null, true);
-    }
-
-    /**
-     * Load a form with a specific name
-     *
-     * @param $name
-     * @return QuickForm
-     */
-    public function loadForm($name)
-    {
-        return FormLoader::load($name, $this->Module());
     }
 }
