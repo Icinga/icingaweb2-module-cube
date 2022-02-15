@@ -13,11 +13,18 @@ namespace Icinga\Module\Cube;
 interface Dimension
 {
     /**
-     * The name of this dimenstion
+     * The name of this dimension
      *
      * @return string
      */
     public function getName();
+
+    /**
+     * The label of this dimension
+     *
+     * @return string
+     */
+    public function getLabel();
 
     /**
      * Column expression

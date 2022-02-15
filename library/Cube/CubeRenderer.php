@@ -23,10 +23,13 @@ abstract class CubeRenderer
     /** @var Cube */
     protected $cube;
 
-    /** @var array Our dimension in regular order */
+    /** @var array Our dimensions */
     protected $dimensions;
 
-    /** @var array Our dimension in reversed order as a quick lookup source */
+    /** @var array Our dimensions in regular order */
+    protected $dimensionOrder;
+
+    /** @var array Our dimensions in reversed order as a quick lookup source */
     protected $reversedDimensions;
 
     /** @var array Level (deepness) for each dimension (0, 1, 2...) */
@@ -93,8 +96,8 @@ abstract class CubeRenderer
     protected function initializeLastRow()
     {
         $object = (object) array();
-        foreach ($this->dimensions as $key) {
-            $object->$key = null;
+        foreach ($this->dimensions as $dimension) {
+            $object->{$dimension->getName()} = null;
         }
 
         $this->lastRow = $object;
@@ -112,16 +115,18 @@ abstract class CubeRenderer
         $min = 3;
         $cnt = count($this->dimensions);
         if ($cnt < $min) {
+            $pos = 0;
             $diff = $min - $cnt;
-            $dimensions = $this->dimensions;
-            $this->dimensions = array();
-            foreach ($dimensions as $key => $dimension) {
-                $this->dimensions[$key + $diff] = $dimension;
+            $this->dimensionOrder = [];
+            foreach ($this->dimensions as $name => $_) {
+                $this->dimensionOrder[$pos++ + $diff] = $name;
             }
+        } else {
+            $this->dimensionOrder = array_keys($this->dimensions);
         }
 
-        $this->reversedDimensions = array_reverse($this->dimensions);
-        $this->dimensionLevels = array_flip($this->dimensions);
+        $this->reversedDimensions = array_reverse($this->dimensionOrder);
+        $this->dimensionLevels = array_flip($this->dimensionOrder);
         return $this;
     }
 
@@ -149,9 +154,9 @@ abstract class CubeRenderer
      */
     protected function startsDimension($row)
     {
-        foreach ($this->dimensions as $name) {
+        foreach ($this->dimensionOrder as $name) {
             if ($row->$name === null) {
-                $this->summaries->{$name} = $this->extractFacts($row);
+                $this->summaries->$name = $this->extractFacts($row);
                 return true;
             }
         }
@@ -203,7 +208,7 @@ abstract class CubeRenderer
     protected function beginDimensionsForRow($row)
     {
         $last = $this->lastRow;
-        foreach ($this->dimensions as $name) {
+        foreach ($this->dimensionOrder as $name) {
             if ($last->$name !== $row->$name) {
                 return $this->beginDimensionsUpFrom($name, $row);
             }
@@ -217,7 +222,7 @@ abstract class CubeRenderer
         $htm = '';
         $found = false;
 
-        foreach ($this->dimensions as $name) {
+        foreach ($this->dimensionOrder as $name) {
             if ($name === $dimension) {
                 $found = true;
             }
@@ -233,7 +238,7 @@ abstract class CubeRenderer
     protected function closeDimensionsForRow($row)
     {
         $last = $this->lastRow;
-        foreach ($this->dimensions as $name) {
+        foreach ($this->dimensionOrder as $name) {
             if ($last->$name !== $row->$name) {
                 return $this->closeDimensionsDownTo($name);
             }
@@ -289,6 +294,7 @@ abstract class CubeRenderer
             $this->started = true;
         }
         $view = $this->view;
+        $dimension = $this->cube->getDimension($name);
 
         return
             $indent . '<div class="'
@@ -296,7 +302,7 @@ abstract class CubeRenderer
             . '">' . "\n"
             . $indent . '  <div class="header"><a href="'
             . $this->getDetailsUrl($name, $row)
-            . '" title="' . $view->escape(sprintf('Show details for %s: %s', $name, $row->$name)) . '"'
+            . '" title="' . $view->escape(sprintf('Show details for %s: %s', $dimension->getLabel(), $row->$name)) . '"'
             . ' data-base-target="_next">'
             . $this->renderDimensionLabel($name, $row)
             . '</a><a class="icon-filter" href="'
@@ -328,7 +334,7 @@ abstract class CubeRenderer
     {
         $cube = $this->cube;
 
-        $dimensions = array_merge($cube->listDimensions(), $cube->listSlices());
+        $dimensions = array_merge(array_keys($cube->listDimensions()), $cube->listSlices());
         $params = [
             'dimensions' => DimensionParams::update($dimensions)->getParams()
         ];

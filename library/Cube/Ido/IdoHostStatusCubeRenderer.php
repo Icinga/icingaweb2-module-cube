@@ -18,8 +18,8 @@ class IdoHostStatusCubeRenderer extends CubeRenderer
     {
         $htm = parent::renderDimensionLabel($name, $row);
 
-        if (($next = $this->cube->getDimensionAfter($name)) && isset($this->summaries->$next)) {
-            $htm .= ' <span class="sum">(' . $this->summaries->$next->hosts_cnt . ')</span>';
+        if (($next = $this->cube->getDimensionAfter($name)) && isset($this->summaries->{$next->getName()})) {
+            $htm .= ' <span class="sum">(' . $this->summaries->{$next->getName()}->hosts_cnt . ')</span>';
         }
 
         return $htm;

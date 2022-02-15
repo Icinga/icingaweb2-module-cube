@@ -92,9 +92,20 @@ class IdoServiceStatusCube extends IdoCube
     public function addDimensionByName($name)
     {
         if (count($this->filterProtectedCustomvars([$name])) === 1) {
-            $this->addDimension(new CustomVarDimension($name, CustomVarDimension::TYPE_SERVICE));
+            $this->addDimension($this->createDimension($name));
         }
 
         return $this;
+    }
+
+    public function createDimension($name)
+    {
+        $this->registerAvailableDimensions();
+
+        if (isset($this->availableDimensions[$name])) {
+            return clone $this->availableDimensions[$name];
+        }
+
+        return new CustomVarDimension($name, CustomVarDimension::TYPE_SERVICE);
     }
 }

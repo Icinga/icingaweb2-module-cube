@@ -27,6 +27,11 @@ class CustomVarDimension implements Dimension
     protected $varName;
 
     /**
+     * @var string custom variable label
+     */
+    protected $varLabel;
+
+    /**
      * @var bool Whether null values should be shown
      */
     protected $wantNull = false;
@@ -64,6 +69,44 @@ class CustomVarDimension implements Dimension
     public function getName()
     {
         return $this->varName;
+    }
+
+    /**
+     * @return string
+     */
+    public function getLabel()
+    {
+        return $this->varLabel ?: $this->getName();
+    }
+
+    /**
+     * Set the label
+     *
+     * @param string $label
+     * @return $this
+     */
+    public function setLabel($label)
+    {
+        $this->varLabel = $label;
+
+        return $this;
+    }
+
+    /**
+     * Add a label
+     *
+     * @param string $label
+     * @return $this
+     */
+    public function addLabel($label)
+    {
+        if ($this->varLabel === null) {
+            $this->setLabel($label);
+        } else {
+            $this->varLabel .= ' & ' . $label;
+        }
+
+        return $this;
     }
 
     public function getColumnExpression(Cube $cube)
