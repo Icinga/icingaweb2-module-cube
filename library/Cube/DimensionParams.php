@@ -28,7 +28,7 @@ class DimensionParams
     {
         $self = new static();
 
-        $self->dimensions = array_map('rawurldecode', array_filter($dimensions));
+        $self->dimensions = array_filter($dimensions);
 
         return $self;
     }
@@ -74,7 +74,7 @@ class DimensionParams
      */
     public function getParams()
     {
-        return implode(',', array_map('rawurlencode', $this->dimensions));
+        return implode(',', $this->dimensions);
     }
 
     /**
