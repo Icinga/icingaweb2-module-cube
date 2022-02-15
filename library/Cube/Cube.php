@@ -8,6 +8,9 @@ use Icinga\Web\View;
 
 abstract class Cube
 {
+    /** @var array<string, Dimension> Available dimensions */
+    protected $availableDimensions;
+
     /** @var array Fact names */
     protected $chosenFacts;
 
@@ -59,7 +62,9 @@ abstract class Cube
             return null;
         }
 
-        return implode(' -> ', $dimensions);
+        return implode(' -> ', array_map(function ($d) {
+            return $d->getLabel();
+        }, $dimensions));
     }
 
     public function getSlicesLabel()
@@ -71,19 +76,45 @@ abstract class Cube
             return null;
         }
         foreach ($slices as $key => $value) {
-            $parts[] = sprintf('%s = %s', $key, $value);
+            $parts[] = sprintf('%s = %s', $this->getDimension($key)->getLabel(), $value);
         }
 
         return implode(', ', $parts);
     }
 
+    /**
+     * Create a new dimension
+     *
+     * @param string $name
+     * @return Dimension
+     */
+    abstract public function createDimension($name);
+
+    protected function registerAvailableDimensions()
+    {
+        if ($this->availableDimensions !== null) {
+            return;
+        }
+
+        $this->availableDimensions = [];
+        foreach ($this->listAvailableDimensions() as $label) {
+            $name = strtolower($label);
+            if (! isset($this->availableDimensions[$name])) {
+                $this->availableDimensions[$name] = $this->createDimension($name)->setLabel($label);
+            } else {
+                $this->availableDimensions[$name]->addLabel($label);
+            }
+        }
+    }
+
     public function listAdditionalDimensions()
     {
-        $list = array();
+        $this->registerAvailableDimensions();
 
-        foreach ($this->listAvailableDimensions() as $dimension) {
-            if (! array_key_exists($dimension, $this->dimensions)) {
-                $list[] = $dimension;
+        $list = [];
+        foreach ($this->availableDimensions as $name => $dimension) {
+            if (! $this->hasDimension($name)) {
+                $list[$name] = $dimension->getLabel();
             }
         }
 
@@ -97,13 +128,13 @@ abstract class Cube
         $found = false;
         $after = null;
 
-        foreach ($this->listDimensions() as $d) {
+        foreach ($this->listDimensions() as $k => $d) {
             if ($found) {
                 $after = $d;
                 break;
             }
 
-            if ($d === $name) {
+            if ($k === $name) {
                 $found = true;
             }
         }
@@ -114,7 +145,7 @@ abstract class Cube
     public function listDimensionsUpTo($name)
     {
         $res = array();
-        foreach ($this->listDimensions() as $d) {
+        foreach ($this->listDimensions() as $d => $_) {
             $res[] = $d;
             if ($d === $name) {
                 break;
@@ -267,14 +298,12 @@ abstract class Cube
 
     public function listDimensions()
     {
-        return array_values(
-            array_diff(array_keys($this->dimensions), $this->listSlices())
-        );
+        return array_diff_key($this->dimensions, $this->slices);
     }
 
     public function listColumns()
     {
-        return array_merge($this->listDimensions(), $this->listFacts());
+        return array_merge(array_keys($this->listDimensions()), $this->listFacts());
     }
 
     /**

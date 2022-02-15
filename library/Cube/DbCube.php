@@ -269,7 +269,7 @@ abstract class DbCube extends Cube
 
         $dimensions = array_map(function ($val) {
             return $this->db()->quoteIdentifier([$val]);
-        }, $this->listDimensions());
+        }, array_keys($this->listDimensions()));
         $this->finalizeInnerQuery();
         $columns = array();
         foreach ($dimensions as $dimension) {

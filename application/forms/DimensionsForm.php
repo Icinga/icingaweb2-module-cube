@@ -4,10 +4,12 @@
 namespace Icinga\Module\Cube\Forms;
 
 use Icinga\Module\Cube\Cube;
-use Icinga\Module\Cube\Web\Form\QuickForm;
-use Icinga\Module\Cube\Web\IconHelper;
+use Icinga\Module\Cube\Dimension;
+use Icinga\Module\Cube\DimensionParams;
+use Icinga\Web\Form;
+use Icinga\Web\Notification;
 
-class DimensionsForm extends QuickForm
+class DimensionsForm extends Form
 {
     /**
      * @var Cube
@@ -20,191 +22,184 @@ class DimensionsForm extends QuickForm
         return $this;
     }
 
-    public function setup()
+    public function createElements(array $formData)
     {
         $cube = $this->cube;
+        $dimensions = $cube->listDimensions();
+        $cnt = count($dimensions);
 
-        if (count($cube->listDimensions()) < 3) {
-            $dimensions = array_diff(
-                $cube->listAdditionalDimensions(),
-                $cube->listDimensions()
-            );
-
-            if (! empty($dimensions)) {
-                $dimensions = array_combine($dimensions, $dimensions);
-            }
+        if ($cnt < 3) {
+            $allDimensions = $cube->listAdditionalDimensions();
 
             $this->addElement('select', 'addDimension', [
-                'multiOptions'  => [null => $this->translate('+ Add a dimension')] + $dimensions,
+                'multiOptions'  => [null => $this->translate('+ Add a dimension')] + $allDimensions,
                 'decorators'    => ['ViewHelper'],
                 'class'         => 'autosubmit'
             ]);
         }
 
-        $dimensions = $cube->listDimensions();
-        $cnt = count($dimensions);
-        foreach ($dimensions as $pos => $dimension) {
-            $this->addDimensionButtons($dimension, $pos, $cnt);
+        $pos = 0;
+        foreach ($dimensions as $dimension) {
+            $this->addDimensionButtons($dimension, $pos++, $cnt);
         }
 
         foreach ($cube->getSlices() as $key => $value) {
-            $this->addSlice($key, $value);
+            $this->addSlice($this->cube->getDimension($key), $value);
         }
 
-
-        $this->setSubmitLabel(false);
         $this->addAttribs(['class' => 'icinga-controls']);
     }
 
-    protected function addSlice($key, $value)
+    protected function addSlice(Dimension $dimension, $value)
     {
         $view = $this->getView();
 
-        $this->addElement('submit', 'removeSlice_' . $key, array(
-            'label'      => IconHelper::instance()->iconCharacter('cancel'),
-            'decorators' => array('ViewHelper')
-        ));
+        $sliceId = sha1($dimension->getName());
+        $this->addElement('button', 'removeSlice_' . $sliceId, [
+            'label' => $view->icon('cancel'),
+            'decorators' => ['ViewHelper'],
+            'value' => $dimension->getName(),
+            'type' => 'submit',
+            'escape' => false,
+            'class' => 'dimension-control'
+        ]);
 
         $label = $view->escape(
             sprintf(
                 '%s: %s = %s',
                 $view->translate('Slice/Filter'),
-                $key,
+                $dimension->getLabel(),
                 $value
             )
         );
 
-        $this->addHtml(
-            '<span class="dimension-name">' . $label . '</span>',
-            array('name' => 'slice_' . $key)
-        );
+        $this->addElement('note', 'slice_' . $sliceId, [
+            'class' => 'dimension-name',
+            'value' => '<span class="dimension-name">' . $label . '</span>',
+            'decorators' => ['ViewHelper']
+        ]);
 
-        $this->addSimpleDisplayGroup(
-            array(
-                'removeSlice_' . $key,
-                'slice_' . $key,
-            ),
-            $key,
-            array('class' => 'dimensions')
-        );
-    }
-
-    protected function addDimensionButtons($dimension, $pos, $total)
-    {
-        $this->addHtml(
-            '<span class="dimension-name">' . $this->getView()->escape($dimension) . '</span>',
-            array('name' => 'dimension_' . $dimension)
-        );
-        $icons = IconHelper::instance();
-        $this->addElement('submit', 'removeDimension_' . $dimension, array(
-            'label' => $icons->iconCharacter('cancel'),
-            'decorators' => array('ViewHelper'),
-            'title' => sprintf($this->translate('Remove dimension "%s"'), $dimension),
-        ));
-
-        $this->addElement('submit', 'moveDimensionUp_' . $dimension, array(
-            'label' => $icons->iconCharacter('angle-double-left'),
-            'decorators' => array('ViewHelper'),
-            'title' => sprintf($this->translate('Move dimension "%s" up'), $dimension),
-        ));
-
-        $this->addElement('submit', 'moveDimensionDown_' . $dimension, array(
-            'label' => $icons->iconCharacter('angle-double-right'),
-            'decorators' => array('ViewHelper'),
-            'title' => sprintf($this->translate('Move dimension "%s" down'), $dimension),
-        ));
-
-        if ($pos === 0) {
-            $this->getElement('moveDimensionUp_' . $dimension)->disabled = 'disabled';
-        }
-
-        if ($pos + 1 === $total) {
-            $this->getElement('moveDimensionDown_' . $dimension)->disabled = 'disabled';
-        }
-
-        $this->addSimpleDisplayGroup(
-            array(
-                'removeDimension_' . $dimension,
-                'moveDimensionUp_' . $dimension,
-                'moveDimensionDown_' . $dimension,
-                'dimension_' . $dimension,
-            ),
-            $dimension,
-            array('class' => 'dimensions')
+        $this->addDisplayGroup(
+            [
+                'removeSlice_' . $sliceId,
+                'slice_' . $sliceId,
+            ],
+            $dimension->getName(),
+            [
+                'class' => 'dimensions',
+                'decorators'  => [
+                    'FormElements',
+                    'Fieldset'
+                ]
+            ]
         );
     }
 
-    public function onRequest()
+    protected function addDimensionButtons(Dimension $dimension, $pos, $total)
     {
-        parent::onRequest();
-        if (! $this->hasBeenSent()) {
-            return;
+        $view = $this->getView();
+        $dimensionId = sha1($dimension->getName());
+
+        $this->addElement('note', 'dimension_' . $dimensionId, [
+            'class' => 'dimension-name',
+            'value' => '<span class="dimension-name">' . $view->escape($dimension->getLabel()) . '</span>',
+            'decorators' => ['ViewHelper']
+        ]);
+
+        $this->addElement('button', 'removeDimension_' . $dimensionId, [
+            'label' => $view->icon('cancel'),
+            'decorators' => ['ViewHelper'],
+            'title' => sprintf($this->translate('Remove dimension "%s"'), $dimension->getLabel()),
+            'value' => $dimension->getName(),
+            'type' => 'submit',
+            'escape' => false,
+            'class' => 'dimension-control'
+        ]);
+
+        if ($pos > 0) {
+            $this->addElement('button', 'moveDimensionUp_' . $dimensionId, [
+                'label' => $view->icon('angle-double-up'),
+                'decorators' => ['ViewHelper'],
+                'title' => sprintf($this->translate('Move dimension "%s" up'), $dimension->getLabel()),
+                'value' => $dimension->getName(),
+                'type' => 'submit',
+                'escape' => false,
+                'class' => 'dimension-control'
+            ]);
         }
 
-        $url = $this->getSuccessUrl();
-        $post = $this->getRequest()->getPost();
-        $this->populate($post);
-        $cube = $this->cube;
-        $dimension = null;
-
-        foreach ($this->getElements() as $el) {
-            if (! $el->getValue()) {
-                // Skip unpressed buttons
-                continue;
-            }
-            $name = $el->getName();
-            $pos = strpos($name, '_');
-
-            if ($pos === false || $pos === 0) {
-                continue;
-            }
-
-            $action = substr($name, 0, $pos);
-            $name = substr($name, $pos + 1);
-
-            switch ($action) {
-                case 'removeSlice':
-                    $dimension = $name;
-                    $url->getParams()->remove($dimension);
-                    break 2;
-
-                case 'removeDimension':
-                    $dimension = $name;
-                    $cube->removeDimension($dimension);
-                    break 2;
-
-                case 'moveDimensionUp':
-                    $dimension = $name;
-                    $cube->moveDimensionUp($dimension);
-                    break 2;
-
-                case 'moveDimensionDown':
-                    $dimension = $name;
-                    $cube->moveDimensionDown($dimension);
-                    break 2;
-                default:
-            }
+        if ($pos + 1 !== $total) {
+            $this->addElement('button', 'moveDimensionDown_' . $dimensionId, [
+                'label' => $view->icon('angle-double-down'),
+                'decorators' => ['ViewHelper'],
+                'title' => sprintf($this->translate('Move dimension "%s" down'), $dimension->getLabel()),
+                'value' => $dimension->getName(),
+                'type' => 'submit',
+                'escape' => false,
+                'class' => 'dimension-control'
+            ]);
         }
 
-        if ($dimension) {
-            $dimensions = array_merge($cube->listDimensions(), $cube->listSlices());
-            if ($action !== 'removeSlice') {
-                $url->setParam('dimensions', implode(',', $dimensions));
-            }
-            $this->redirectAndExit($url);
-        }
+        $this->addDisplayGroup(
+            [
+                'removeDimension_' . $dimensionId,
+                'moveDimensionUp_' . $dimensionId,
+                'moveDimensionDown_' . $dimensionId,
+                'dimension_' . $dimensionId,
+            ],
+            $dimensionId,
+            [
+                'class' => 'dimensions',
+                'decorators'  => [
+                    'FormElements',
+                    'Fieldset'
+                ]
+            ]
+        );
+    }
 
-        if ($dimension = $this->getSentValue('addDimension')) {
-            $dimensions = $url->getParam('dimensions');
-            if (empty($dimensions)) {
-                $dimensions = $dimension;
+    public function onSuccess()
+    {
+        $url = $this->getRequest()->getUrl();
+
+        if ($dimension = $this->getValue('addDimension')) {
+            $url->setParam('dimensions', DimensionParams::fromUrl($url)->add($dimension)->getParams());
+            Notification::success($this->translate('New dimension has been added'));
+        } else {
+            $updateDimensions = false;
+            foreach ($this->cube->listDimensions() as $name => $_) {
+                $dimensionId = sha1($name);
+
+                switch (true) {
+                    case ($el = $this->getElement('removeDimension_' . $dimensionId)) && $el->isChecked():
+                        $this->cube->removeDimension($name);
+                        $updateDimensions = true;
+                        break 2;
+                    case ($el = $this->getElement('moveDimensionUp_' . $dimensionId)) && $el->isChecked():
+                        $this->cube->moveDimensionUp($name);
+                        $updateDimensions = true;
+                        break 2;
+                    case ($el = $this->getElement('moveDimensionDown_' . $dimensionId)) && $el->isChecked():
+                        $this->cube->moveDimensionDown($name);
+                        $updateDimensions = true;
+                        break 2;
+                }
+            }
+
+            if ($updateDimensions) {
+                $dimensions = array_merge(array_keys($this->cube->listDimensions()), $this->cube->listSlices());
+                $url->setParam('dimensions', DimensionParams::update($dimensions)->getParams());
             } else {
-                $dimensions .= ',' . $dimension;
-            }
-            $url->setParam('dimensions', $dimensions);
+                foreach ($this->cube->listSlices() as $slice) {
+                    $sliceId = sha1($slice);
 
-            $this->setSuccessUrl($url->without('addDimension'));
-            $this->redirectOnSuccess($this->translate('New dimension has been added'));
+                    if (($el = $this->getElement('removeSlice_' . $sliceId)) && $el->isChecked()) {
+                        $url->getParams()->remove(rawurlencode($slice));
+                    }
+                }
+            }
         }
+
+        $this->setRedirectUrl($url);
     }
 }

@@ -3,8 +3,8 @@
 
 namespace Icinga\Module\Cube\Web;
 
-use Icinga\Module\Cube\Web\Form\FormLoader;
-use Icinga\Module\Cube\Web\Form\QuickForm;
+use Icinga\Module\Cube\DimensionParams;
+use Icinga\Module\Cube\Forms\DimensionsForm;
 use Icinga\Web\Controller as WebController;
 use Icinga\Web\View;
 
@@ -36,16 +36,13 @@ abstract class Controller extends WebController
         ])->activate('details');
 
         $this->cube->chooseFacts(array_keys($this->cube->getAvailableFactColumns()));
-        $dimensions = $this->params->shift('dimensions');
+        $vars = DimensionParams::fromString($this->params->shift('dimensions', ''))->getDimensions();
         $wantNull = $this->params->shift('wantNull');
 
-        if ($dimensions) {
-            $vars = preg_split('/,/', $dimensions, -1, PREG_SPLIT_NO_EMPTY);
-            foreach ($vars as $var) {
-                $this->cube->addDimensionByName($var);
-                if ($wantNull) {
-                    $this->cube->getDimension($var)->wantNull();
-                }
+        foreach ($vars as $var) {
+            $this->cube->addDimensionByName($var);
+            if ($wantNull) {
+                $this->cube->getDimension($var)->wantNull();
             }
         }
 
@@ -54,7 +51,7 @@ abstract class Controller extends WebController
         }
 
         foreach ($this->params->toArray() as $param) {
-            $this->cube->slice($param[0], urldecode($param[1]));
+            $this->cube->slice(rawurldecode($param[0]), rawurldecode($param[1]));
         }
 
         $this->view->title = $this->cube->getSlicesLabel();
@@ -69,16 +66,13 @@ abstract class Controller extends WebController
         $showSettings = $this->params->shift('showSettings');
 
         $this->cube->chooseFacts(array_keys($this->cube->getAvailableFactColumns()));
-        $dimensions = $this->params->shift('dimensions');
+        $vars = DimensionParams::fromString($this->params->shift('dimensions', ''))->getDimensions();
         $wantNull = $this->params->shift('wantNull');
 
-        if ($dimensions) {
-            $vars = preg_split('/,/', $dimensions, -1, PREG_SPLIT_NO_EMPTY);
-            foreach ($vars as $var) {
-                $this->cube->addDimensionByName($var);
-                if ($wantNull) {
-                    $this->cube->getDimension($var)->wantNull();
-                }
+        foreach ($vars as $var) {
+            $this->cube->addDimensionByName($var);
+            if ($wantNull) {
+                $this->cube->getDimension($var)->wantNull();
             }
         }
 
@@ -87,7 +81,7 @@ abstract class Controller extends WebController
         }
 
         foreach ($this->params->toArray() as $param) {
-            $this->cube->slice($param[0], urldecode($param[1]));
+            $this->cube->slice(rawurldecode($param[0]), rawurldecode($param[1]));
         }
 
         $this->view->title = sprintf(
@@ -102,24 +96,12 @@ abstract class Controller extends WebController
         }
 
         if ($showSettings) {
-            $this->view->form = $this->loadForm('Dimensions')
-                ->setCube($this->cube)
-                ->handleRequest();
+            $this->view->form = (new DimensionsForm())->setCube($this->cube);
+            $this->view->form->handleRequest();
         } else {
             $this->setAutorefreshInterval(15);
         }
 
         $this->render('cube-index', null, true);
-    }
-
-    /**
-     * Load a form with a specific name
-     *
-     * @param $name
-     * @return QuickForm
-     */
-    public function loadForm($name)
-    {
-        return FormLoader::load($name, $this->Module());
     }
 }

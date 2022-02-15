@@ -228,37 +228,39 @@ fieldset.dimensions {
     display: inline-block;
   }
 
-  input[type=submit] {
+  button[type=submit] {
     border: none;
     color: @text-color;
     background: none;
-    font-family: 'ifont';
+
+    padding-left: .75em;
+    padding-right: .75em;
+
+    i:before {
+      margin-right: 0;
+    }
+
+    &:not([disabled]):hover {
+      .rounded-corners();
+      background-color: @icinga-blue;
+      color: @text-color-on-icinga-blue;
+    }
   }
 
-  input[type=submit][disabled] {
+  button[type=submit][disabled] {
     color: @disabled-gray;
     background-color: @body-bg-color;
     cursor: auto;
   }
 
-  input[type=submit]:not([disabled]):hover {
-    color: @icinga-blue;
+  &:first-of-type button[type=submit]:nth-of-type(2) {
+    margin-left: 2.75em;
   }
 
-  input[type=submit]:nth-of-type(2) {
-    -moz-transform: rotate(90deg);
-    -ms-transform: rotate(90deg);
-    -o-transform: rotate(90deg);
-    -webkit-transform: rotate(90deg);
-    transform: rotate(90deg);
-  }
-
-  input[type=submit]:nth-of-type(3) {
-    -moz-transform: rotate(90deg);
-    -ms-transform: rotate(90deg);
-    -o-transform: rotate(90deg);
-    -webkit-transform: rotate(90deg);
-    transform: rotate(90deg);
+  &:not(:first-of-type) {
+    button[type=submit]:nth-of-type(2):last-of-type {
+      margin-right: 2.75em;
+    }
   }
 
   &:last-of-type {
@@ -332,15 +334,10 @@ ul.action-links {
   margin-bottom: 2em;
 }
 
-form input[type=submit] {
+form button[type=submit] {
   margin-top: 0.5em;
 }
 
 select {
   width: 100%;
-}
-
-form dl {
-  margin: 0;
-  padding: 0;
 }

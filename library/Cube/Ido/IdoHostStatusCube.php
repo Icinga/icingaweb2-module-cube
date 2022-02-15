@@ -30,6 +30,17 @@ class IdoHostStatusCube extends IdoCube
         );
     }
 
+    public function createDimension($name)
+    {
+        $this->registerAvailableDimensions();
+
+        if (isset($this->availableDimensions[$name])) {
+            return clone $this->availableDimensions[$name];
+        }
+
+        return new CustomVarDimension($name, CustomVarDimension::TYPE_HOST);
+    }
+
     /**
      * Add a specific named dimension
      *
@@ -42,7 +53,7 @@ class IdoHostStatusCube extends IdoCube
     public function addDimensionByName($name)
     {
         if (count($this->filterProtectedCustomvars(array($name))) === 1) {
-            $this->addDimension(new CustomVarDimension($name, CustomVarDimension::TYPE_HOST));
+            $this->addDimension($this->createDimension($name));
         }
 
         return $this;
