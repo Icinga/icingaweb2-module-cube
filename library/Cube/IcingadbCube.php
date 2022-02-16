@@ -86,8 +86,8 @@ abstract class IcingadbCube extends Cube
         $alias = 'sub';
 
         $dimensions = array_map(function ($val) {
-            return $val;
-        }, $this->listDimensions());
+            return $this->getDb()->quoteIdentifier($val);
+        }, array_keys($this->listDimensions()));
 
         $this->finalizeQuery();
         $columns = array();
