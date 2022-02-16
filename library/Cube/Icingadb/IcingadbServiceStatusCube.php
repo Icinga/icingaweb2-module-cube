@@ -42,6 +42,17 @@ class IcingadbServiceStatusCube extends IcingadbCube
         ];
     }
 
+    public function createDimension($name)
+    {
+        $this->registerAvailableDimensions();
+
+        if (isset($this->availableDimensions[$name])) {
+            return clone $this->availableDimensions[$name];
+        }
+
+        return new IcingadbCustomVarDimension($name, IcingadbCustomVarDimension::TYPE_SERVICE);
+    }
+
     /**
      * @return \Generator
      * @throws \Icinga\Exception\ConfigurationError
