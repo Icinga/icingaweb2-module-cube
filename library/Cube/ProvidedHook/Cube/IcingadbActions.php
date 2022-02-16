@@ -3,23 +3,25 @@
 
 namespace Icinga\Module\Cube\ProvidedHook\Cube;
 
-use Icinga\Module\Cube\BaseCube;
 use Icinga\Module\Cube\Cube;
 use Icinga\Module\Cube\Hook\ActionsHook;
-use Icinga\Module\Cube\Hook\IcingadbHook;
 use Icinga\Module\Cube\Icingadb\IcingadbServiceStatusCube;
-use Icinga\Module\Cube\ServiceCube;
+use Icinga\Module\Cube\IcingadbCube;
+use Icinga\Module\Cube\Ido\IdoCube;
 use Icinga\Web\View;
 
 class IcingadbActions extends ActionsHook
 {
-
     /**
      * @param Cube $cube
      * @param View $view
      */
     public function prepareActionLinks(Cube $cube, View $view)
     {
+        if (! $cube instanceof IcingadbCube) {
+            return;
+        }
+
         $type = 'host';
         if ($cube instanceof IcingadbServiceStatusCube) {
             $type = 'service';
