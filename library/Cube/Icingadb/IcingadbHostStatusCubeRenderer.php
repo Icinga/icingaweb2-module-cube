@@ -125,10 +125,12 @@ class IcingadbHostStatusCubeRenderer extends CubeRenderer
         $mainLink = '';
         $sub = '';
         $subLink = [];
-        $name = $this->name;
+        $params = [];
 
         foreach ($parts as $class => $count) {
-            $params = [$this->getParamUrlPrefix() . $this->name => $this->row->$name];
+            foreach (array_keys($this->dimensions) as $dimension) {
+                $params[$this->getParamUrlPrefix() . $dimension] = $this->row->$dimension;
+            }
 
             if ($this->cube->getSlices()) {
                 foreach ($this->cube->getSlices() as $slice => $value) {
