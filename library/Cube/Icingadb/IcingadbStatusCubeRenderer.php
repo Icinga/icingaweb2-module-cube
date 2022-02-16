@@ -126,8 +126,8 @@ class IcingadbStatusCubeRenderer extends CubeRenderer
 
         $htm = parent::renderDimensionLabel($name, $row);
 
-        if (($next = $this->cube->getDimensionAfter($name)) && isset($this->summaries->$next)) {
-            $htm .= ' <span class="sum">(' . $this->summaries->$next->services_cnt . ')</span>';
+        if (($next = $this->cube->getDimensionAfter($name)) && isset($this->summaries->{$next->getLabel()})) {
+            $htm .= ' <span class="sum">(' . $this->summaries->{$next->getLabel()}->services_cnt . ')</span>';
         }
 
         return $htm;
