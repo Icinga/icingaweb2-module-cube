@@ -1,0 +1,99 @@
+<?php
+// Icinga DB Web | (c) 2022 Icinga GmbH | GPLv2
+
+namespace Icinga\Module\Cube\IcingaDb;
+
+use Icinga\Module\Cube\Cube;
+use Icinga\Module\Cube\Dimension;
+use ipl\Sql\Expression;
+
+class CustomVariableDimension implements Dimension
+{
+    const TYPE_HOST = 'host';
+
+    const TYPE_SERVICE = 'service';
+
+    protected $name;
+
+    protected $label;
+
+    protected $wantNull = false;
+
+    protected $type;
+
+    public function __construct($name, $type)
+    {
+        $this->name = $name;
+        $this->type = $type;
+    }
+
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    public function getLabel()
+    {
+        return $this->label ?: $this->getName();
+    }
+
+    /**
+     * Set the label
+     *
+     * @param string $label
+     * @return $this
+     */
+    public function setLabel($label)
+    {
+        $this->label = $label;
+
+        return $this;
+    }
+
+    /**
+     * Add a label
+     *
+     * @param string $label
+     * @return $this
+     */
+    public function addLabel($label)
+    {
+        if ($this->label === null) {
+            $this->setLabel($label);
+        } else {
+            $this->label .= ' & ' . $label;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Define whether null values should be shown
+     *
+     * @param bool $wantNull
+     * @return $this
+     */
+    public function wantNull($wantNull = true)
+    {
+        $this->wantNull = $wantNull;
+
+        return $this;
+    }
+
+    public function getColumnExpression(Cube $cube)
+    {
+        /** @var IcingaDbCube $cube */
+        $expression = $cube->getDb()->quoteIdentifier(['c_' . $this->getName(), 'flatvalue']);
+
+        if ($this->wantNull) {
+            return new Expression("COALESCE($expression, '-')");
+        }
+
+        return $expression;
+    }
+
+    public function addToCube(Cube $cube)
+    {
+
+    }
+}
