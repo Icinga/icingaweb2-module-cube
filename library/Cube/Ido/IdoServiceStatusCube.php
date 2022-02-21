@@ -3,13 +3,13 @@
 
 namespace Icinga\Module\Cube\Ido;
 
-use Icinga\Application\Config;
+use Icinga\Module\Cube\CubeRenderer\ServiceStatusCubeRenderer;
 
 class IdoServiceStatusCube extends IdoCube
 {
     public function getRenderer()
     {
-        return new IdoStatusCubeRenderer($this);
+        return new ServiceStatusCubeRenderer($this);
     }
 
     public function getAvailableFactColumns()

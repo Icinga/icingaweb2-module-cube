@@ -1,11 +1,11 @@
 <?php
 // Icinga Web 2 Cube Module | (c) 2019 Icinga GmbH | GPLv2
 
-namespace Icinga\Module\Cube\Ido;
+namespace Icinga\Module\Cube\CubeRenderer;
 
 use Icinga\Module\Cube\CubeRenderer;
 
-class IdoStatusCubeRenderer extends CubeRenderer
+class ServiceStatusCubeRenderer extends CubeRenderer
 {
     public function renderFacts($facts)
     {

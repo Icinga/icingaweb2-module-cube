@@ -1,9 +1,10 @@
 <?php
 // Icinga Web 2 Cube Module | (c) 2016 Icinga GmbH | GPLv2
 
-namespace Icinga\Module\Cube;
+namespace Icinga\Module\Cube\Ido;
 
 use Icinga\Data\Db\DbConnection;
+use Icinga\Module\Cube\Cube;
 
 abstract class DbCube extends Cube
 {

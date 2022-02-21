@@ -1,6 +1,6 @@
 <?php
 
-namespace Icinga\Module\Cube;
+namespace Icinga\Module\Cube\Ido;
 
 /**
  * Since version 1.1.0 we're using the monitoring module's queries as the cubes' base queries.

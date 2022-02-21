@@ -1,19 +1,12 @@
 <?php
 // Icinga Web 2 Cube Module | (c) 2016 Icinga GmbH | GPLv2
 
-namespace Icinga\Module\Cube\Ido;
+namespace Icinga\Module\Cube\CubeRenderer;
 
 use Icinga\Module\Cube\CubeRenderer;
 
-/**
- * Class IdoHostStatusCubeRenderer
- * @package Icinga\Module\Cube\Ido
- */
-class IdoHostStatusCubeRenderer extends CubeRenderer
+class HostStatusCubeRenderer extends CubeRenderer
 {
-    /**
-     * @inheritdoc
-     */
     protected function renderDimensionLabel($name, $row)
     {
         $htm = parent::renderDimensionLabel($name, $row);

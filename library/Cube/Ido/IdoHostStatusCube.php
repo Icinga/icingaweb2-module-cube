@@ -3,13 +3,14 @@
 
 namespace Icinga\Module\Cube\Ido;
 
+use Icinga\Module\Cube\CubeRenderer\HostStatusCubeRenderer;
 use Icinga\Module\Cube\Ido\DataView\Hoststatus;
 
 class IdoHostStatusCube extends IdoCube
 {
     public function getRenderer()
     {
-        return new IdoHostStatusCubeRenderer($this);
+        return new HostStatusCubeRenderer($this);
     }
 
     /**
