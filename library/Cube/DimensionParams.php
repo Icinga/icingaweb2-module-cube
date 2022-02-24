@@ -74,7 +74,7 @@ class DimensionParams
      */
     public function getParams()
     {
-        return implode(',', $this->dimensions);
+        return implode(',', (array)$this->dimensions);
     }
 
     /**
