@@ -61,6 +61,7 @@ class IcingaDbHostStatusCube extends IcingaDbCube
         $query->disableDefaultSort();
         $this->applyRestrictions($query);
 
-        return $query;
+        $this->innerQuery = $query;
+        return $this->innerQuery;
     }
 }

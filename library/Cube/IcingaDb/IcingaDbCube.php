@@ -6,8 +6,6 @@ namespace Icinga\Module\Cube\IcingaDb;
 use Icinga\Module\Cube\Cube;
 use Icinga\Module\Icingadb\Common\Auth;
 use Icinga\Module\Icingadb\Common\Database;
-use Icinga\Module\Icingadb\Model\CustomvarFlat;
-use ipl\Orm\Model;
 use ipl\Orm\Query;
 use ipl\Sql\Select;
 
@@ -15,6 +13,15 @@ abstract class IcingaDbCube extends Cube
 {
     use Auth;
     use Database;
+
+    /** @var Query The inner query fetching all required data */
+    protected $innerQuery;
+
+    /** @var Select The rollup query, creating grouped sums over innerQuery */
+    protected $rollupQuery;
+
+    /** @var Select The outer query, orders respecting NULL values, rollup first */
+    protected $fullQuery;
 
     /**
      * An IcingaDbCube must provide a list of all available columns
@@ -32,6 +39,36 @@ abstract class IcingaDbCube extends Cube
     abstract public function prepareInnerQuery();
 
     /**
+     * Get our inner query
+     *
+     * Hint: mostly used to get rid of NULL values
+     *
+     * @return Query
+     */
+    public function innerQuery()
+    {
+        if ($this->innerQuery === null) {
+            $this->innerQuery = $this->prepareInnerQuery();
+        }
+
+        return $this->innerQuery;
+    }
+
+    /**
+     * Get our rollup query
+     *
+     * @return Select
+     */
+    protected function rollupQuery()
+    {
+        if ($this->rollupQuery === null) {
+            $this->rollupQuery = $this->prepareRollupQuery();
+        }
+
+        return $this->rollupQuery;
+    }
+
+    /**
      * Add a specific named dimension
      *
      * @param string $name
@@ -44,131 +81,106 @@ abstract class IcingaDbCube extends Cube
         return $this;
     }
 
-    public function fetchAll()
+    /**
+     * We first prepare the queries and to finalize it later on
+     *
+     * This way dimensions can be added one by one, they will be allowed to
+     * optionally join additional tables or apply other modifications late
+     * in the process
+     *
+     * @return void
+     */
+    protected function finalizeInnerQuery()
     {
-        $innerQuery = $this->prepareInnerQuery();
-        $resolver = $innerQuery->getResolver();
+        $query = $this->innerQuery()->getSelectBase();
+        $columns = [];
+        foreach ($this->dimensions as $name => $dimension) {
+            $quotedDimension = $this->getDb()->quoteIdentifier([$name]);
+            $dimension->addToCube($this);
+            $columns[$quotedDimension] = $dimension->getColumnExpression($this);
+
+            if ($this->hasSlice($name)) {
+                $query->where(
+                    $dimension->getColumnExpression($this) . ' = ?',
+                    $this->slices[$name]
+                );
+            } else {
+                $columns[$quotedDimension] = $dimension->getColumnExpression($this);
+            }
+        }
+
+        $query->columns($columns);
+    }
+
+    protected function prepareRollupQuery()
+    {
         $dimensions = $this->listDimensions();
-        $sourceTable = $innerQuery->getModel()->getTableName();
+        $this->finalizeInnerQuery();
 
-        $select = $innerQuery->assembleSelect();
+        $columns = [];
+        $groupBy = [];
+        foreach ($dimensions as $name => $dimension) {
+            $quotedDimension = $this->getDb()->quoteIdentifier([$name]);
 
-        // TODO: $dimension->addToCube($this)
-        foreach ($resolver->resolveRelations($sourceTable . '.vars') as $relation) {
-            foreach ($dimensions as $dimension => $_) {
-                $quotedDimension = $this->getDb()->quoteIdentifier([$dimension]);
-                foreach ($relation->resolve() as list($source, $target, $relatedKeys)) {
-                    /** @var Model $source */
-                    /** @var Model $target */
-
-                    $sourceAlias = $resolver->getAlias($source);
-                    if ($sourceAlias !== $resolver->getAlias($innerQuery->getModel())) {
-                        $sourceAlias = $this->getDb()->quoteIdentifier(
-                            [$sourceAlias . '_' . $dimension]
-                        );
-                    }
-
-                    if ($target instanceof CustomvarFlat) {
-                        $targetAlias = $this->getDb()->quoteIdentifier(['c_' . $dimension]);
-                    } else {
-                        $targetAlias = $this->getDb()->quoteIdentifier(
-                            [$resolver->getAlias($target) . '_' . $dimension]
-                        );
-                    }
-
-                    $conditions = [];
-                    foreach ($relatedKeys as $fk => $ck) {
-                        $conditions[] = sprintf(
-                            '%s = %s',
-                            $resolver->qualifyColumn($fk, $targetAlias),
-                            $resolver->qualifyColumn($ck, $sourceAlias)
-                        );
-                    }
-
-                    if ($target instanceof CustomvarFlat) {
-                        $select->groupBy("$targetAlias.flatvalue");
-                        $select->columns([$quotedDimension => $targetAlias . '.flatvalue']); // TODO: $dimension->getColumnExpression($this)
-                        $conditions[sprintf('%s = ?', $resolver->qualifyColumn('flatname', $targetAlias))] = $dimension;
-                    }
-
-                    $table = [$targetAlias => $target->getTableName()];
-                    $select->join($table, $conditions);
-                }
-
-                $columns[$quotedDimension] = 'f.' . $quotedDimension;
-                $groupBy[] = $quotedDimension;
-            }
+            $columns[$quotedDimension] = 'f.' . $quotedDimension;
+            $groupBy[] = $quotedDimension;
         }
-
-        // TODO: Should be performed by CustomVarDimension::addToCube()
-        foreach ($resolver->resolveRelations($sourceTable . '.vars') as $relation) {
-            foreach ($this->listSlices() as $dimension) {
-                foreach ($relation->resolve() as list($source, $target, $relatedKeys)) {
-                    /** @var Model $source */
-                    /** @var Model $target */
-
-                    $sourceAlias = $resolver->getAlias($source);
-                    if ($sourceAlias !== $resolver->getAlias($innerQuery->getModel())) {
-                        $sourceAlias = $this->getDb()->quoteIdentifier(
-                            [$sourceAlias . '_' . $dimension]
-                        );
-                    }
-
-                    if ($target instanceof CustomvarFlat) {
-                        $targetAlias = $this->getDb()->quoteIdentifier(['c_' . $dimension]);
-                    } else {
-                        $targetAlias = $this->getDb()->quoteIdentifier(
-                            [$resolver->getAlias($target) . '_' . $dimension]
-                        );
-                    }
-
-                    $conditions = [];
-                    foreach ($relatedKeys as $fk => $ck) {
-                        $conditions[] = sprintf(
-                            '%s = %s',
-                            $resolver->qualifyColumn($fk, $targetAlias),
-                            $resolver->qualifyColumn($ck, $sourceAlias)
-                        );
-                    }
-
-                    if ($target instanceof CustomvarFlat) {
-                        $select->groupBy("$targetAlias.flatvalue");
-                        $select->where(["$targetAlias.flatvalue = ?" => $this->slices[$dimension]]); // TODO: $dimension->getColumnExpression($this)
-                        $conditions[sprintf('%s = ?', $resolver->qualifyColumn('flatname', $targetAlias))] = $dimension;
-                    }
-
-                    $table = [$targetAlias => $target->getTableName()];
-                    $select->join($table, $conditions);
-                }
-            }
-        }
-
-        $groupBy[count($groupBy) - 1] .= ' WITH ROLLUP';
 
         $availableFacts = $this->getAvailableFactColumns();
+
         foreach ($this->chosenFacts as $alias) {
             $columns[$alias] = 'SUM(f.' . $availableFacts[$alias] . ')';
         }
 
-        $outerQuery = new Select();
-        $outerQuery->from(['f' => $select])->columns($columns)->groupBy($groupBy);
-
-
-
-        $rollupColumns = [];
-        foreach ($this->listColumns() as $column) {
-            $quotedColumn = $this->getDb()->quoteIdentifier([$column]);
-            $rollupColumns[$quotedColumn] = 'rollup.' . $quotedColumn;
+        if (! empty($groupBy)) {
+            $groupBy[count($groupBy) - 1] .= ' WITH ROLLUP';
         }
 
         $rollupQuery = new Select();
-        $rollupQuery->from(['rollup' => $outerQuery])->columns($rollupColumns);
+        $rollupQuery->from(['f' => $this->innerQuery()->assembleSelect()])
+            ->columns($columns)
+            ->groupBy($groupBy);
 
-        foreach ($rollupColumns as $quotedColumn => $_) {
-            $rollupQuery->orderBy("($quotedColumn IS NOT NULL)");
-            $rollupQuery->orderBy($quotedColumn);
+        return $rollupQuery;
+    }
+
+    protected function prepareFullQuery()
+    {
+        $rollupQuery = $this->rollupQuery();
+        $columns = [];
+        foreach ($this->listColumns() as $column) {
+            $quotedColumn = $this->getDb()->quoteIdentifier([$column]);
+            $columns[$quotedColumn] = 'rollup.' . $this->getDb()->quoteIdentifier([$column]);
         }
 
-        return $this->getDb()->fetchAll($rollupQuery);
+        $fullQuery = new Select();
+        $fullQuery->from(['rollup' => $rollupQuery])->columns($columns);
+
+        foreach ($columns as $quotedColumn => $_) {
+            $fullQuery->orderBy("($quotedColumn IS NOT NULL)");
+            $fullQuery->orderBy($quotedColumn);
+        }
+
+        return $fullQuery;
+    }
+
+    /**
+     * Lazy-load our full query
+     *
+     * @return Select
+     */
+    protected function fullQuery()
+    {
+        if ($this->fullQuery === null) {
+            $this->fullQuery = $this->prepareFullQuery();
+        }
+
+        return $this->fullQuery;
+    }
+
+    public function fetchAll()
+    {
+        $query = $this->fullQuery();
+        return $this->getDb()->fetchAll($query);
     }
 }
