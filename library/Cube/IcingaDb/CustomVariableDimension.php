@@ -5,6 +5,8 @@ namespace Icinga\Module\Cube\IcingaDb;
 
 use Icinga\Module\Cube\Cube;
 use Icinga\Module\Cube\Dimension;
+use Icinga\Module\Icingadb\Model\CustomvarFlat;
+use ipl\Orm\Model;
 use ipl\Sql\Expression;
 
 class CustomVariableDimension implements Dimension
@@ -80,9 +82,12 @@ class CustomVariableDimension implements Dimension
         return $this;
     }
 
+    /**
+     * @param IcingaDbCube $cube
+     * @return Expression|string
+     */
     public function getColumnExpression(Cube $cube)
     {
-        /** @var IcingaDbCube $cube */
         $expression = $cube->getDb()->quoteIdentifier(['c_' . $this->getName(), 'flatvalue']);
 
         if ($this->wantNull) {
@@ -94,6 +99,49 @@ class CustomVariableDimension implements Dimension
 
     public function addToCube(Cube $cube)
     {
+        /** @var IcingaDbCube $cube */
+        $name = $this->getName();
+        $innerQuery = $cube->innerQuery();
+        $resolver = $innerQuery->getResolver();
+        $sourceTable = $innerQuery->getModel()->getTableName();
 
+        foreach ($resolver->resolveRelations($sourceTable . '.vars') as $relation) {
+            foreach ($relation->resolve() as list($source, $target, $relatedKeys)) {
+                /** @var Model $source */
+                /** @var Model $target */
+
+                $sourceAlias = $resolver->getAlias($source);
+                if ($sourceAlias !== $resolver->getAlias($innerQuery->getModel())) {
+                    $sourceAlias = $cube->getDb()->quoteIdentifier(
+                        [$sourceAlias . '_' . $name]
+                    );
+                }
+
+                if ($target instanceof CustomvarFlat) {
+                    $targetAlias = $cube->getDb()->quoteIdentifier(['c_' . $name]);
+                } else {
+                    $targetAlias = $cube->getDb()->quoteIdentifier(
+                        [$resolver->getAlias($target) . '_' . $name]
+                    );
+                }
+
+                $conditions = [];
+                foreach ($relatedKeys as $fk => $ck) {
+                    $conditions[] = sprintf(
+                        '%s = %s',
+                        $resolver->qualifyColumn($fk, $targetAlias),
+                        $resolver->qualifyColumn($ck, $sourceAlias)
+                    );
+                }
+
+                if ($target instanceof CustomvarFlat) {
+                    $innerQuery->getSelectBase()->groupBy("$targetAlias.flatvalue");
+                    $conditions[sprintf('%s = ?', $resolver->qualifyColumn('flatname', $targetAlias))] = $name;
+                }
+
+                $table = [$targetAlias => $target->getTableName()];
+                $innerQuery->getSelectBase()->join($table, $conditions);
+            }
+        }
     }
 }
