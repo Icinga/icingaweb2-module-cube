@@ -65,4 +65,37 @@ class IcingaDbServiceStatusCube extends IcingaDbCube
 
         return $query;
     }
+
+    /**
+     * Return Filter for Services cube.
+     *
+     * @return Filter\Any|Filter\Chain
+     */
+    public function getObjectsFilter()
+    {
+        if ($this->objectsFilter === null) {
+            $this->finalizeInnerQuery();
+
+            $services = $this->innerQuery()->setColumns([
+                'host_name' => 'host.name',
+                'service_name' => 'service.name'
+            ]);
+
+            $services->getSelectBase()->resetGroupBy();
+            $filter = Filter::any();
+
+            foreach ($services as $service) {
+                $filter->add(
+                    Filter::all(
+                        Filter::equal('service.name', $service->service_name),
+                        Filter::equal('host.name', $service->host_name)
+                    )
+                );
+            }
+
+            $this->objectsFilter = $filter;
+        }
+
+        return $this->objectsFilter;
+    }
 }

@@ -23,6 +23,9 @@ abstract class IcingaDbCube extends Cube
     /** @var Select The outer query, orders respecting NULL values, rollup first */
     protected $fullQuery;
 
+    protected $objectsFilter;
+
+    abstract public function getObjectsFilter();
     /**
      * An IcingaDbCube must provide a list of all available columns
      *

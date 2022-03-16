@@ -64,4 +64,29 @@ class IcingaDbHostStatusCube extends IcingaDbCube
         $this->innerQuery = $query;
         return $this->innerQuery;
     }
+
+    /**
+     * Return Filter for Hosts cube.
+     *
+     * @return Filter\Any|Filter\Chain
+     */
+    public function getObjectsFilter()
+    {
+        if ($this->objectsFilter === null) {
+            $this->finalizeInnerQuery();
+
+            $hosts = $this->innerQuery()->setColumns(['host' => 'host.name']);
+            $hosts->getSelectBase()->resetGroupBy();
+
+            $filter = Filter::any();
+
+            foreach ($hosts as $object) {
+                $filter->add(Filter::equal('host.name', $object->host));
+            }
+
+            $this->objectsFilter = $filter;
+        }
+        
+        return $this->objectsFilter;
+    }
 }
