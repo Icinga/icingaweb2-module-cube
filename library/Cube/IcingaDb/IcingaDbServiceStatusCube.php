@@ -18,7 +18,6 @@ class IcingaDbServiceStatusCube extends IcingaDbCube
 
     public function createDimension($name)
     {
-        // TODO: Implement createDimension() method.
         $this->registerAvailableDimensions();
 
         if (isset($this->availableDimensions[$name])) {
