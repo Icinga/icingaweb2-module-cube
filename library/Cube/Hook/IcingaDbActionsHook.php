@@ -23,8 +23,8 @@ use ipl\Web\Widget\Link;
  */
 abstract class IcingaDbActionsHook
 {
-    /** @var IcingaDbActionLinks */
-    private $actionLinks;
+    /** @var Link[] */
+    private $actionLinks = [];
 
     /**
      * Create additional action links for the given cube
@@ -35,20 +35,17 @@ abstract class IcingaDbActionsHook
     abstract public function createActionLinks(IcingaDbCube $cube);
 
     /**
-     * Lazy access to an ActionLinks object
+     * Return the action links for the cube
      *
-     * @return IcingaDbActionLinks
+     * @return Link[]
      */
     final protected function getActionLinks(): array
     {
-        if ($this->actionLinks === null) {
-            $this->actionLinks = new IcingaDbActionLinks();
-        }
         return $this->actionLinks;
     }
 
     /**
-     * Helper method instantiating an ActionLink object
+     * Helper method to populate action links array
      *
      * @param Url $url
      * @param string $title
@@ -64,9 +61,7 @@ abstract class IcingaDbActionsHook
         $linkContent->addHtml(HtmlElement::create('span', ['class' => 'title'], $title));
         $linkContent->addHtml(HtmlElement::create('p', null, $description));
 
-        $this->getActionLinks()->add(
-            new Link($linkContent, $url->getAbsoluteUrl())
-        );
+        $this->actionLinks[] = new Link($linkContent, $url);
 
         return $this;
     }
@@ -86,5 +81,44 @@ abstract class IcingaDbActionsHook
         }
 
         return $url;
+    }
+
+    /**
+     * Render all links for all Hook implementations
+     *
+     * This is what the Cube calls when rendering details
+     *
+     * @param IcingaDbCube $cube
+     *
+     * @return string
+     */
+    public static function renderAll(Cube $cube)
+    {
+        $html = new HtmlDocument();
+
+        /** @var IcingaDbActionsHook $hook */
+        foreach (Hook::all('Cube/IcingaDbActions') as $hook) {
+            try {
+                $hook->createActionLinks($cube);
+            } catch (Exception $e) {
+                $html->addHtml(HtmlElement::create('li', ['class' => 'error'], $e->getMessage()));
+            }
+
+            foreach ($hook->getActionLinks() as $link) {
+                $html->addHtml(HtmlElement::create('li', null, $link));
+            }
+        }
+
+        if ($html->isEmpty()) {
+            $html->addHtml(
+                HtmlElement::create(
+                    'li',
+                    ['class' => 'error'],
+                    t('No action links have been provided for this cube')
+                )
+            );
+        }
+
+        return $html->render();
     }
 }

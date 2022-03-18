@@ -6,6 +6,7 @@ namespace Icinga\Module\Cube\Web;
 use Icinga\Application\Modules\Module;
 use Icinga\Module\Cube\DimensionParams;
 use Icinga\Module\Cube\Forms\DimensionsForm;
+use Icinga\Module\Cube\Hook\IcingaDbActionsHook;
 use Icinga\Module\Cube\ProvidedHook\Icingadb\IcingadbSupport;
 use Icinga\Web\Controller as WebController;
 use Icinga\Web\View;
@@ -58,7 +59,7 @@ abstract class Controller extends WebController
 
         $this->view->title = $this->cube->getSlicesLabel();
         if (Module::exists('icingadb') && IcingadbSupport::useIcingaDbAsBackend()) {
-            $this->view->links = IcingaDbActionLinks::renderAll($this->cube);
+            $this->view->links = IcingaDbActionsHook::renderAll($this->cube);
         } else {
             $this->view->links = ActionLinks::renderAll($this->cube, $this->view);
         }
