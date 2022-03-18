@@ -35,7 +35,7 @@ class IcingaDbHostStatusCube extends IcingaDbCube
             return clone $this->availableDimensions[$name];
         }
 
-        return new CustomVariableDimension($name, CustomVariableDimension::TYPE_HOST);
+        return new CustomVariableDimension($name);
     }
 
     public function listAvailableDimensions()

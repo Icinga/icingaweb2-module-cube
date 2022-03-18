@@ -24,7 +24,7 @@ class IcingaDbServiceStatusCube extends IcingaDbCube
             return clone $this->availableDimensions[$name];
         }
 
-        return new CustomVariableDimension($name, CustomVariableDimension::TYPE_SERVICE);
+        return new CustomVariableDimension($name);
     }
 
     public function getAvailableFactColumns()

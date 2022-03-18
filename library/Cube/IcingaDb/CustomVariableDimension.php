@@ -11,22 +11,15 @@ use ipl\Sql\Expression;
 
 class CustomVariableDimension implements Dimension
 {
-    const TYPE_HOST = 'host';
-
-    const TYPE_SERVICE = 'service';
-
     protected $name;
 
     protected $label;
 
     protected $wantNull = false;
 
-    protected $type;
-
-    public function __construct($name, $type)
+    public function __construct($name)
     {
         $this->name = $name;
-        $this->type = $type;
     }
 
     public function getName()
