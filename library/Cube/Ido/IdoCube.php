@@ -8,7 +8,6 @@ use Icinga\Authentication\Auth;
 use Icinga\Data\Filter\Filter;
 use Icinga\Exception\ConfigurationError;
 use Icinga\Exception\QueryException;
-use Icinga\Module\Cube\DbCube;
 use Icinga\Module\Monitoring\Backend\MonitoringBackend;
 use Icinga\Util\GlobFilter;
 
