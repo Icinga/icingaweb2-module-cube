@@ -1,6 +1,8 @@
 Name: Cube
 Version: 1.1.1
-Depends: monitoring (>= 2.7.0), icingadb (>= 1.0.0)
+Requires:
+  Libraries: icinga-php-library (>=0.6.0)
+  Modules: monitoring (>= 2.9.0), icingadb (>= 1.0.0)
 Description: Cube for Icinga Web 2
  The Cube allows you to analyze data across multiple dimensions in your
  Icinga Web frontend. Currently it shows host statistics (total count,
