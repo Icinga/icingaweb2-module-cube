@@ -3,9 +3,11 @@
 
 namespace Icinga\Module\Cube\Hook;
 
+use Exception;
+use Icinga\Application\Hook;
+use Icinga\Module\Cube\Cube;
 use Icinga\Module\Cube\IcingaDb\IcingaDbCube;
-use Icinga\Module\Cube\Web\IcingaDbActionLinks;
-use Icinga\Web\Url;
+use ipl\Web\Url;
 use ipl\Html\HtmlDocument;
 use ipl\Html\HtmlElement;
 use ipl\Web\Widget\Icon;
@@ -28,8 +30,7 @@ abstract class IcingaDbActionsHook
      * Create additional action links for the given cube
      *
      * @param IcingaDbCube $cube
-     *
-     * @return Link[]
+     * @return void
      */
     abstract public function createActionLinks(IcingaDbCube $cube);
 
@@ -38,7 +39,7 @@ abstract class IcingaDbActionsHook
      *
      * @return IcingaDbActionLinks
      */
-    public function getActionLinks()
+    final protected function getActionLinks(): array
     {
         if ($this->actionLinks === null) {
             $this->actionLinks = new IcingaDbActionLinks();
@@ -56,7 +57,7 @@ abstract class IcingaDbActionsHook
      *
      * @return $this
      */
-    public function addActionLink(Url $url, $title, $description, $icon)
+    final protected function addActionLink(Url $url, string $title, string $description, string $icon): self
     {
         $linkContent = (new HtmlDocument());
         $linkContent->addHtml(new Icon($icon));
@@ -77,7 +78,7 @@ abstract class IcingaDbActionsHook
      * @param array $params
      * @return Url
      */
-    public function makeUrl($path, $params = null)
+    final protected function makeUrl(string $path, array $params = null): Url
     {
         $url = Url::fromPath($path);
         if ($params !== null) {
