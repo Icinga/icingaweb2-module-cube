@@ -76,8 +76,9 @@ can slice and dice your data, drill down and pivot/rotate the whole cube.
 Requirements
 ------------
 
-If you are using PostgreSQL, you need at least 9.5 which provides the `ROLLUP`
-feature.
+Icinga Web 2 v2.9 and the icinga-php-library v0.8.0.
+
+If you are using PostgreSQL, you need at least 9.5 which provides the `ROLLUP` feature.
 
 Installation
 ------------
