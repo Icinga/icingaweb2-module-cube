@@ -7,6 +7,7 @@ use Icinga\Module\Cube\Cube;
 use Icinga\Module\Icingadb\Common\Auth;
 use Icinga\Module\Icingadb\Common\Database;
 use ipl\Orm\Query;
+use ipl\Sql\Adapter\Pgsql;
 use ipl\Sql\Select;
 
 abstract class IcingaDbCube extends Cube
@@ -136,7 +137,11 @@ abstract class IcingaDbCube extends Cube
         }
 
         if (! empty($groupBy)) {
-            $groupBy[count($groupBy) - 1] .= ' WITH ROLLUP';
+            if ($this->getDb()->getAdapter() instanceof Pgsql) {
+                $groupBy = 'ROLLUP(' . implode(', ', $groupBy) . ')';
+            } else {
+                $groupBy[count($groupBy) - 1] .= ' WITH ROLLUP';
+            }
         }
 
         $rollupQuery = new Select();
