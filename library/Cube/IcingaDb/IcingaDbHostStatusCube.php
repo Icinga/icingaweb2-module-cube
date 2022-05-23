@@ -48,7 +48,7 @@ class IcingaDbHostStatusCube extends IcingaDbCube
         $query
             ->columns('flatname')
             ->orderBy('flatname')
-            ->filter(Filter::equal('host.id', '*'));
+            ->filter(Filter::like('host.id', '*'));
         $query->getSelectBase()->groupBy('flatname');
 
         return $db->fetchCol($query->assembleSelect());

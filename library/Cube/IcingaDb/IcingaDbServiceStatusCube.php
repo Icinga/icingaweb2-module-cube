@@ -50,7 +50,7 @@ class IcingaDbServiceStatusCube extends IcingaDbCube
         $query
             ->columns('flatname')
             ->orderBy('flatname')
-            ->filter(Filter::equal('service.id', '*'));
+            ->filter(Filter::like('service.id', '*'));
         $query->getSelectBase()->groupBy('flatname');
 
         return $db->fetchCol($query->assembleSelect());
