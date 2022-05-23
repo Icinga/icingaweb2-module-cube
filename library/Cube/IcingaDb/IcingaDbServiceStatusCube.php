@@ -58,7 +58,7 @@ class IcingaDbServiceStatusCube extends IcingaDbCube
 
     public function prepareInnerQuery()
     {
-        $query = ServicestateSummary::on($this->getDb())->with(['service.state']);
+        $query = ServicestateSummary::on($this->getDb());
         $query->columns(array_diff_key($query->getModel()->getColumns(), (new Service())->getColumns()));
         $query->disableDefaultSort();
         $this->applyRestrictions($query);
