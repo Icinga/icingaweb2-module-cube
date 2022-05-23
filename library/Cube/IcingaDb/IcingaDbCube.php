@@ -8,6 +8,7 @@ use Icinga\Module\Icingadb\Common\Auth;
 use Icinga\Module\Icingadb\Common\Database;
 use ipl\Orm\Query;
 use ipl\Sql\Adapter\Pgsql;
+use ipl\Sql\Expression;
 use ipl\Sql\Select;
 
 abstract class IcingaDbCube extends Cube
@@ -133,7 +134,7 @@ abstract class IcingaDbCube extends Cube
         $availableFacts = $this->getAvailableFactColumns();
 
         foreach ($this->chosenFacts as $alias) {
-            $columns[$alias] = 'SUM(f.' . $availableFacts[$alias] . ')';
+            $columns[$alias] = new Expression('SUM(f.' . $availableFacts[$alias] . ')');
         }
 
         if (! empty($groupBy)) {
