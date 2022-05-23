@@ -56,7 +56,7 @@ class IcingaDbHostStatusCube extends IcingaDbCube
 
     public function prepareInnerQuery()
     {
-        $query = HoststateSummary::on($this->getDb())->with('host.state');
+        $query = HoststateSummary::on($this->getDb());
         $query->columns(array_diff_key($query->getModel()->getColumns(), (new Host())->getColumns()));
         $query->disableDefaultSort();
         $this->applyRestrictions($query);
