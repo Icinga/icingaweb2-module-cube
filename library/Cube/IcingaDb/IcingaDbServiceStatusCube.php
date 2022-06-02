@@ -76,7 +76,7 @@ class IcingaDbServiceStatusCube extends IcingaDbCube
         if ($this->objectsFilter === null) {
             $this->finalizeInnerQuery();
 
-            $services = $this->innerQuery()->setColumns([
+            $services = $this->innerQuery()->columns([
                 'host_name' => 'host.name',
                 'service_name' => 'service.name'
             ]);
