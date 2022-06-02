@@ -75,7 +75,7 @@ class IcingaDbHostStatusCube extends IcingaDbCube
         if ($this->objectsFilter === null) {
             $this->finalizeInnerQuery();
 
-            $hosts = $this->innerQuery()->setColumns(['host' => 'host.name']);
+            $hosts = $this->innerQuery()->columns(['host' => 'host.name']);
             $hosts->getSelectBase()->resetGroupBy();
 
             $filter = Filter::any();
