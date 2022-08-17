@@ -51,7 +51,14 @@ class IcingaDbHostStatusCube extends IcingaDbCube
             ->filter(Filter::like('host.id', '*'));
         $query->getSelectBase()->groupBy('flatname');
 
-        return $db->fetchCol($query->assembleSelect());
+        $dimensions = [];
+        foreach ($query as $row) {
+            // Replaces array index notations with [*] to get results for arbitrary indexes
+            $name = preg_replace('/\\[\d+](?=\\.|$)/', '[*]', $row->flatname);
+            $dimensions[$name] = $name;
+        }
+
+        return $dimensions;
     }
 
     public function prepareInnerQuery()

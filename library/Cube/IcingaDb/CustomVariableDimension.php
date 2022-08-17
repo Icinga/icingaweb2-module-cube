@@ -1,13 +1,13 @@
 <?php
-// Icinga DB Web | (c) 2022 Icinga GmbH | GPLv2
+// Icinga Web 2 Cube Module | (c) 2022 Icinga GmbH | GPLv2
 
 namespace Icinga\Module\Cube\IcingaDb;
 
 use Icinga\Module\Cube\Cube;
 use Icinga\Module\Cube\Dimension;
 use Icinga\Module\Icingadb\Model\CustomvarFlat;
-use ipl\Orm\Model;
 use ipl\Sql\Expression;
+use ipl\Stdlib\Filter;
 
 class CustomVariableDimension implements Dimension
 {
@@ -95,46 +95,24 @@ class CustomVariableDimension implements Dimension
         /** @var IcingaDbCube $cube */
         $name = $this->getName();
         $innerQuery = $cube->innerQuery();
-        $resolver = $innerQuery->getResolver();
         $sourceTable = $innerQuery->getModel()->getTableName();
 
-        foreach ($resolver->resolveRelations($sourceTable . '.vars') as $relation) {
-            foreach ($relation->resolve() as list($source, $target, $relatedKeys)) {
-                /** @var Model $source */
-                /** @var Model $target */
+        $subQuery = $innerQuery->createSubQuery(new CustomvarFlat(), $sourceTable . '.vars');
+        $subQuery->getSelectBase()->resetWhere(); // The link to the outer query is the ON condition
+        $subQuery->columns(['flatvalue', 'object_id' => $sourceTable . '.id']);
+        $subQuery->filter(Filter::like('flatname', $name));
 
-                $sourceAlias = $resolver->getAlias($source);
-                if ($sourceAlias !== $resolver->getAlias($innerQuery->getModel())) {
-                    $sourceAlias = $cube->getDb()->quoteIdentifier(
-                        [$sourceAlias . '_' . $name]
-                    );
-                }
+        // Values might not be unique (wildcard dimensions)
+        $subQuery->getSelectBase()->groupBy([
+            $subQuery->getResolver()->getAlias($subQuery->getModel()) . '.flatvalue',
+            'object_id'
+        ]);
 
-                if ($target instanceof CustomvarFlat) {
-                    $targetAlias = $cube->getDb()->quoteIdentifier(['c_' . $name]);
-                } else {
-                    $targetAlias = $cube->getDb()->quoteIdentifier(
-                        [$resolver->getAlias($target) . '_' . $name]
-                    );
-                }
-
-                $conditions = [];
-                foreach ($relatedKeys as $fk => $ck) {
-                    $conditions[] = sprintf(
-                        '%s = %s',
-                        $resolver->qualifyColumn($fk, $targetAlias),
-                        $resolver->qualifyColumn($ck, $sourceAlias)
-                    );
-                }
-
-                if ($target instanceof CustomvarFlat) {
-                    $innerQuery->getSelectBase()->groupBy("$targetAlias.flatvalue");
-                    $conditions[sprintf('%s = ?', $resolver->qualifyColumn('flatname', $targetAlias))] = $name;
-                }
-
-                $table = [$targetAlias => $target->getTableName()];
-                $innerQuery->getSelectBase()->join($table, $conditions);
-            }
-        }
+        $subQueryAlias = $cube->getDb()->quoteIdentifier(['c_' . $name]);
+        $innerQuery->getSelectBase()->groupBy($subQueryAlias . '.flatvalue');
+        $innerQuery->getSelectBase()->join(
+            [$subQueryAlias => $subQuery->assembleSelect()],
+            [$subQueryAlias . '.object_id = ' . $innerQuery->getResolver()->getAlias($innerQuery->getModel()) . '.id']
+        );
     }
 }
