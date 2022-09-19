@@ -18,9 +18,9 @@ use Icinga\Module\Cube\Dimension;
  */
 class CustomVarDimension implements Dimension
 {
-    const TYPE_HOST = 'host';
+    public const TYPE_HOST = 'host';
 
-    const TYPE_SERVICE = 'service';
+    public const TYPE_SERVICE = 'service';
 
     /**
      * @var string custom variable name
