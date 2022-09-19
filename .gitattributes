@@ -1,2 +1,2 @@
 .git* export-ignore
-.phpcs.xml export-ignore
+phpcs.xml export-ignore
