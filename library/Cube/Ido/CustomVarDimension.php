@@ -1,4 +1,5 @@
 <?php
+
 // Icinga Web 2 Cube Module | (c) 2016 Icinga GmbH | GPLv2
 
 namespace Icinga\Module\Cube\Ido;
@@ -17,9 +18,9 @@ use Icinga\Module\Cube\Dimension;
  */
 class CustomVarDimension implements Dimension
 {
-    const TYPE_HOST = 'host';
+    public const TYPE_HOST = 'host';
 
-    const TYPE_SERVICE = 'service';
+    public const TYPE_SERVICE = 'service';
 
     /**
      * @var string custom variable name

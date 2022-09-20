@@ -1,4 +1,5 @@
 <?php
+
 // Icinga Web 2 Cube Module | (c) 2020 Icinga GmbH | GPLv2
 
 namespace Icinga\Module\Cube;
@@ -7,7 +8,6 @@ use Icinga\Web\Url;
 
 class DimensionParams
 {
-
     /**
      * @var array Raw dimensions
      */

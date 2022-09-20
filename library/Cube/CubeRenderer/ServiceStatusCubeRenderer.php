@@ -1,4 +1,5 @@
 <?php
+
 // Icinga Web 2 Cube Module | (c) 2019 Icinga GmbH | GPLv2
 
 namespace Icinga\Module\Cube\CubeRenderer;
@@ -36,8 +37,10 @@ class ServiceStatusCubeRenderer extends CubeRenderer
             $parts['unknown handled'] = $facts->services_unknown - $facts->services_unhandled_unknown;
         }
 
-        if ($facts->services_cnt > $facts->services_critical && $facts->services_cnt > $facts->services_warning
-            && $facts->services_cnt > $facts->services_unknown) {
+        if (
+            $facts->services_cnt > $facts->services_critical && $facts->services_cnt > $facts->services_warning
+            && $facts->services_cnt > $facts->services_unknown
+        ) {
             $parts['ok'] = $facts->services_cnt - $facts->services_critical - $facts->services_warning -
                 $facts->services_unknown;
         }

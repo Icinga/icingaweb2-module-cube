@@ -1,4 +1,5 @@
 <?php
+
 namespace Icinga\Module\Cube\ProvidedHook\Cube;
 
 use Icinga\Module\Cube\Hook\IcingaDbActionsHook;
@@ -14,7 +15,7 @@ class IcingaDbActions extends IcingaDbActionsHook
             $type = 'service';
         }
 
-        $url = 'icingadb/'. $type . 's';
+        $url = 'icingadb/' . $type . 's';
 
         $paramsWithPrefix = [];
         foreach ($cube->getSlices() as $dimension => $slice) {
