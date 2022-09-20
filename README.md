@@ -1,12 +1,12 @@
 # Icinga Cube
 
-[![PHP Support](https://img.shields.io/badge/php-%3E%3D%207.0-777BB4?logo=PHP)](https://php.net/)
+[![PHP Support](https://img.shields.io/badge/php-%3E%3D%207.2-777BB4?logo=PHP)](https://php.net/)
 ![Build Status](https://github.com/icinga/icingaweb2-module-cube/workflows/PHP%20Tests/badge.svg?branch=master)
 [![Github Tag](https://img.shields.io/github/tag/Icinga/icingaweb2-module-cube.svg)](https://github.com/Icinga/icingaweb2-module-cube)
 
 ![Icinga Logo](https://icinga.com/wp-content/uploads/2014/06/icinga_logo.png)
 
-The Icinga Cube is a tiny but useful [Icinga Web 2](https://github.com/Icinga/icingaweb2)
+The Icinga Cube is a tiny but useful [Icinga Web](https://github.com/Icinga/icingaweb2)
 module. It currently shows host and service statistics (total count, health) grouped by
 various custom variables in multiple dimensions.
 
@@ -40,13 +40,12 @@ the Cube to fit your needs.
 
 ![Cube - Configure Dimensions](doc/img/cube_move-up.png)
 
-Want to drill down? Choose a slice and get your
- answers:
+Want to drill down? Choose a slice and get your answers:
 
 ![Cube - Configure Dimensions](doc/img/cube_slice.png)
 
 All facts configured for systems monitored by [Icinga](https://www.icinga.com/)
- can be used for your research.
+can be used for your research.
 
 For Icinga Director users
 -------------------------
@@ -59,40 +58,7 @@ modify multiple hosts at once.
 
 ![Cube - Director multi-edit](doc/img/cube_director.png)
 
-For Developers
---------------
-
-Our main intention when developing the Icinga Cube was too provide a modular small
-framework allowing you to drill into data provided from various sources. So it
-provides hooks for custom Cubes, related Renderers or just custom action links.
-
-For DBAs
---------
-
-Yes, it's mostly what the name suggests. Just a configurable rollup cube,
-providing a frontend allowing you to add and flip dimensions at will. You
-can slice and dice your data, drill down and pivot/rotate the whole cube.
-
-Requirements
-------------
-
-Icinga Web 2 v2.9 and the icinga-php-library v0.9.0.
-
-If you are using PostgreSQL, you need at least 9.5 which provides the `ROLLUP` feature.
-
 Installation
 ------------
 
-Install it [like any other module](https://icinga.com/docs/icinga-web-2/latest/doc/08-Modules/#installation).
-Use `cube` as name.
-
-Configuration
--------------
-
-Enable the module. That's it.
-
-Permissions
------------
-
-Someone able to access the cube will only see statistics for the objects they have permissions to view. Blacklist properties also apply.
-Restrictions applied to other modules will have no effect, at least not unless those modules provide their own Icinga Cube hooks taking care about such.
+To install Icinga Cube see [Installation](https://icinga.com/docs/icinga-cube/latest/doc/02-Installation/).
