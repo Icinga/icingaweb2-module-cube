@@ -68,6 +68,29 @@ apt-get update
 ```
 <!-- {% endif %} -->
 
+<!-- {% if fedora %} -->
+<!-- {% if not icingaDocs %} -->
+### Fedora Repository
+<!-- {% endif %} -->
+
+```bash
+dnf install https://packages.icinga.com/fedora/icinga-rpm-release-$(. /etc/os-release; echo "$VERSION_ID")-latest.noarch.rpm
+```
+<!-- {% endif %} -->
+
+<!-- {% if opensuse %} -->
+<!-- {% if not icingaDocs %} -->
+### openSUSE Repository
+<!-- {% endif %} -->
+
+```bash
+rpm --import https://packages.icinga.com/icinga.key
+
+zypper ar https://packages.icinga.com/openSUSE/ICINGA-release.repo
+zypper ref
+```
+<!-- {% endif %} -->
+
 <!-- {% if rhel %} -->
 <!-- {% if not icingaDocs %} -->
 ### RHEL Repository
@@ -160,6 +183,24 @@ apt-get install icinga-cube
 ```
 <!-- {% endif %} -->
 
+<!-- {% if fedora %} -->
+<!-- {% if not icingaDocs %} -->
+#### Fedora
+<!-- {% endif %} -->
+```bash
+dnf install icinga-cube
+```
+<!-- {% endif %} -->
+
+<!-- {% if opensuse %} -->
+<!-- {% if not icingaDocs %} -->
+#### openSUSE
+<!-- {% endif %} -->
+```bash
+zypper install icinga-cube
+```
+<!-- {% endif %} -->
+
 <!-- {% if rhel %} -->
 #### RHEL 8 or Later
 
@@ -218,6 +259,12 @@ you have completed the instructions here and can proceed to
 <!-- {% endif %} -->
 <!-- {% if debian %} -->
 [install the web server on Debian](https://icinga.com/docs/icinga-web-2/latest/doc/02-Installation/01-Debian/#install-the-web-server),
+<!-- {% endif %} -->
+<!-- {% if fedora %} -->
+[install the web server on Fedora](https://icinga.com/docs/icinga-web-2/latest/doc/02-Installation/04-Fedora/#install-the-web-server),
+<!-- {% endif %} -->
+<!-- {% if opensuse %} -->
+[install the web server on openSUSE](https://icinga.com/docs/icinga-web-2/latest/doc/02-Installation/05-openSUSE/#install-the-web-server),
 <!-- {% endif %} -->
 <!-- {% if rhel %} -->
 [install the web server on RHEL](https://icinga.com/docs/icinga-web-2/latest/doc/02-Installation/04-RHEL/#install-the-web-server),
