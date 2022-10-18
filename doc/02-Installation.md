@@ -68,6 +68,17 @@ apt-get update
 ```
 <!-- {% endif %} -->
 
+<!-- {% if fedora %} -->
+<!-- {% if not icingaDocs %} -->
+### Fedora Repository
+<!-- {% endif %} -->
+
+```bash
+rpm --import https://packages.icinga.com/icinga.key
+dnf config-manager --add-repo https://packages.icinga.com/fedora/$(. /etc/os-release; echo "$VERSION_ID")/release
+```
+<!-- {% endif %} -->
+
 <!-- {% if rhel %} -->
 <!-- {% if not icingaDocs %} -->
 ### RHEL Repository
@@ -160,6 +171,15 @@ apt-get install icinga-cube
 ```
 <!-- {% endif %} -->
 
+<!-- {% if fedora %} -->
+<!-- {% if not icingaDocs %} -->
+#### Fedora
+<!-- {% endif %} -->
+```bash
+dnf install icinga-cube
+```
+<!-- {% endif %} -->
+
 <!-- {% if rhel %} -->
 #### RHEL 8 or Later
 
@@ -211,19 +231,22 @@ Package installations of `icinga-cube` already set up the necessary dependencies
 If Icinga Web has not been installed or set up before,
 you have completed the instructions here and can proceed to
 <!-- {% if amazon_linux %} -->
-[install the web server on Amazon Linux](https://icinga.com/docs/icinga-web-2/latest/doc/02-Installation/06-Amazon-Linux/#install-the-web-server),
+[install the web server on Amazon Linux](https://icinga.com/docs/icinga-web-2/latest/doc/02-Installation/07-Amazon-Linux/#install-the-web-server),
 <!-- {% endif %} -->
 <!-- {% if centos %} -->
-[install the web server on CentOS](https://icinga.com/docs/icinga-web-2/latest/doc/02-Installation/03-CentOS/#install-the-web-server),
+[install the web server on CentOS](https://icinga.com/docs/icinga-web-2/latest/doc/02-Installation/04-CentOS/#install-the-web-server),
 <!-- {% endif %} -->
 <!-- {% if debian %} -->
 [install the web server on Debian](https://icinga.com/docs/icinga-web-2/latest/doc/02-Installation/01-Debian/#install-the-web-server),
 <!-- {% endif %} -->
+<!-- {% if fedora %} -->
+[install the web server on Fedora](https://icinga.com/docs/icinga-web-2/latest/doc/02-Installation/03-Fedora/#install-the-web-server),
+<!-- {% endif %} -->
 <!-- {% if rhel %} -->
-[install the web server on RHEL](https://icinga.com/docs/icinga-web-2/latest/doc/02-Installation/04-RHEL/#install-the-web-server),
+[install the web server on RHEL](https://icinga.com/docs/icinga-web-2/latest/doc/02-Installation/05-RHEL/#install-the-web-server),
 <!-- {% endif %} -->
 <!-- {% if sles %} -->
-[install the web server on SLES](https://icinga.com/docs/icinga-web-2/latest/doc/02-Installation/05-SLES/#install-the-web-server),
+[install the web server on SLES](https://icinga.com/docs/icinga-web-2/latest/doc/02-Installation/06-SLES/#install-the-web-server),
 <!-- {% endif %} -->
 <!-- {% if ubuntu %} -->
 [install the web server on Ubuntu](https://icinga.com/docs/icinga-web-2/latest/doc/02-Installation/02-Ubuntu/#install-the-web-server),
