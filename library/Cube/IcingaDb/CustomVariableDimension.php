@@ -7,11 +7,25 @@ namespace Icinga\Module\Cube\IcingaDb;
 use Icinga\Module\Cube\Cube;
 use Icinga\Module\Cube\Dimension;
 use Icinga\Module\Icingadb\Model\CustomvarFlat;
+use Icinga\Module\Icingadb\Model\Service;
 use ipl\Sql\Expression;
 use ipl\Stdlib\Filter;
 
 class CustomVariableDimension implements Dimension
 {
+    /** @var string Prefix for host custom variable */
+    public const HOST_PREFIX = 'host.vars.';
+
+    /** @var string Prefix for service custom variable */
+    public const SERVICE_PREFIX = 'service.vars.';
+
+    /** @var ?string variable source name */
+    protected $sourceName;
+
+    /** @var ?string Variable name without prefix */
+    protected $varName;
+
+    /** @var string Variable name with prefix */
     protected $name;
 
     protected $label;
@@ -20,7 +34,32 @@ class CustomVariableDimension implements Dimension
 
     public function __construct($name)
     {
+        if (preg_match('/^(host|service)\.vars\.(.*)/', $name, $matches)) {
+            $this->sourceName = $matches[1];
+            $this->varName = $matches[2];
+        }
+
         $this->name = $name;
+    }
+
+    /**
+     * Get the variable name without prefix
+     *
+     * @return string
+     */
+    public function getVarName(): string
+    {
+        return $this->varName ?? $this->getName();
+    }
+
+    /**
+     * Get the variable source name
+     *
+     * @return ?string
+     */
+    public function getSourceName(): ?string
+    {
+        return $this->sourceName;
     }
 
     public function getName()
@@ -82,7 +121,7 @@ class CustomVariableDimension implements Dimension
      */
     public function getColumnExpression(Cube $cube)
     {
-        $expression = $cube->getDb()->quoteIdentifier(['c_' . $this->getName(), 'flatvalue']);
+        $expression = $cube->getDb()->quoteIdentifier([$this->createCustomVarAlias(), 'flatvalue']);
 
         if ($this->wantNull) {
             return new Expression("COALESCE($expression, '-')");
@@ -94,14 +133,13 @@ class CustomVariableDimension implements Dimension
     public function addToCube(Cube $cube)
     {
         /** @var IcingaDbCube $cube */
-        $name = $this->getName();
         $innerQuery = $cube->innerQuery();
-        $sourceTable = $innerQuery->getModel()->getTableName();
+        $sourceTable = $this->getSourceName() ?? $innerQuery->getModel()->getTableName();
 
         $subQuery = $innerQuery->createSubQuery(new CustomvarFlat(), $sourceTable . '.vars');
         $subQuery->getSelectBase()->resetWhere(); // The link to the outer query is the ON condition
         $subQuery->columns(['flatvalue', 'object_id' => $sourceTable . '.id']);
-        $subQuery->filter(Filter::like('flatname', $name));
+        $subQuery->filter(Filter::like('flatname', $this->getVarName()));
 
         // Values might not be unique (wildcard dimensions)
         $subQuery->getSelectBase()->groupBy([
@@ -109,11 +147,25 @@ class CustomVariableDimension implements Dimension
             'object_id'
         ]);
 
-        $subQueryAlias = $cube->getDb()->quoteIdentifier(['c_' . $name]);
+        $subQueryAlias = $cube->getDb()->quoteIdentifier([$this->createCustomVarAlias()]);
         $innerQuery->getSelectBase()->groupBy($subQueryAlias . '.flatvalue');
+
+        $sourceIdPath = '.id';
+        if ($innerQuery->getModel() instanceof Service && $sourceTable === 'host') {
+            $sourceIdPath = '.host_id';
+        }
+
         $innerQuery->getSelectBase()->join(
             [$subQueryAlias => $subQuery->assembleSelect()],
-            [$subQueryAlias . '.object_id = ' . $innerQuery->getResolver()->getAlias($innerQuery->getModel()) . '.id']
+            [
+                $subQueryAlias . '.object_id = '
+                . $innerQuery->getResolver()->getAlias($innerQuery->getModel()) . $sourceIdPath
+            ]
         );
+    }
+
+    protected function createCustomVarAlias(): string
+    {
+        return implode('_', ['c', $this->getSourceName(), $this->getVarName()]);
     }
 }
