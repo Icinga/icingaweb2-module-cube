@@ -4,11 +4,19 @@
 
 namespace Icinga\Module\Cube;
 
+use Icinga\Application\Modules\Module;
 use Icinga\Exception\IcingaException;
+use Icinga\Module\Cube\ProvidedHook\Icingadb\IcingadbSupport;
 use Icinga\Web\View;
 
 abstract class Cube
 {
+    /** @var string Prefix for slice params */
+    public const SLICE_PREFIX = 'slice.';
+
+    /** @var bool Whether the icingadb backend is in use */
+    public const IS_USING_ICINGADB = null;
+
     /** @var array<string, Dimension> Available dimensions */
     protected $availableDimensions;
 
@@ -23,6 +31,17 @@ abstract class Cube
     protected $renderer;
 
     abstract public function fetchAll();
+
+    /**
+     * Get whether the icingadb backend is in use
+     *
+     * @return bool
+     */
+    public static function isUsingIcingaDb(): bool
+    {
+        return static::IS_USING_ICINGADB
+            ?? (Module::exists('icingadb') && IcingadbSupport::useIcingaDbAsBackend());
+    }
 
     public function removeDimension($name)
     {
