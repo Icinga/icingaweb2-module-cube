@@ -19,6 +19,12 @@ abstract class IcingaDbCube extends Cube
     use Auth;
     use Database;
 
+    public const SLICE_PREFIX = 'slice.';
+    public const IS_USING_ICINGADB = true;
+
+    /** @var bool Whether to show problems only */
+    protected $problemsOnly = false;
+
     /** @var Query The inner query fetching all required data */
     protected $innerQuery;
 
@@ -87,6 +93,31 @@ abstract class IcingaDbCube extends Cube
         $this->addDimension($this->createDimension($name));
 
         return $this;
+    }
+
+    /**
+     * Set whether to show problems only
+     *
+     * @param bool $problemOnly
+     *
+     * @return $this
+     */
+    public function problemsOnly(bool $problemOnly = true): self
+    {
+        $this->problemsOnly = $problemOnly;
+
+        return $this;
+    }
+
+
+    /**
+     * Get whether to show problems only
+     *
+     * @return bool
+     */
+    public function isProblemsOnly(): bool
+    {
+        return $this->problemsOnly;
     }
 
     /**

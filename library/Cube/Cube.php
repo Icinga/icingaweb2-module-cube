@@ -12,7 +12,7 @@ use Icinga\Web\View;
 abstract class Cube
 {
     /** @var string Prefix for slice params */
-    public const SLICE_PREFIX = 'slice.';
+    public const SLICE_PREFIX = null;
 
     /** @var bool Whether the icingadb backend is in use */
     public const IS_USING_ICINGADB = null;

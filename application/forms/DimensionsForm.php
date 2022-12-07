@@ -54,8 +54,8 @@ class DimensionsForm extends Form
     protected function addSlice(Dimension $dimension, $value)
     {
         $view = $this->getView();
+        $sliceId = sha1($this->cube::SLICE_PREFIX . $dimension->getName());
 
-        $sliceId = sha1($dimension->getName());
         $this->addElement('button', 'removeSlice_' . $sliceId, [
             'label' => $view->icon('cancel'),
             'decorators' => ['ViewHelper'],
@@ -192,6 +192,7 @@ class DimensionsForm extends Form
                 $url->setParam('dimensions', DimensionParams::update($dimensions)->getParams());
             } else {
                 foreach ($this->cube->listSlices() as $slice) {
+                    $slice = $this->cube::SLICE_PREFIX . $slice;
                     $sliceId = sha1($slice);
 
                     if (($el = $this->getElement('removeSlice_' . $sliceId)) && $el->isChecked()) {
