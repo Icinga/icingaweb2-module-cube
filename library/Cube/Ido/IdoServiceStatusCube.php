@@ -63,7 +63,10 @@ class IdoServiceStatusCube extends IdoCube
 
         $select->order('cv.varname');
 
-        return $this->filterProtectedCustomvars($this->db()->fetchCol($select));
+        $dimensions = $this->filterProtectedCustomvars($this->db()->fetchCol($select));
+        $keys = array_map('strtolower', $dimensions);
+
+        return array_combine($keys, $dimensions);
     }
 
     public function prepareInnerQuery()
