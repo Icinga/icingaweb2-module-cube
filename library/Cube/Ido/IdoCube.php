@@ -40,6 +40,8 @@ abstract class IdoCube extends DbCube
     /** @var GlobFilter The properties to hide from the user */
     protected $blacklistedProperties;
 
+    public const IS_USING_ICINGADB = false;
+
     /**
      * We can steal the DB connection directly from a Monitoring backend
      *
