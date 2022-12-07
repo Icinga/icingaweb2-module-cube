@@ -28,18 +28,6 @@ class IcingaDbServiceStatusCube extends IcingaDbCube
         return new CustomVariableDimension($name);
     }
 
-    public function hasDimension($name)
-    {
-        return array_key_exists($name, $this->dimensions)
-            || array_key_exists(CustomVariableDimension::SERVICE_PREFIX . $name, $this->dimensions)
-            || (Str::StartsWith($name, CustomVariableDimension::SERVICE_PREFIX)// required to create select options list
-                && array_key_exists(
-                    substr($name, strlen(CustomVariableDimension::SERVICE_PREFIX)),
-                    $this->dimensions
-                )
-            );
-    }
-
     public function getAvailableFactColumns()
     {
         return [

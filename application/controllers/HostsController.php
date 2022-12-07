@@ -4,27 +4,42 @@
 
 namespace Icinga\Module\Cube\Controllers;
 
-use Icinga\Application\Modules\Module;
+use Icinga\Module\Cube\IcingaDb\IcingaDbCube;
 use Icinga\Module\Cube\IcingaDb\IcingaDbHostStatusCube;
-use Icinga\Module\Cube\Ido\IdoHostStatusCube;
-use Icinga\Module\Cube\ProvidedHook\Icingadb\IcingadbSupport;
-use Icinga\Module\Cube\Web\IdoController;
+use Icinga\Module\Cube\Web\Controller;
+use Icinga\Module\Icingadb\Model\Host;
+use Icinga\Module\Icingadb\Web\Control\SearchBar\ObjectSuggestions;
 
-class HostsController extends IdoController
+class HostsController extends Controller
 {
-    public function indexAction()
+    public function indexAction(): void
     {
         $this->createTabs()->activate('cube/hosts');
 
         $this->renderCube();
     }
 
-    protected function getCube()
+    protected function getCube(): IcingaDbCube
     {
-        if (Module::exists('icingadb') && IcingadbSupport::useIcingaDbAsBackend()) {
-            return new IcingaDbHostStatusCube();
-        }
+        return new IcingaDbHostStatusCube();
+    }
 
-        return new IdoHostStatusCube();
+    public function completeAction(): void
+    {
+        $suggestions = new ObjectSuggestions();
+        $suggestions->setModel(Host::class);
+        $suggestions->forRequest($this->getServerRequest());
+        $this->getDocument()->add($suggestions);
+    }
+
+    public function searchEditorAction(): void
+    {
+        $editor = $this->createSearchEditor(
+            Host::on($this->getDb()),
+            $this->preserveParams
+        );
+
+        $this->getDocument()->add($editor);
+        $this->setTitle(t('Adjust Filter'));
     }
 }

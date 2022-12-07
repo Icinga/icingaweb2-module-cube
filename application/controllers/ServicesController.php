@@ -4,27 +4,42 @@
 
 namespace Icinga\Module\Cube\Controllers;
 
-use Icinga\Application\Modules\Module;
+use Icinga\Module\Cube\IcingaDb\IcingaDbCube;
 use Icinga\Module\Cube\IcingaDb\IcingaDbServiceStatusCube;
-use Icinga\Module\Cube\Ido\IdoServiceStatusCube;
-use Icinga\Module\Cube\ProvidedHook\Icingadb\IcingadbSupport;
-use Icinga\Module\Cube\Web\IdoController;
+use Icinga\Module\Cube\Web\Controller;
+use Icinga\Module\Icingadb\Model\Service;
+use Icinga\Module\Icingadb\Web\Control\SearchBar\ObjectSuggestions;
 
-class ServicesController extends IdoController
+class ServicesController extends Controller
 {
-    public function indexAction()
+    public function indexAction(): void
     {
         $this->createTabs()->activate('cube/services');
 
         $this->renderCube();
     }
 
-    protected function getCube()
+    protected function getCube(): IcingaDbCube
     {
-        if (Module::exists('icingadb') && IcingadbSupport::useIcingaDbAsBackend()) {
-            return new IcingaDbServiceStatusCube();
-        }
+        return new IcingaDbServiceStatusCube();
+    }
 
-        return new IdoServiceStatusCube();
+    public function completeAction(): void
+    {
+        $suggestions = new ObjectSuggestions();
+        $suggestions->setModel(Service::class);
+        $suggestions->forRequest($this->getServerRequest());
+        $this->getDocument()->add($suggestions);
+    }
+
+    public function searchEditorAction(): void
+    {
+        $editor = $this->createSearchEditor(
+            Service::on($this->getDb()),
+            $this->preserveParams
+        );
+
+        $this->getDocument()->add($editor);
+        $this->setTitle(t('Adjust Filter'));
     }
 }

@@ -335,17 +335,25 @@ abstract class CubeRenderer
     {
         $cube = $this->cube;
 
+        $params = [];
+        $slicePrefix = null;
+        if ($this->cube::isUsingIcingaDb()) {
+            $slicePrefix = Cube::SLICE_PREFIX;
+
+            if ($this->cube->isProblemsOnly()) {
+                $params['problems'] = true;
+            }
+        }
+
         $dimensions = array_merge(array_keys($cube->listDimensions()), $cube->listSlices());
-        $params = [
-            'dimensions' => DimensionParams::update($dimensions)->getParams()
-        ];
+        $params['dimensions'] = DimensionParams::update($dimensions)->getParams();
 
         foreach ($this->cube->listDimensionsUpTo($name) as $dimensionName) {
-            $params[$dimensionName] = $row->$dimensionName;
+            $params[$slicePrefix . $dimensionName] = $row->$dimensionName;
         }
 
         foreach ($this->cube->getSlices() as $key => $val) {
-            $params[$key] = $val;
+            $params[$slicePrefix . $key] = $val;
         }
 
         return $this->view->url(
@@ -356,6 +364,12 @@ abstract class CubeRenderer
 
     protected function getSliceUrl($name, $row)
     {
+        if ($this->cube::isUsingIcingaDb()) {
+            // required for filter support, so we can differentiate between filter and slice params
+            return $this->view->url()
+                ->setParam(Cube::SLICE_PREFIX . $name, $row->$name);
+        }
+
         return $this->view->url()
             ->setParam($name, $row->$name);
     }
