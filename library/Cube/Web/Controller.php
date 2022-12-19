@@ -168,6 +168,10 @@ abstract class Controller extends CompatController
 
         if (! $searchBar->hasBeenSubmitted() && $searchBar->hasBeenSent()) {
             $this->sendMultipartUpdate();
+            //TODO: find better solution
+            // Currently there is no way to get the newly added filter when sendMultipartUpdate() is triggered.
+            // The $searchbar->getFilter() returns null, only the searchbar's redirect url contains the new filter
+            $this->redirectNow($searchBar->getRedirectUrl());
         }
     }
 
