@@ -79,4 +79,13 @@ class IcingaDbHostStatusCube extends IcingaDbCube
 
         return $this->objectsFilter;
     }
+
+    protected function getSortBySeverityColumns(?string $dir = 'ASC'): array
+    {
+        return [
+            'hosts_unhandled_down'          => $dir,
+            'hosts_unhandled_unreachable'   => $dir,
+            'hosts_down'                    => $dir
+        ];
+    }
 }

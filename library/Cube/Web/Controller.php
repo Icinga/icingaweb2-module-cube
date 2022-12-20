@@ -21,6 +21,7 @@ use ipl\Stdlib\Filter;
 use ipl\Stdlib\Str;
 use ipl\Web\Compat\CompatController;
 use ipl\Web\Compat\SearchControls;
+use ipl\Web\Control\SortControl;
 use ipl\Web\Filter\QueryString;
 use ipl\Web\Url;
 use ipl\Web\Widget\Tabs;
@@ -127,6 +128,15 @@ abstract class Controller extends CompatController
         }
 
         $this->addControl($problemToggle);
+
+        $sortControl = SortControl::create([
+            IcingaDbCube::DIMENSION_VALUE_SORT_PARAM => t('Value'),
+            IcingaDbCube::DIMENSION_SEVERITY_SORT_PARAM . ' desc' => t('Severity'),
+        ]);
+
+        $this->params->shift($sortControl->getSortParam());
+        $this->cube->sortBy($sortControl->getSort());
+        $this->addControl($sortControl);
 
         $searchBar = $this->createSearchBar(
             $query,

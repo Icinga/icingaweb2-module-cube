@@ -9,6 +9,7 @@ use Icinga\Module\Icingadb\Common\Auth;
 use Icinga\Module\Icingadb\Common\Database;
 use Icinga\Module\Icingadb\Model\Host;
 use Icinga\Module\Icingadb\Model\Service;
+use ipl\Orm\Common\SortUtil;
 use ipl\Orm\Query;
 use ipl\Sql\Adapter\Pgsql;
 use ipl\Sql\Expression;
@@ -24,6 +25,12 @@ abstract class IcingaDbCube extends Cube
     /** @var Bool Whether to show problems only */
     protected $problemsOnly;
 
+    /** @var string Sort param used to sort dimensions by value */
+    public const DIMENSION_VALUE_SORT_PARAM = 'value';
+
+    /** @var string Sort param used to sort dimensions by severity */
+    public const DIMENSION_SEVERITY_SORT_PARAM = 'severity';
+
     /** @var Query The inner query fetching all required data */
     protected $innerQuery;
 
@@ -34,6 +41,9 @@ abstract class IcingaDbCube extends Cube
     protected $fullQuery;
 
     protected $objectsFilter;
+
+    /** @var array The sort order of dimensions, column as key and direction as value */
+    protected $sortBy;
 
     abstract public function getObjectsFilter();
     /**
@@ -50,6 +60,13 @@ abstract class IcingaDbCube extends Cube
      * @return Query
      */
     abstract public function prepareInnerQuery();
+
+    /**
+     * Get sort by severity columns with given direction
+     *
+     * @return array Column as key and direction as value
+     */
+    abstract protected function getSortBySeverityColumns(?string $dir = 'ASC'): array;
 
     /**
      * Get our inner query
@@ -173,6 +190,34 @@ abstract class IcingaDbCube extends Cube
     }
 
     /**
+     * Set sort by rule for dimensions
+     *
+     * @param ?string $sortBy
+     *
+     * @return $this
+     */
+    public function sortBy(?string $sortBy): self
+    {
+        if (empty($sortBy)) {
+            return $this;
+        }
+
+        $this->sortBy = SortUtil::createOrderBy($sortBy)[0];
+
+        return $this;
+    }
+
+    /**
+     * Get sort by rule for dimensions
+     *
+     * @return ?array Column as key and direction as value
+     */
+    public function getSortBy(): ?array
+    {
+        return $this->sortBy;
+    }
+
+    /**
      * We first prepare the queries and to finalize it later on
      *
      * This way dimensions can be added one by one, they will be allowed to
@@ -241,22 +286,30 @@ abstract class IcingaDbCube extends Cube
 
     protected function prepareFullQuery()
     {
-        $rollupQuery = $this->rollupQuery();
         $columns = [];
+        $orderBy = [];
+        $sortBy = $this->getSortBy();
+        $isSortBySeverity = $sortBy && self::DIMENSION_SEVERITY_SORT_PARAM === $sortBy[0];
+
         foreach ($this->listColumns() as $column) {
             $quotedColumn = $this->getDb()->quoteIdentifier([$column]);
-            $columns[$quotedColumn] = 'rollup.' . $this->getDb()->quoteIdentifier([$column]);
+            $columns[$quotedColumn] = 'rollup.' . $quotedColumn;
+
+            $orderBy["($quotedColumn IS NOT NULL)"] = null;
+
+            if ($this->hasDimension($column)) {
+                $orderBy[$quotedColumn] = $isSortBySeverity ? 'ASC' : $sortBy[1] ?? 'ASC';
+            }
         }
 
-        $fullQuery = new Select();
-        $fullQuery->from(['rollup' => $rollupQuery])->columns($columns);
-
-        foreach ($columns as $quotedColumn => $_) {
-            $fullQuery->orderBy("($quotedColumn IS NOT NULL)");
-            $fullQuery->orderBy($quotedColumn);
+        if ($isSortBySeverity) {
+            $orderBy = array_merge($this->getSortBySeverityColumns($sortBy[1]), $orderBy);
         }
 
-        return $fullQuery;
+        return (new Select())
+            ->from(['rollup' => $this->rollupQuery()])
+            ->columns($columns)
+            ->orderBy($orderBy);
     }
 
     /**

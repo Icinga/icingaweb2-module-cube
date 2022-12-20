@@ -91,4 +91,16 @@ class IcingaDbServiceStatusCube extends IcingaDbCube
 
         return $this->objectsFilter;
     }
+
+    protected function getSortBySeverityColumns(?string $dir = 'ASC'): array
+    {
+        return [
+            'services_unhandled_critical'   => $dir,
+            'services_unhandled_unknown'    => $dir,
+            'services_unhandled_warning'    => $dir,
+            'services_critical'             => $dir,
+            'services_unknown'              => $dir,
+            'services_warning'              => $dir
+        ];
+    }
 }
