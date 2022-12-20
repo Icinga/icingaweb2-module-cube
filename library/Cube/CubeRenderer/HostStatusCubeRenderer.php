@@ -22,8 +22,13 @@ class HostStatusCubeRenderer extends CubeRenderer
     protected function getDimensionClasses($name, $row)
     {
         $classes = parent::getDimensionClasses($name, $row);
-
         $sums = $row;
+
+        $next = $this->cube->getDimensionAfter($name);
+        if ($next && isset($this->summaries->{$next->getName()})) {
+            $sums = $this->summaries->{$next->getName()};
+        }
+
         if ($sums->hosts_down > 0) {
             $classes[] = 'critical';
             if ((int) $sums->hosts_unhandled_down === 0) {
