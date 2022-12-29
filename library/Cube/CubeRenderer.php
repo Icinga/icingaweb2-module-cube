@@ -334,18 +334,21 @@ abstract class CubeRenderer
     protected function getDetailsUrl($name, $row)
     {
         $cube = $this->cube;
+        $params = [];
+
+        if ($this->cube::isUsingIcingaDb() && $this->cube->isProblemsOnly()) {
+            $params['problems'] = true;
+        }
 
         $dimensions = array_merge(array_keys($cube->listDimensions()), $cube->listSlices());
-        $params = [
-            'dimensions' => DimensionParams::update($dimensions)->getParams()
-        ];
+        $params['dimensions'] = DimensionParams::update($dimensions)->getParams();
 
         foreach ($this->cube->listDimensionsUpTo($name) as $dimensionName) {
-            $params[$dimensionName] = $row->$dimensionName;
+            $params[$this->cube::SLICE_PREFIX . $dimensionName] = $row->$dimensionName;
         }
 
         foreach ($this->cube->getSlices() as $key => $val) {
-            $params[$key] = $val;
+            $params[$this->cube::SLICE_PREFIX . $key] = $val;
         }
 
         return $this->view->url(
@@ -357,7 +360,7 @@ abstract class CubeRenderer
     protected function getSliceUrl($name, $row)
     {
         return $this->view->url()
-            ->setParam($name, $row->$name);
+            ->setParam($this->cube::SLICE_PREFIX . $name, $row->$name);
     }
 
     protected function isOuterDimension($name)

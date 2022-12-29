@@ -1,5 +1,7 @@
 <div class="controls">
-<?= $this->tabs ?>
+<?php if (! \Icinga\Module\Cube\Cube::isUsingIcingaDb()): ?>
+    <?= $this->tabs ?>
+<?php endif ?>
 <h1><?= $this->escape($this->title) ?></h1>
 </div>
 

@@ -69,6 +69,10 @@ class HostStatusCubeRenderer extends CubeRenderer
         $main = '';
         $sub = '';
         foreach ($parts as $class => $count) {
+            if ($count === 0) {
+                continue;
+            }
+
             if ($main === '') {
                 $main = $this->makeBadgeHtml($class, $count);
             } else {
