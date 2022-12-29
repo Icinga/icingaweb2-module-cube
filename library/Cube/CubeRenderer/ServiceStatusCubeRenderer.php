@@ -17,24 +17,24 @@ class ServiceStatusCubeRenderer extends CubeRenderer
             $parts['critical'] = $facts->services_unhandled_critical;
         }
 
-        if ($facts->services_critical > 0 && $facts->services_critical > $facts->services_unhandled_critical) {
-            $parts['critical handled'] = $facts->services_critical - $facts->services_unhandled_critical;
+        if ($facts->services_unhandled_unknown > 0) {
+            $parts['unknown'] = $facts->services_unhandled_unknown;
         }
 
         if ($facts->services_unhandled_warning > 0) {
             $parts['warning'] = $facts->services_unhandled_warning;
         }
 
-        if ($facts->services_warning > 0 && $facts->services_warning > $facts->services_unhandled_warning) {
-            $parts['warning handled'] = $facts->services_warning - $facts->services_unhandled_warning;
-        }
-
-        if ($facts->services_unhandled_unknown > 0) {
-            $parts['unknown'] = $facts->services_unhandled_unknown;
+        if ($facts->services_critical > 0 && $facts->services_critical > $facts->services_unhandled_critical) {
+            $parts['critical handled'] = $facts->services_critical - $facts->services_unhandled_critical;
         }
 
         if ($facts->services_unknown > 0 && $facts->services_unknown > $facts->services_unhandled_unknown) {
             $parts['unknown handled'] = $facts->services_unknown - $facts->services_unhandled_unknown;
+        }
+
+        if ($facts->services_warning > 0 && $facts->services_warning > $facts->services_unhandled_warning) {
+            $parts['warning handled'] = $facts->services_warning - $facts->services_unhandled_warning;
         }
 
         if (
@@ -94,26 +94,27 @@ class ServiceStatusCubeRenderer extends CubeRenderer
             $sums = $this->summaries->{$next->getName()};
         }
 
-        if ($sums->services_critical > 0) {
-            $classes[] = 'critical';
-            if ((int) $sums->services_unhandled_critical === 0) {
-                $classes[] = 'handled';
-            }
-        } elseif ($sums->services_warning > 0) {
-            $classes[] = 'warning';
-            if ((int) $sums->services_unhandled_warning === 0) {
-                $classes[] = 'handled';
-            }
-        } elseif ($sums->services_unknown > 0) {
-            $classes[] = 'unknown';
-            if ((int) $sums->services_unhandled_unknown === 0) {
-                $classes[] = 'handled';
-            }
-        } else {
-            $classes[] = 'ok';
+        if ($sums->services_unhandled_critical > 0) {
+            $severityClass[] = 'critical';
+        } elseif ($sums->services_unhandled_unknown > 0) {
+            $severityClass[] = 'unknown';
+        } elseif ($sums->services_unhandled_warning > 0) {
+            $severityClass[] = 'warning';
         }
 
-        return $classes;
+        if (empty($severityClass)) {
+            if ($sums->services_critical > 0) {
+                $severityClass = ['critical', 'handled'];
+            } elseif ($sums->services_unknown > 0) {
+                $severityClass = ['unknown', 'handled'];
+            } elseif ($sums->services_warning > 0) {
+                $severityClass = ['warning', 'handled'];
+            } else {
+                $severityClass[] = 'ok';
+            }
+        }
+
+        return array_merge($classes, $severityClass);
     }
 
     protected function makeBadgeHtml($class, $count)

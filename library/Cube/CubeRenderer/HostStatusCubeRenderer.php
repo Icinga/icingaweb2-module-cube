@@ -29,21 +29,24 @@ class HostStatusCubeRenderer extends CubeRenderer
             $sums = $this->summaries->{$next->getName()};
         }
 
-        if ($sums->hosts_down > 0) {
-            $classes[] = 'critical';
-            if ((int) $sums->hosts_unhandled_down === 0) {
-                $classes[] = 'handled';
-            }
-        } elseif ($sums->hosts_unreachable > 0) {
-            $classes[] = 'unreachable';
-            if ((int) $sums->hosts_unhandled_unreachable === 0) {
-                $classes[] = 'handled';
-            }
-        } else {
-            $classes[] = 'ok';
+        $severityClass = [];
+        if ($sums->hosts_unhandled_down > 0) {
+            $severityClass[] = 'critical';
+        } elseif ($sums->hosts_unhandled_unreachable > 0) {
+            $severityClass[] = 'unreachable';
         }
 
-        return $classes;
+        if (empty($severityClass)) {
+            if ($sums->hosts_down > 0) {
+                $severityClass = ['critical', 'handled'];
+            } elseif ($sums->hosts_unreachable > 0) {
+                $severityClass = ['unreachable', 'handled'];
+            } else {
+                $severityClass[] = 'ok';
+            }
+        }
+
+        return array_merge($classes, $severityClass);
     }
 
     public function renderFacts($facts)
@@ -55,12 +58,12 @@ class HostStatusCubeRenderer extends CubeRenderer
             $parts['critical'] = $facts->hosts_unhandled_down;
         }
 
-        if ($facts->hosts_down > 0 && $facts->hosts_down > $facts->hosts_unhandled_down) {
-            $parts['critical handled'] = $facts->hosts_down - $facts->hosts_unhandled_down;
-        }
-
         if ($facts->hosts_unhandled_unreachable > 0) {
             $parts['unreachable'] = $facts->hosts_unhandled_unreachable;
+        }
+
+        if ($facts->hosts_down > 0 && $facts->hosts_down > $facts->hosts_unhandled_down) {
+            $parts['critical handled'] = $facts->hosts_down - $facts->hosts_unhandled_down;
         }
 
         if ($facts->hosts_unreachable > 0 && $facts->hosts_unreachable > $facts->hosts_unhandled_unreachable) {
