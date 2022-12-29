@@ -7,6 +7,8 @@ namespace Icinga\Module\Cube\IcingaDb;
 use Icinga\Module\Cube\Cube;
 use Icinga\Module\Icingadb\Common\Auth;
 use Icinga\Module\Icingadb\Common\Database;
+use Icinga\Module\Icingadb\Model\Host;
+use Icinga\Module\Icingadb\Model\Service;
 use ipl\Orm\Query;
 use ipl\Sql\Adapter\Pgsql;
 use ipl\Sql\Expression;
@@ -85,6 +87,60 @@ abstract class IcingaDbCube extends Cube
         $this->addDimension($this->createDimension($name));
 
         return $this;
+    }
+
+    /**
+     * Fetch the host variable dimensions
+     *
+     * @return array
+     */
+    public function fetchHostVariableDimensions(): array
+    {
+        $query = Host::on($this->getDb())
+            ->with('customvar_flat')
+            ->columns('customvar_flat.flatname')
+            ->orderBy('customvar_flat.flatname');
+
+        $this->applyRestrictions($query);
+
+        $query->getSelectBase()->groupBy('flatname');
+
+        $dimensions = [];
+        foreach ($query as $row) {
+            // Replaces array index notations with [*] to get results for arbitrary indexes
+            $name = preg_replace('/\\[\d+](?=\\.|$)/', '[*]', $row->customvar_flat->flatname);
+            $name = strtolower($name);
+            $dimensions[CustomVariableDimension::HOST_PREFIX . $name] = 'Host ' . $name;
+        }
+
+        return $dimensions;
+    }
+
+    /**
+     * Fetch the service variable dimensions
+     *
+     * @return array
+     */
+    public function fetchServiceVariableDimensions(): array
+    {
+        $query = Service::on($this->getDb())
+            ->with('customvar_flat')
+            ->columns('customvar_flat.flatname')
+            ->orderBy('customvar_flat.flatname');
+
+        $this->applyRestrictions($query);
+
+        $query->getSelectBase()->groupBy('flatname');
+
+        $dimensions = [];
+        foreach ($query as $row) {
+            // Replaces array index notations with [*] to get results for arbitrary indexes
+            $name = preg_replace('/\\[\d+](?=\\.|$)/', '[*]', $row->customvar_flat->flatname);
+            $name = strtolower($name);
+            $dimensions[CustomVariableDimension::SERVICE_PREFIX . $name] = 'Service ' . $name;
+        }
+
+        return $dimensions;
     }
 
     /**

@@ -5,10 +5,10 @@
 namespace Icinga\Module\Cube\IcingaDb;
 
 use Icinga\Module\Cube\CubeRenderer\ServiceStatusCubeRenderer;
-use Icinga\Module\Icingadb\Model\CustomvarFlat;
 use Icinga\Module\Icingadb\Model\Service;
 use Icinga\Module\Icingadb\Model\ServicestateSummary;
 use ipl\Stdlib\Filter;
+use ipl\Stdlib\Str;
 
 class IcingaDbServiceStatusCube extends IcingaDbCube
 {
@@ -28,6 +28,18 @@ class IcingaDbServiceStatusCube extends IcingaDbCube
         return new CustomVariableDimension($name);
     }
 
+    public function hasDimension($name)
+    {
+        return array_key_exists($name, $this->dimensions)
+            || array_key_exists(CustomVariableDimension::SERVICE_PREFIX . $name, $this->dimensions)
+            || (Str::StartsWith($name, CustomVariableDimension::SERVICE_PREFIX)// required to create select options list
+                && array_key_exists(
+                    substr($name, strlen(CustomVariableDimension::SERVICE_PREFIX)),
+                    $this->dimensions
+                )
+            );
+    }
+
     public function getAvailableFactColumns()
     {
         return [
@@ -43,25 +55,10 @@ class IcingaDbServiceStatusCube extends IcingaDbCube
 
     public function listAvailableDimensions()
     {
-        $db = $this->getDb();
-
-        $query = CustomvarFlat::on($db);
-        $this->applyRestrictions($query);
-
-        $query
-            ->columns('flatname')
-            ->orderBy('flatname')
-            ->filter(Filter::like('service.id', '*'));
-        $query->getSelectBase()->groupBy('flatname');
-
-        $dimensions = [];
-        foreach ($query as $row) {
-            // Replaces array index notations with [*] to get results for arbitrary indexes
-            $name = preg_replace('/\\[\d+](?=\\.|$)/', '[*]', $row->flatname);
-            $dimensions[$name] = $name;
-        }
-
-        return $dimensions;
+        return array_merge(
+            $this->fetchServiceVariableDimensions(),
+            $this->fetchHostVariableDimensions()
+        );
     }
 
     public function prepareInnerQuery()

@@ -3,8 +3,10 @@
 namespace Icinga\Module\Cube\ProvidedHook\Cube;
 
 use Icinga\Module\Cube\Hook\IcingaDbActionsHook;
+use Icinga\Module\Cube\IcingaDb\CustomVariableDimension;
 use Icinga\Module\Cube\IcingaDb\IcingaDbCube;
 use Icinga\Module\Cube\Icingadb\IcingadbServiceStatusCube;
+use ipl\Stdlib\Str;
 
 class IcingaDbActions extends IcingaDbActionsHook
 {
@@ -19,7 +21,14 @@ class IcingaDbActions extends IcingaDbActionsHook
 
         $paramsWithPrefix = [];
         foreach ($cube->getSlices() as $dimension => $slice) {
-            $paramsWithPrefix[$type . '.vars.' . $dimension] = $slice;
+            if (
+                ! Str::startsWith($dimension, CustomVariableDimension::HOST_PREFIX)
+                && ! Str::startsWith($dimension, CustomVariableDimension::SERVICE_PREFIX)
+            ) {
+                $dimension = $type . '.vars.' . $dimension;
+            }
+
+            $paramsWithPrefix[$dimension] = $slice;
         }
 
         if ($type === 'host') {

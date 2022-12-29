@@ -98,8 +98,7 @@ abstract class Cube
         }
 
         $this->availableDimensions = [];
-        foreach ($this->listAvailableDimensions() as $label) {
-            $name = strtolower($label);
+        foreach ($this->listAvailableDimensions() as $name => $label) {
             if (! isset($this->availableDimensions[$name])) {
                 $this->availableDimensions[$name] = $this->createDimension($name)->setLabel($label);
             } else {
@@ -226,7 +225,7 @@ abstract class Cube
     public function addDimension(Dimension $dimension)
     {
         $name = $dimension->getName();
-        if (array_key_exists($name, $this->dimensions)) {
+        if ($this->hasDimension($name)) {
             throw new IcingaException('Cannot add dimension "%s" twice', $name);
         }
 
