@@ -63,6 +63,16 @@ abstract class Controller extends CompatController
         $this->prepareCube();
     }
 
+    public function fetchFilterColumns(Query $query)
+    {
+        $columns = [];
+        foreach ($query->getResolver()->getColumnDefinitions($query->getModel()) as $name => $definition) {
+            $columns[$name] = $definition->getLabel();
+        }
+
+        return $columns;
+    }
+
     /**
      * Get the filter created from query string parameters
      *
