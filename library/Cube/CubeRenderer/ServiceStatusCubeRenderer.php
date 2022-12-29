@@ -133,4 +133,47 @@ class ServiceStatusCubeRenderer extends CubeRenderer
     {
         return 'cube/services/details';
     }
+
+    private function sortBySeverity($a, $b): int
+    {
+        if (is_array($a)) {
+            $a = $a[0];
+            $b = $b[0];
+        }
+
+        if ($this->isSortDirDesc) {
+            $y = $a;
+            $a = $b;
+            $b = $y;
+        }
+
+        switch (true) {
+            case $a->services_unhandled_critical > $b->services_unhandled_critical:
+                return 1;
+            case $a->services_unhandled_critical < $b->services_unhandled_critical:
+                return -1;
+            case $a->services_unhandled_unknown > $b->services_unhandled_unknown:
+                return 1;
+            case $a->services_unhandled_unknown < $b->services_unhandled_unknown:
+                return -1;
+            case $a->services_unhandled_warning > $b->services_unhandled_warning:
+                return 1;
+            case $a->services_unhandled_warning < $b->services_unhandled_warning:
+                return -1;
+            case $a->services_critical - $a->services_unhandled_critical > $b->services_critical - $b->services_unhandled_critical:
+                return 1;
+            case $a->services_critical - $a->services_unhandled_critical < $b->services_critical - $b->services_unhandled_critical:
+                return -1;
+            case $a->services_unknown - $a->services_unhandled_unknown > $b->services_unknown - $b->services_unhandled_unknown:
+                return 1;
+            case $a->services_unknown - $a->services_unhandled_unknown < $b->services_unknown - $b->services_unhandled_unknown:
+                return -1;
+            case $a->services_warning - $a->services_unhandled_warning > $b->services_warning - $b->services_unhandled_warning:
+                return 1;
+            case $a->services_warning - $a->services_unhandled_warning < $b->services_warning - $b->services_unhandled_warning:
+                return -1;
+            default:
+                return 0;
+        }
+    }
 }

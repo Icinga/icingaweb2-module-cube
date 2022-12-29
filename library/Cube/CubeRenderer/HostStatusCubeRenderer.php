@@ -114,4 +114,39 @@ class HostStatusCubeRenderer extends CubeRenderer
     {
         return 'cube/hosts/details';
     }
+
+    protected function sortBySeverity($a, $b): int
+    {
+        if (is_array($a)) {
+            $a = $a[0];
+            $b = $b[0];
+        }
+
+        if ($this->isSortDirDesc) {
+            $y = $a;
+            $a = $b;
+            $b = $y;
+        }
+
+        switch (true) {
+            case $a->hosts_unhandled_down > $b->hosts_unhandled_down:
+                return 1;
+            case $a->hosts_unhandled_down < $b->hosts_unhandled_down:
+                return -1;
+            case $a->hosts_unhandled_unreachable > $b->hosts_unhandled_unreachable:
+                return 1;
+            case $a->hosts_unhandled_unreachable < $b->hosts_unhandled_unreachable:
+                return -1;
+            case $a->hosts_down - $a->hosts_unhandled_down > $b->hosts_down - $b->hosts_unhandled_down:
+                return 1;
+            case $a->hosts_down - $a->hosts_unhandled_down < $b->hosts_down - $b->hosts_unhandled_down:
+                return -1;
+            case $a->hosts_unreachable - $a->hosts_unhandled_unreachable > $b->hosts_unreachable - $b->hosts_unhandled_unreachable:
+                return 1;
+            case $a->hosts_unreachable - $a->hosts_unhandled_unreachable < $b->hosts_unreachable - $b->hosts_unhandled_unreachable:
+                return -1;
+            default:
+                return 0;
+        }
+    }
 }

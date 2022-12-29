@@ -54,6 +54,9 @@ abstract class CubeRenderer
 
     protected $started;
 
+    /** @var bool Whether the sort dir is desc (Only for icingadb cube) */
+    protected $isSortDirDesc;
+
     /**
      * CubeRenderer constructor.
      *
@@ -185,11 +188,112 @@ abstract class CubeRenderer
         $this->view = $view;
         $this->initialize();
         $htm = $this->beginContainer();
-        foreach ($this->cube->fetchAll() as $row) {
+
+        $results = $this->cube->fetchAll();
+
+        if (! empty($results) && $this->cube::isUsingIcingaDb()) {
+            $sortBy = $this->cube->getSortBy();
+            if ($sortBy && $sortBy[0] === $this->cube::DIMENSION_SEVERITY_SORT_PARAM) {
+                 $preparedResults = $this->prepareResultsForSort($results);
+                 $this->isSortDirDesc = isset($sortBy[1]) && $sortBy[1] !== 'asc';
+
+                 $this->sort($preparedResults[1]);
+
+                $results = [];
+                 array_walk_recursive($preparedResults, function ($a) use (&$results) {
+                     $results[] = $a;
+                 });
+            }
+        }
+
+        foreach ($results as $row) {
             $htm .= $this->renderRow($row);
         }
 
         return $htm . $this->closeDimensions() . $this->endContainer();
+    }
+
+    private function prepareResultsForSort(array $results): array
+    {
+        $dimensionOrder = array_values($this->dimensionOrder);
+
+        $d2 = null;
+        $d3 = null;
+        switch (count($dimensionOrder)) {
+            case 3:
+                $d3 = $dimensionOrder[2];
+                //no break
+            case 2:
+                $d2 = $dimensionOrder[1];
+                //no break
+            case 1:
+                $d1 = $dimensionOrder[0];
+        }
+
+        $map = [];
+        $currentSubMap = [];
+        $cache = [];
+        foreach ($results as $i => $result) {
+            if ($i === 0) {
+                $map = [$result];
+                continue;
+            }
+
+            if (isset($d3) && $result->$d3 === null && $result->$d2 === null) {
+                if (! empty($cache[1])) {
+                    $currentSubMap[1][] = $cache;
+                    unset($cache);
+                }
+
+                if (! empty($currentSubMap)) {
+                    $map[1][] = $currentSubMap;
+                }
+
+                $currentSubMap = [$result];
+            } elseif (isset($d3) && $result->$d3 === null && $result->$d2 !== null) {
+                if (! empty($cache[1])) {
+                    $currentSubMap[1][] = $cache;
+                }
+
+                $cache = [$result];
+            } elseif (isset($d3) && $result->$d3 !== null) {
+                $cache[1][] = $result;
+            } elseif (isset($d2) && $result->$d2 === null) {
+                if (! empty($currentSubMap)) {
+                    $map[1][] = $currentSubMap;
+                }
+
+                $currentSubMap = [$result];
+            } elseif (isset($d2) && $result->$d2 !== null) {
+                $currentSubMap[1][] = $result;
+            } elseif (isset($d1) && $result->$d1 !== null) {
+                $map[1][] = $result;
+            }
+        }
+
+        if (isset($d2)) {
+            if (! empty($cache[1])) {
+                $currentSubMap[1][] = $cache;
+                unset($cache);
+            }
+
+            $map[1][] = $currentSubMap;
+        }
+
+        return $map;
+    }
+
+    private function sort(&$preparedResults)
+    {
+        usort($preparedResults, [$this, 'sortBySeverity']);
+
+        foreach ($preparedResults as &$d2) {
+            if (! is_array($d2)) {
+                break;
+            }
+
+            $this->sort($d2[1]);
+        }
     }
 
     protected function renderRow($row)
