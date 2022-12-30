@@ -134,7 +134,7 @@ class ServiceStatusCubeRenderer extends CubeRenderer
         return 'cube/services/details';
     }
 
-    private function sortBySeverity($a, $b): int
+    protected function sortBySeverity($a, $b): int
     {
         if (is_array($a)) {
             $a = $a[0];
