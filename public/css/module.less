@@ -341,3 +341,79 @@ ul.action-links {
     width: 100%;
   }
 }
+
+.sort-control {
+  display: flex;
+  justify-content: flex-end;
+
+  .form-element {
+    display: inline-flex;
+    align-items: baseline;
+    margin-right: .5em;
+
+    label {
+      margin-right: .5em;
+    }
+  }
+
+  .control-button {
+    margin: 0;
+  }
+}
+
+.search-controls {
+  display: flex;
+  min-width: 100%;
+
+  .search-bar {
+    flex: 1 1 auto;
+
+    & ~ .control-button {
+      margin-left: .5em;
+    }
+  }
+}
+
+/**
+ The default layout of list controls in Icinga Web
+
+ ┌────────────────────────────────────────────────────────────────┐
+ │ .pagination-control               .limit-control .sort-control │
+ │ <-------------------- .search-controls ----------------------> │
+ └────────────────────────────────────────────────────────────────┘
+ */
+.controls.default-layout {
+  .box-shadow(0, 0, 0, 1px, @gray-lighter);
+  z-index: 1; // The content may clip, this ensures the separator is always visible
+
+  > .pagination-control {
+    float: left;
+  }
+
+  > .sort-control,
+  > .limit-control {
+    float: right;
+  }
+
+  > .limit-control {
+    margin-right: .5em;
+  }
+
+  > .search-controls {
+    clear: both;
+  }
+
+  > :not(:only-child) {
+    margin-bottom: 0.5em;
+  }
+
+  > .sort-control,
+  > .search-controls > .control-button:last-child {
+    margin-right: -.5em;
+  }
+
+  > .search-controls > .search-bar .search-suggestions {
+    // Suggestions should be kept at a distance from the bottom of the page
+    margin-bottom: 2.5em;
+  }
+}

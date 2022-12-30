@@ -10,18 +10,19 @@ use Icinga\Module\Cube\Forms\DimensionsForm;
 use Icinga\Module\Cube\Hook\IcingaDbActionsHook;
 use Icinga\Module\Cube\IcingaDb\CustomVariableDimension;
 use Icinga\Module\Cube\IcingaDb\IcingaDbCube;
+use Icinga\Module\Cube\SortControl;
 use Icinga\Module\Icingadb\Common\Auth;
 use Icinga\Module\Icingadb\Common\Database;
 use Icinga\Module\Icingadb\Web\Control\ProblemToggle;
 use Icinga\Web\View;
 use Icinga\Web\Widget\Tabextension\DashboardAction;
+use ipl\Html\Html;
 use ipl\Html\HtmlString;
 use ipl\Orm\Query;
 use ipl\Stdlib\Filter;
 use ipl\Stdlib\Str;
 use ipl\Web\Compat\CompatController;
 use ipl\Web\Compat\SearchControls;
-use ipl\Web\Control\SortControl;
 use ipl\Web\Filter\QueryString;
 use ipl\Web\Url;
 use ipl\Web\Widget\Tabs;
@@ -152,6 +153,7 @@ abstract class Controller extends CompatController
             $query,
             $this->preserveParams
         );
+        $searchBar->addWrapper(Html::tag('div', ['class' => 'search-controls']));
 
         if ($searchBar->hasBeenSent() && ! $searchBar->isValid()) {
             if ($searchBar->hasBeenSubmitted()) {
