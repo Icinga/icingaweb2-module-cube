@@ -192,11 +192,11 @@ abstract class Controller extends CompatController
                 $this->cube->getDimension($dimension)->wantNull();
             }
 
-            $sliceParamWithPrefix = $this->cube::SLICE_PREFIX . $dimension;
+            $sliceParamWithPrefix = rawurlencode($this->cube::SLICE_PREFIX . $dimension);
 
             if ($this->params->has($sliceParamWithPrefix)) {
                 $this->preserveParams[] = $sliceParamWithPrefix;
-                $this->cube->slice(rawurldecode($dimension), rawurldecode($this->params->shift($sliceParamWithPrefix)));
+                $this->cube->slice($dimension, $this->params->shift($sliceParamWithPrefix));
             }
         }
     }
