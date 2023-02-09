@@ -14,10 +14,12 @@ use ipl\Orm\Query;
 use ipl\Sql\Adapter\Pgsql;
 use ipl\Sql\Expression;
 use ipl\Sql\Select;
+use ipl\Stdlib\BaseFilter;
 
 abstract class IcingaDbCube extends Cube
 {
     use Auth;
+    use BaseFilter;
     use Database;
 
     public const SLICE_PREFIX = 'slice.';
@@ -223,7 +225,9 @@ abstract class IcingaDbCube extends Cube
      */
     protected function finalizeInnerQuery()
     {
-        $query = $this->innerQuery()->getSelectBase();
+        $query = $this->innerQuery();
+        $select = $query->getSelectBase();
+
         $columns = [];
         foreach ($this->dimensions as $name => $dimension) {
             $quotedDimension = $this->getDb()->quoteIdentifier([$name]);
@@ -231,7 +235,7 @@ abstract class IcingaDbCube extends Cube
             $columns[$quotedDimension] = $dimension->getColumnExpression($this);
 
             if ($this->hasSlice($name)) {
-                $query->where(
+                $select->where(
                     $dimension->getColumnExpression($this) . ' = ?',
                     $this->slices[$name]
                 );
@@ -240,7 +244,12 @@ abstract class IcingaDbCube extends Cube
             }
         }
 
-        $query->columns($columns);
+        $select->columns($columns);
+
+        $this->applyRestrictions($query);
+        if ($this->hasBaseFilter()) {
+            $query->filter($this->getBaseFilter());
+        }
     }
 
     protected function prepareRollupQuery()

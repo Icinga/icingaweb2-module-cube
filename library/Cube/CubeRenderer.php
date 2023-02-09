@@ -4,7 +4,10 @@
 
 namespace Icinga\Module\Cube;
 
+use Icinga\Module\Cube\IcingaDb\IcingaDbCube;
 use Icinga\Web\View;
+use ipl\Web\Filter\QueryString;
+use ipl\Web\Url;
 
 /**
  * CubeRenderer base class
@@ -437,28 +440,26 @@ abstract class CubeRenderer
 
     protected function getDetailsUrl($name, $row)
     {
-        $cube = $this->cube;
-        $params = [];
+        $url = Url::fromPath($this->getDetailsBaseUrl());
 
-        if ($this->cube::isUsingIcingaDb() && $this->cube->isProblemsOnly()) {
-            $params['problems'] = true;
+        if ($this->cube instanceof IcingaDbCube && $this->cube->hasBaseFilter()) {
+            $url->setQueryString(QueryString::render($this->cube->getBaseFilter()));
         }
 
-        $dimensions = array_merge(array_keys($cube->listDimensions()), $cube->listSlices());
-        $params['dimensions'] = DimensionParams::update($dimensions)->getParams();
+        $urlParams = $url->getParams();
+
+        $dimensions = array_merge(array_keys($this->cube->listDimensions()), $this->cube->listSlices());
+        $urlParams->add('dimensions', DimensionParams::update($dimensions)->getParams());
 
         foreach ($this->cube->listDimensionsUpTo($name) as $dimensionName) {
-            $params[$this->cube::SLICE_PREFIX . $dimensionName] = $row->$dimensionName;
+            $urlParams->add($this->cube::SLICE_PREFIX . $dimensionName, $row->$dimensionName);
         }
 
         foreach ($this->cube->getSlices() as $key => $val) {
-            $params[$this->cube::SLICE_PREFIX . $key] = $val;
+            $urlParams->add($this->cube::SLICE_PREFIX . $key, $val);
         }
 
-        return $this->view->url(
-            $this->getDetailsBaseUrl(),
-            $params
-        );
+        return $url;
     }
 
     protected function getSliceUrl($name, $row)
