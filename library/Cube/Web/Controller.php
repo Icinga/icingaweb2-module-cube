@@ -92,6 +92,8 @@ abstract class Controller extends CompatController
             'url'   => $this->getRequest()->getUrl()
         ])->activate('details');
 
+        $this->cube->setBaseFilter($this->getFilter());
+
         $this->setTitle($this->cube->getSlicesLabel());
         $this->view->links = IcingaDbActionsHook::renderAll($this->cube);
 
@@ -110,8 +112,8 @@ abstract class Controller extends CompatController
         $showSettings = $this->params->shift('showSettings');
 
         $query = $this->cube->innerQuery();
-        $problemsOnly = $this->params->shift('problems');
-        $problemToggle = (new ProblemToggle($problemsOnly))
+        $problemsOnly = (bool) $this->params->shift('problems', false);
+        $problemToggle = (new ProblemToggle($problemsOnly ?: null))
             ->setIdProtector([$this->getRequest(), 'protectId'])
             ->on(ProblemToggle::ON_SUCCESS, function (ProblemToggle $form) {
                 if (! $form->getElement('problems')->isChecked()) {
@@ -120,11 +122,6 @@ abstract class Controller extends CompatController
                     $this->redirectNow(Url::fromRequest()->setParam('problems'));
                 }
             })->handleRequest($this->getServerRequest());
-
-        if ($problemsOnly) {
-            $query->filter(Filter::equal('state.is_problem', 1));
-            $this->cube->problemsOnly();
-        }
 
         $this->addControl($problemToggle);
 
@@ -145,7 +142,12 @@ abstract class Controller extends CompatController
             $filter = $searchBar->getFilter();
         }
 
-        $this->filter($query, $filter);
+        if ($problemsOnly) {
+            $filter = Filter::all($filter, Filter::equal('state.is_problem', true));
+        }
+
+        $this->cube->setBaseFilter($filter);
+        $this->cube->problemsOnly($problemsOnly);
 
         $this->addControl($searchBar);
 
