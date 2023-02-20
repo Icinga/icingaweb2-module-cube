@@ -19,11 +19,29 @@ if (! Cube::isUsingIcingaDb()) {
         ]
     ));
 
+    $this->addRoute('cube/hosts/details', new Zend_Controller_Router_Route_Static(
+        'cube/hosts/details',
+        [
+            'controller'    => 'ido-hosts',
+            'action'        => 'details',
+            'module'        => 'cube'
+        ]
+    ));
+
     $this->addRoute('cube/services', new Zend_Controller_Router_Route_Static(
         'cube/services',
         [
             'controller'    => 'ido-services',
             'action'        => 'index',
+            'module'        => 'cube'
+        ]
+    ));
+
+    $this->addRoute('cube/services/details', new Zend_Controller_Router_Route_Static(
+        'cube/services/details',
+        [
+            'controller'    => 'ido-services',
+            'action'        => 'details',
             'module'        => 'cube'
         ]
     ));
