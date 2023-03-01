@@ -30,6 +30,7 @@ abstract class IdoController extends Controller
     protected function moduleInit()
     {
         $this->cube = $this->getCube();
+        $this->cube->chooseFacts(array_keys($this->cube->getAvailableFactColumns()));
     }
 
     public function detailsAction(): void
@@ -39,24 +40,7 @@ abstract class IdoController extends Controller
             'url'   => $this->getRequest()->getUrl()
         ])->activate('details');
 
-        $this->cube->chooseFacts(array_keys($this->cube->getAvailableFactColumns()));
-        $vars = DimensionParams::fromString($this->params->shift('dimensions', ''))->getDimensions();
-        $wantNull = $this->params->shift('wantNull');
-
-        foreach ($vars as $var) {
-            $this->cube->addDimensionByName($var);
-            if ($wantNull) {
-                $this->cube->getDimension($var)->wantNull();
-            }
-        }
-
-        foreach (['renderLayout', 'showFullscreen', 'showCompact', 'view'] as $p) {
-            $this->params->shift($p);
-        }
-
-        foreach ($this->params->toArray() as $param) {
-            $this->cube->slice(rawurldecode($param[0]), rawurldecode($param[1]));
-        }
+        $this->prepareCube();
 
         $this->view->title = $this->cube->getSlicesLabel();
 
@@ -69,25 +53,7 @@ abstract class IdoController extends Controller
     {
         // Hint: order matters, we are shifting!
         $showSettings = $this->params->shift('showSettings');
-
-        $this->cube->chooseFacts(array_keys($this->cube->getAvailableFactColumns()));
-        $vars = DimensionParams::fromString($this->params->shift('dimensions', ''))->getDimensions();
-        $wantNull = $this->params->shift('wantNull');
-
-        foreach ($vars as $var) {
-            $this->cube->addDimensionByName($var);
-            if ($wantNull) {
-                $this->cube->getDimension($var)->wantNull();
-            }
-        }
-
-        foreach (['renderLayout', 'showFullscreen', 'showCompact', 'view'] as $p) {
-            $this->params->shift($p);
-        }
-
-        foreach ($this->params->toArray() as $param) {
-            $this->cube->slice(rawurldecode($param[0]), rawurldecode($param[1]));
-        }
+        $this->prepareCube();
 
         $this->view->title = sprintf(
             $this->translate('Cube: %s'),
@@ -108,6 +74,27 @@ abstract class IdoController extends Controller
         }
 
         $this->render('cube-index', null, true);
+    }
+
+    private function prepareCube(): void
+    {
+        $vars = DimensionParams::fromString($this->params->shift('dimensions', ''))->getDimensions();
+        $wantNull = $this->params->shift('wantNull');
+
+        foreach ($vars as $var) {
+            $this->cube->addDimensionByName($var);
+            if ($wantNull) {
+                $this->cube->getDimension($var)->wantNull();
+            }
+        }
+
+        foreach (['renderLayout', 'showFullscreen', 'showCompact', 'view'] as $p) {
+            $this->params->shift($p);
+        }
+
+        foreach ($this->params->toArray() as $param) {
+            $this->cube->slice(rawurldecode($param[0]), rawurldecode($param[1]));
+        }
     }
 
     public function createTabs(): Tabs
