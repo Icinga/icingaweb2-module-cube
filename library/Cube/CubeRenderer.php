@@ -8,6 +8,8 @@ use Icinga\Module\Cube\IcingaDb\IcingaDbCube;
 use Icinga\Web\View;
 use ipl\Web\Filter\QueryString;
 use ipl\Web\Url;
+use Generator;
+use Icinga\Data\Tree\TreeNode;
 
 /**
  * CubeRenderer base class
@@ -81,6 +83,13 @@ abstract class CubeRenderer
      * @return string
      */
     abstract protected function getDetailsBaseUrl();
+
+    /**
+     * Get the severity sort columns
+     *
+     * @return Generator
+     */
+    abstract protected function getSeveritySortColumns(): Generator;
 
     /**
      * Initialize all we need
@@ -188,11 +197,98 @@ abstract class CubeRenderer
         $this->view = $view;
         $this->initialize();
         $htm = $this->beginContainer();
-        foreach ($this->cube->fetchAll() as $row) {
+
+        $results = $this->cube->fetchAll();
+
+        if (! empty($results) && $this->cube::isUsingIcingaDb()) {
+            $sortBy = $this->cube->getSortBy();
+            if ($sortBy && $sortBy[0] === $this->cube::DIMENSION_SEVERITY_SORT_PARAM) {
+                $isSortDirDesc = isset($sortBy[1]) && $sortBy[1] !== 'asc';
+                $results = $this->sortBySeverity($results, $isSortDirDesc);
+            }
+        }
+
+        foreach ($results as $row) {
             $htm .= $this->renderRow($row);
         }
 
         return $htm . $this->closeDimensions() . $this->endContainer();
+    }
+
+
+    /**
+     * Sort the results by severity
+     *
+     * @param $results array The fetched results
+     * @param $isSortDirDesc bool Whether the sort direction is descending
+     *
+     * @return Generator
+     */
+    private function sortBySeverity(array $results, bool $isSortDirDesc): Generator
+    {
+        $perspective = end($this->dimensionOrder);
+        $resultsCount = count($results);
+        $tree = [new TreeNode()];
+
+        $prepareHeaders = function (array $tree, object $row): TreeNode {
+            $node = (new TreeNode())
+                ->setValue($row);
+            $parent = end($tree);
+            $parent->appendChild($node);
+
+            return $node;
+        };
+
+        $i = 0;
+        do {
+            $row = $results[$i];
+            while ($row->$perspective === null) {
+                $tree[] = $prepareHeaders($tree, $row);
+
+                $row = $results[++$i];
+            }
+
+            for (; $i < $resultsCount; $i++) {
+                $row = $results[$i];
+
+                $anyNull = false;
+                foreach ($this->dimensionOrder as $dimension) {
+                    if ($row->$dimension === null) {
+                        $anyNull = true;
+                        array_pop($tree);
+                    }
+                }
+
+                if ($anyNull) {
+                    break;
+                }
+
+                $prepareHeaders($tree, $row);
+            }
+        } while ($i < $resultsCount);
+
+        $nodes = function (TreeNode $node) use (&$nodes, $isSortDirDesc): Generator {
+            yield $node->getValue();
+            $children = $node->getChildren();
+
+            uasort($children, function (TreeNode $a, TreeNode $b) use ($isSortDirDesc): int {
+                foreach ($this->getSeveritySortColumns() as $column) {
+                    $comparison = $a->getValue()->$column <=> $b->getValue()->$column;
+                    if ($comparison !== 0) {
+                        return $comparison * ($isSortDirDesc ? -1 : 1);
+                    }
+                }
+
+                // $a and $b are equal in terms of $priorities.
+                return 0;
+            });
+
+            foreach ($children as $node) {
+                yield from $nodes($node);
+            }
+        };
+
+        return $nodes($tree[1]);
     }
 
     protected function renderRow($row)

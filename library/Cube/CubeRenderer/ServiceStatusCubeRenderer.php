@@ -4,6 +4,7 @@
 
 namespace Icinga\Module\Cube\CubeRenderer;
 
+use Generator;
 use Icinga\Module\Cube\CubeRenderer;
 
 class ServiceStatusCubeRenderer extends CubeRenderer
@@ -132,5 +133,17 @@ class ServiceStatusCubeRenderer extends CubeRenderer
     protected function getDetailsBaseUrl()
     {
         return 'cube/services/details';
+    }
+
+    protected function getSeveritySortColumns(): Generator
+    {
+        $columns = ['critical', 'unknown', 'warning'];
+        foreach ($columns as $column) {
+            yield "services_unhandled_$column";
+        }
+
+        foreach ($columns as $column) {
+            yield "services_$column";
+        }
     }
 }

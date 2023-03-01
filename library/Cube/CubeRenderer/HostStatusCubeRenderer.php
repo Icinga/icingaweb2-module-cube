@@ -4,6 +4,7 @@
 
 namespace Icinga\Module\Cube\CubeRenderer;
 
+use Generator;
 use Icinga\Module\Cube\CubeRenderer;
 
 class HostStatusCubeRenderer extends CubeRenderer
@@ -113,5 +114,17 @@ class HostStatusCubeRenderer extends CubeRenderer
     protected function getDetailsBaseUrl()
     {
         return 'cube/hosts/details';
+    }
+
+    protected function getSeveritySortColumns(): Generator
+    {
+        $columns = ['down', 'unreachable'];
+        foreach ($columns as $column) {
+            yield "hosts_unhandled_$column";
+        }
+
+        foreach ($columns as $column) {
+            yield "hosts_$column";
+        }
     }
 }
