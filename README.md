@@ -50,8 +50,6 @@ can be used for your research.
 For Icinga Director users
 -------------------------
 
-![Cube - Action Links](doc/img/cube_action-links.png)
-
 In case you are using the [Icinga Director](https://github.com/Icinga/icingaweb2-module-director),
 in addition to the multi-selection/edit feature the cube provides a nice way to
 modify multiple hosts at once.
