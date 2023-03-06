@@ -77,15 +77,6 @@ abstract class Controller extends CompatController
         return $this->filter;
     }
 
-    public function filter(Query $query, Filter\Rule $filter = null): self
-    {
-        $this->applyRestrictions($query);
-
-        $query->filter($filter ?: $this->getFilter());
-
-        return $this;
-    }
-
     public function detailsAction(): void
     {
         $this->getTabs()->add('details', [
