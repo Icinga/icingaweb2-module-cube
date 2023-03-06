@@ -6,6 +6,7 @@ namespace Icinga\Module\Cube\IcingaDb;
 
 use Icinga\Module\Cube\Cube;
 use Icinga\Module\Cube\Dimension;
+use Icinga\Module\Icingadb\Common\Auth;
 use Icinga\Module\Icingadb\Model\CustomvarFlat;
 use Icinga\Module\Icingadb\Model\Service;
 use ipl\Sql\Expression;
@@ -13,6 +14,8 @@ use ipl\Stdlib\Filter;
 
 class CustomVariableDimension implements Dimension
 {
+    use Auth;
+
     /** @var string Prefix for host custom variable */
     public const HOST_PREFIX = 'host.vars.';
 
@@ -142,10 +145,14 @@ class CustomVariableDimension implements Dimension
         $subQuery->filter(Filter::like('flatname', $this->getVarName()));
 
         // Values might not be unique (wildcard dimensions)
+        $subQueryModelAlias = $subQuery->getResolver()->getAlias($subQuery->getModel());
         $subQuery->getSelectBase()->groupBy([
-            $subQuery->getResolver()->getAlias($subQuery->getModel()) . '.flatvalue',
+            $subQueryModelAlias . '.flatname', // Required by postgres, if there are any custom variable protections
+            $subQueryModelAlias . '.flatvalue',
             'object_id'
         ]);
+
+        $this->applyRestrictions($subQuery);
 
         $subQueryAlias = $cube->getDb()->quoteIdentifier([$this->createCustomVarAlias()]);
         $innerQuery->getSelectBase()->groupBy($subQueryAlias . '.flatvalue');
