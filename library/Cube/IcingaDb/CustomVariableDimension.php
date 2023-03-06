@@ -145,8 +145,10 @@ class CustomVariableDimension implements Dimension
         $subQuery->filter(Filter::like('flatname', $this->getVarName()));
 
         // Values might not be unique (wildcard dimensions)
+        $subQueryModelAlias = $subQuery->getResolver()->getAlias($subQuery->getModel());
         $subQuery->getSelectBase()->groupBy([
-            $subQuery->getResolver()->getAlias($subQuery->getModel()) . '.flatvalue',
+            $subQueryModelAlias . '.flatname', // Required by postgres, if there are any custom variable protections
+            $subQueryModelAlias . '.flatvalue',
             'object_id'
         ]);
 
