@@ -4,7 +4,6 @@
 
 namespace Icinga\Module\Cube\Web;
 
-use GuzzleHttp\Psr7\ServerRequest;
 use Icinga\Module\Cube\DimensionParams;
 use Icinga\Module\Cube\Forms\DimensionsForm;
 use Icinga\Module\Cube\IcingaDb\CustomVariableDimension;
@@ -12,12 +11,12 @@ use Icinga\Module\Cube\IcingaDb\IcingaDbCube;
 use Icinga\Module\Cube\Ido\IdoCube;
 use Icinga\Web\View;
 use Icinga\Web\Widget\Tabextension\DashboardAction;
-use Icinga\Web\Controller;
-use Icinga\Web\Widget\Tabs;
 use ipl\Stdlib\Str;
+use ipl\Web\Compat\CompatController;
 use ipl\Web\Url;
+use ipl\Web\Widget\Tabs;
 
-abstract class IdoController extends Controller
+abstract class IdoController extends CompatController
 {
     /** @var View This helps IDEs to understand that this is not ZF view */
     public $view;
@@ -78,7 +77,7 @@ abstract class IdoController extends Controller
                 ->on(DimensionsForm::ON_SUCCESS, function ($form) {
                     $this->redirectNow($form->getRedirectUrl());
                 })
-                ->handleRequest(ServerRequest::fromGlobals());
+                ->handleRequest($this->getServerRequest());
 
             $this->view->form = $form;
         } else {
@@ -103,10 +102,6 @@ abstract class IdoController extends Controller
             if ($wantNull) {
                 $this->cube->getDimension($var)->wantNull();
             }
-        }
-
-        foreach (['renderLayout', 'showFullscreen', 'showCompact', 'view'] as $p) {
-            $this->params->shift($p);
         }
 
         foreach ($this->params->toArray() as $param) {
@@ -183,7 +178,6 @@ abstract class IdoController extends Controller
                 ->without($icingadbParams)
         );
     }
-
 
     public function createTabs(): Tabs
     {
