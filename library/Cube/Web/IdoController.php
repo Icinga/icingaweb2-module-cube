@@ -179,14 +179,16 @@ abstract class IdoController extends Controller
 
     public function createTabs(): Tabs
     {
+        $params = Url::fromRequest()->getParams()->toString();
+
         return $this->getTabs()
             ->add('cube/hosts', [
                 'label' => $this->translate('Hosts'),
-                'url'   => 'cube/hosts' . ($this->params->toString() === '' ? '' : '?' . $this->params->toString())
+                'url'   => 'cube/hosts' . ($params === '' ? '' : '?' . $params)
             ])
             ->add('cube/services', [
                 'label' => $this->translate('Services'),
-                'url'   => 'cube/services' . ($this->params->toString() === '' ? '' : '?' . $this->params->toString())
+                'url'   => 'cube/services' . ($params === '' ? '' : '?' . $params)
             ])
             ->extend(new DashboardAction());
     }
