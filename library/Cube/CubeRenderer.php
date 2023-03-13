@@ -245,7 +245,11 @@ abstract class CubeRenderer
             while ($row->$perspective === null) {
                 $tree[] = $prepareHeaders($tree, $row);
 
-                $row = $results[++$i];
+                if (! isset($results[++$i])) {
+                    break;
+                }
+
+                $row = $results[$i];
             }
 
             for (; $i < $resultsCount; $i++) {
