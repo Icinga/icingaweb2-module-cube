@@ -273,7 +273,11 @@ abstract class Controller extends CompatController
 
     public function createTabs(): Tabs
     {
-        $params = Url::fromRequest()->getParams()->toString();
+        $params = Url::fromRequest()
+            ->onlyWith($this->preserveParams)
+            ->getParams()
+            ->toString();
+
         return $this->getTabs()
             ->add('cube/hosts', [
                 'label' => $this->translate('Hosts'),
