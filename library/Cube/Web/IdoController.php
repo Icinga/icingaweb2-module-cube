@@ -4,6 +4,7 @@
 
 namespace Icinga\Module\Cube\Web;
 
+use GuzzleHttp\Psr7\ServerRequest;
 use Icinga\Module\Cube\DimensionParams;
 use Icinga\Module\Cube\Forms\DimensionsForm;
 use Icinga\Module\Cube\IcingaDb\CustomVariableDimension;
@@ -71,8 +72,15 @@ abstract class IdoController extends Controller
         }
 
         if ($this->showSettings) {
-            $this->view->form = (new DimensionsForm())->setCube($this->cube);
-            $this->view->form->handleRequest();
+            $form = (new DimensionsForm())
+                ->setCube($this->cube)
+                ->setUrl(Url::fromRequest())
+                ->on(DimensionsForm::ON_SUCCESS, function ($form) {
+                    $this->redirectNow($form->getRedirectUrl());
+                })
+                ->handleRequest(ServerRequest::fromGlobals());
+
+            $this->view->form = $form;
         } else {
             $this->setAutorefreshInterval(15);
         }
