@@ -84,7 +84,7 @@ abstract class IdoController extends Controller
     {
         $vars = DimensionParams::fromString($this->params->shift('dimensions', ''))->getDimensions();
 
-        if ($this->hasIcingadbDimensionParams($vars)) {
+        if ($this->hasIcingadbDimensionParams($vars) && ! $this->params->shift('resolved', false)) {
             $this->transformicingadbDimensionParamsAndRedirect($vars);
         }
 
@@ -115,13 +115,11 @@ abstract class IdoController extends Controller
      */
     private function hasIcingadbDimensionParams(array $dimensions): bool
     {
-        $prefix = CustomVariableDimension::HOST_PREFIX;
-        if ($this->getRequest()->getControllerName() === 'ido-services') {
-            $prefix = CustomVariableDimension::SERVICE_PREFIX;
-        }
-
         foreach ($dimensions as $dimension) {
-            if (Str::startsWith($dimension, $prefix)) {
+            if (
+                Str::startsWith($dimension, CustomVariableDimension::HOST_PREFIX)
+                || Str::startsWith($dimension, CustomVariableDimension::SERVICE_PREFIX)
+            ) {
                 return true;
             }
         }
@@ -172,6 +170,7 @@ abstract class IdoController extends Controller
             Url::fromRequest()
                 ->setParam('dimensions', DimensionParams::fromArray($dimensions)->getParams())
                 ->addParams($slices)
+                ->addParams(['resolved' => true])
                 ->without($icingadbParams)
         );
     }
