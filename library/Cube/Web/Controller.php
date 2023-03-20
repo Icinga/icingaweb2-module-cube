@@ -158,13 +158,13 @@ abstract class Controller extends CompatController
             $showSettings = true;
         }
 
-        $url = Url::fromRequest()
+        $this->view->url = Url::fromRequest()
             ->onlyWith($this->preserveParams)
             ->addFilter(F::fromQueryString(QueryString::render($searchBar->getFilter())));
 
         if ($showSettings) {
             $form = (new DimensionsForm())
-                ->setUrl($url)
+                ->setUrl($this->view->url)
                 ->setCube($this->cube)
                 ->on(DimensionsForm::ON_SUCCESS, function ($form) {
                     $this->redirectNow($form->getRedirectUrl());
