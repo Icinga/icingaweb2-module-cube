@@ -70,8 +70,10 @@ abstract class IdoController extends CompatController
             $this->showSettings = true;
         }
 
+        $this->view->url = Url::fromRequest();
         if ($this->showSettings) {
             $form = (new DimensionsForm())
+                ->setUrl($this->view->url)
                 ->setCube($this->cube)
                 ->setUrl(Url::fromRequest())
                 ->on(DimensionsForm::ON_SUCCESS, function ($form) {
