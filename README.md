@@ -1,7 +1,7 @@
 # Icinga Cube
 
 [![PHP Support](https://img.shields.io/badge/php-%3E%3D%207.2-777BB4?logo=PHP)](https://php.net/)
-![Build Status](https://github.com/icinga/icingaweb2-module-cube/workflows/PHP%20Tests/badge.svg?branch=master)
+![Build Status](https://github.com/icinga/icingaweb2-module-cube/workflows/PHP%20Tests/badge.svg?branch=main)
 [![Github Tag](https://img.shields.io/github/tag/Icinga/icingaweb2-module-cube.svg)](https://github.com/Icinga/icingaweb2-module-cube)
 
 ![Icinga Logo](https://icinga.com/wp-content/uploads/2014/06/icinga_logo.png)
