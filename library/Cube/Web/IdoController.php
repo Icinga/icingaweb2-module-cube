@@ -38,7 +38,10 @@ abstract class IdoController extends CompatController
     {
         $this->cube = $this->getCube();
         $this->cube->chooseFacts(array_keys($this->cube->getAvailableFactColumns()));
-
+        
+        #bugfix refs Cube#135
+        $this->params->shift('showCompact');
+        
         $this->showSettings = $this->params->shift('showSettings');
         $this->prepareCube();
     }
