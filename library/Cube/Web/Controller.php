@@ -186,8 +186,6 @@ abstract class Controller extends CompatController
             $this->params->shift('dimensions', '')
         )->getDimensions();
 
-        //required when switching back to icingadb
-        $this->params->shift('resolved');
         if ($this->hasLegacyDimensionParams($dimensions)) {
             $this->transformLegacyDimensionParamsAndRedirect($dimensions);
         }

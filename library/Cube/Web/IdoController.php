@@ -88,12 +88,16 @@ abstract class IdoController extends CompatController
 
         $vars = DimensionParams::fromString($this->params->shift('dimensions', ''))->getDimensions();
 
+        $resolved = $this->params->shift('resolved', false);
+
         if (
-            ! $this->params->shift('resolved', false)
+            ! $resolved
             && Module::exists('icingadb')
             && $this->hasIcingadbDimensionParams($vars)
         ) {
             $this->transformicingadbDimensionParamsAndRedirect($vars);
+        } elseif ($resolved) {
+            $this->redirectNow(Url::fromRequest()->without('resolved'));
         }
 
         $wantNull = $this->params->shift('wantNull');
