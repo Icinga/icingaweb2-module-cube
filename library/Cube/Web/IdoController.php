@@ -4,6 +4,7 @@
 
 namespace Icinga\Module\Cube\Web;
 
+use Icinga\Application\Modules\Module;
 use Icinga\Module\Cube\DimensionParams;
 use Icinga\Module\Cube\Forms\DimensionsForm;
 use Icinga\Module\Cube\IcingaDb\CustomVariableDimension;
@@ -93,7 +94,11 @@ abstract class IdoController extends CompatController
     {
         $vars = DimensionParams::fromString($this->params->shift('dimensions', ''))->getDimensions();
 
-        if ($this->hasIcingadbDimensionParams($vars) && ! $this->params->shift('resolved', false)) {
+        if (
+            ! $this->params->shift('resolved', false)
+            && Module::exists('icingadb')
+            && $this->hasIcingadbDimensionParams($vars)
+        ) {
             $this->transformicingadbDimensionParamsAndRedirect($vars);
         }
 
