@@ -33,9 +33,6 @@ abstract class Controller extends CompatController
     /** @var View This helps IDEs to understand that this is not ZF view */
     public $view;
 
-    /** @var IcingaDbCube */
-    protected $cube;
-
     /** @var string[] Preserved params for searchbar and search editor controls */
     protected $preserveParams = [
         'dimensions',
@@ -55,13 +52,6 @@ abstract class Controller extends CompatController
      */
     abstract protected function getCube(): IcingaDbCube;
 
-    protected function moduleInit()
-    {
-        $this->cube = $this->getCube();
-        $this->cube->chooseFacts(array_keys($this->cube->getAvailableFactColumns()));
-        $this->prepareCube();
-    }
-
     /**
      * Get the filter created from query string parameters
      *
@@ -78,15 +68,16 @@ abstract class Controller extends CompatController
 
     public function detailsAction(): void
     {
+        $cube = $this->prepareCube();
         $this->getTabs()->add('details', [
             'label' => $this->translate('Cube details'),
             'url'   => $this->getRequest()->getUrl()
         ])->activate('details');
 
-        $this->cube->setBaseFilter($this->getFilter());
+        $cube->setBaseFilter($this->getFilter());
 
-        $this->setTitle($this->cube->getSlicesLabel());
-        $this->view->links = IcingaDbActionsHook::renderAll($this->cube);
+        $this->setTitle($cube->getSlicesLabel());
+        $this->view->links = IcingaDbActionsHook::renderAll($cube);
 
         $this->addContent(
             HtmlString::create($this->view->render('/cube-details.phtml'))
@@ -95,14 +86,15 @@ abstract class Controller extends CompatController
 
     protected function renderCube(): void
     {
+        $cube = $this->prepareCube();
         $this->setTitle(sprintf(
             $this->translate('Cube: %s'),
-            $this->cube->getPathLabel()
+            $cube->getPathLabel()
         ));
 
         $showSettings = $this->params->shift('showSettings');
 
-        $query = $this->cube->innerQuery();
+        $query = $cube->innerQuery();
         $problemsOnly = (bool) $this->params->shift('problems', false);
         $problemToggle = (new ProblemToggle($problemsOnly ?: null))
             ->setIdProtector([$this->getRequest(), 'protectId'])
@@ -122,7 +114,7 @@ abstract class Controller extends CompatController
         ]);
 
         $this->params->shift($sortControl->getSortParam());
-        $this->cube->sortBy($sortControl->getSort());
+        $cube->sortBy($sortControl->getSort());
         $this->addControl($sortControl);
 
         $searchBar = $this->createSearchBar(
@@ -146,13 +138,13 @@ abstract class Controller extends CompatController
             $filter = Filter::all($filter, Filter::equal('state.is_problem', true));
         }
 
-        $this->cube->setBaseFilter($filter);
-        $this->cube->problemsOnly($problemsOnly);
+        $cube->setBaseFilter($filter);
+        $cube->problemsOnly($problemsOnly);
 
         $this->addControl($searchBar);
 
-        if (count($this->cube->listDimensions()) > 0) {
-            $this->view->cube = $this->cube;
+        if (count($cube->listDimensions()) > 0) {
+            $this->view->cube = $cube;
         } else {
             $showSettings = true;
         }
@@ -165,7 +157,7 @@ abstract class Controller extends CompatController
         if ($showSettings) {
             $form = (new DimensionsForm())
                 ->setUrl($this->view->url)
-                ->setCube($this->cube)
+                ->setCube($cube)
                 ->on(DimensionsForm::ON_SUCCESS, function ($form) {
                     $this->redirectNow($form->getRedirectUrl());
                 })
@@ -185,8 +177,11 @@ abstract class Controller extends CompatController
         }
     }
 
-    private function prepareCube(): void
+    private function prepareCube(): IcingaDbCube
     {
+        $cube = $this->getCube();
+        $cube->chooseFacts(array_keys($cube->getAvailableFactColumns()));
+
         $dimensions = DimensionParams::fromString(
             $this->params->shift('dimensions', '')
         )->getDimensions();
@@ -199,18 +194,20 @@ abstract class Controller extends CompatController
 
         $wantNull = $this->params->shift('wantNull');
         foreach ($dimensions as $dimension) {
-            $this->cube->addDimensionByName($dimension);
+            $cube->addDimensionByName($dimension);
             if ($wantNull) {
-                $this->cube->getDimension($dimension)->wantNull();
+                $cube->getDimension($dimension)->wantNull();
             }
 
-            $sliceParamWithPrefix = rawurlencode($this->cube::SLICE_PREFIX . $dimension);
+            $sliceParamWithPrefix = rawurlencode($cube::SLICE_PREFIX . $dimension);
 
             if ($this->params->has($sliceParamWithPrefix)) {
                 $this->preserveParams[] = $sliceParamWithPrefix;
-                $this->cube->slice($dimension, $this->params->shift($sliceParamWithPrefix));
+                $cube->slice($dimension, $this->params->shift($sliceParamWithPrefix));
             }
         }
+
+        return $cube;
     }
 
     /**
@@ -270,7 +267,7 @@ abstract class Controller extends CompatController
 
             $slice = $this->params->shift($param);
             if ($slice) {
-                $slices[$this->cube::SLICE_PREFIX . $newParam] = $slice;
+                $slices[IcingaDbCube::SLICE_PREFIX . $newParam] = $slice;
             }
 
             $dimensions[] = $newParam;
