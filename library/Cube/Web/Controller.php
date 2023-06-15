@@ -4,7 +4,6 @@
 
 namespace Icinga\Module\Cube\Web;
 
-use Icinga\Data\Filter\Filter as F;
 use Icinga\Module\Cube\DimensionParams;
 use Icinga\Module\Cube\Forms\DimensionsForm;
 use Icinga\Module\Cube\Hook\IcingaDbActionsHook;
@@ -158,9 +157,10 @@ abstract class Controller extends CompatController
             $showSettings = true;
         }
 
-        $this->view->url = Url::fromRequest()
-            ->onlyWith($this->preserveParams)
-            ->addFilter(F::fromQueryString(QueryString::render($searchBar->getFilter())));
+        $this->view->url = Url::fromRequest()->onlyWith($this->preserveParams);
+        $viewUrlParams = $this->view->url->getParams()->toArray(false);
+        $this->view->url->setQueryString(QueryString::render($searchBar->getFilter()))
+            ->addParams($viewUrlParams);
 
         if ($showSettings) {
             $form = (new DimensionsForm())
