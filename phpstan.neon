@@ -1,5 +1,9 @@
 parameters:
     level: 1
+    checkFunctionNameCase: true
+    checkMissingIterableValueType: true
+    checkInternalClassCaseSensitivity: true
+    checkDynamicProperties: true
     paths:
         - application
         - library
@@ -7,3 +11,6 @@ parameters:
         - vendor
     ignoreErrors:
         - '#Unsafe usage of new static\(\)#'
+    universalObjectCratesClasses:
+        - Icinga\Web\View
+        - ipl\Orm\Model
