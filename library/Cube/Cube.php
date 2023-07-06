@@ -11,10 +11,10 @@ use Icinga\Web\View;
 
 abstract class Cube
 {
-    /** @var string Prefix for slice params */
+    /** @var ?string Prefix for slice params */
     public const SLICE_PREFIX = null;
 
-    /** @var bool Whether the icingadb backend is in use */
+    /** @var ?bool Whether the icingadb backend is in use */
     public const IS_USING_ICINGADB = null;
 
     /** @var array<string, Dimension> Available dimensions */

@@ -30,9 +30,6 @@ abstract class Controller extends CompatController
     use Database;
     use Auth;
 
-    /** @var View This helps IDEs to understand that this is not ZF view */
-    public $view;
-
     /** @var string[] Preserved params for searchbar and search editor controls */
     protected $preserveParams = [
         'dimensions',

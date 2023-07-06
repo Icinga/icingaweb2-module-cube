@@ -80,12 +80,6 @@ class CustomVarDimension implements Dimension
         return $this->varLabel ?: $this->getName();
     }
 
-    /**
-     * Set the label
-     *
-     * @param string $label
-     * @return $this
-     */
     public function setLabel($label)
     {
         $this->varLabel = $label;
@@ -93,12 +87,6 @@ class CustomVarDimension implements Dimension
         return $this;
     }
 
-    /**
-     * Add a label
-     *
-     * @param string $label
-     * @return $this
-     */
     public function addLabel($label)
     {
         if ($this->varLabel === null) {
@@ -138,7 +126,7 @@ class CustomVarDimension implements Dimension
                 $objectId = 'o.object_id';
         }
         $name = $this->safeVarname($this->varName);
-        /** @var $cube IdoCube */
+        /** @var IdoCube $cube */
         $alias = $cube->db()->quoteIdentifier(['c_' . $name]);
 
         if ($cube->isPgsql()) {

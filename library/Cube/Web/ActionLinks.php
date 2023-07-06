@@ -41,7 +41,7 @@ class ActionLinks
             try {
                 $hook->prepareActionLinks($cube, $view);
             } catch (Exception $e) {
-                $html[] = static::renderErrorItem($e, $view);
+                $html[] = self::renderErrorItem($e, $view);
             }
 
             foreach ($hook->getActionLinks()->getLinks() as $link) {
@@ -50,7 +50,7 @@ class ActionLinks
         }
 
         if (empty($html)) {
-            $html[] = static::renderErrorItem(
+            $html[] = self::renderErrorItem(
                 $view->translate('No action links have been provided for this cube'),
                 $view
             );

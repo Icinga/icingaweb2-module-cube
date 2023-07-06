@@ -21,11 +21,29 @@ interface Dimension
     public function getName();
 
     /**
-     * The label of this dimension
+     * Fetch label of this dimension
      *
      * @return string
      */
     public function getLabel();
+
+    /**
+     * Add a label
+     *
+     * @param string $label
+     *
+     * @return $this
+     */
+    public function addLabel(string $label);
+
+    /**
+     * Set the label for the dimension
+     *
+     * @param string $label
+     *
+     * @return $this
+     */
+    public function setLabel(string $label);
 
     /**
      * Column expression

@@ -10,7 +10,6 @@ use Icinga\Module\Cube\Forms\DimensionsForm;
 use Icinga\Module\Cube\IcingaDb\CustomVariableDimension;
 use Icinga\Module\Cube\IcingaDb\IcingaDbCube;
 use Icinga\Module\Cube\Ido\IdoCube;
-use Icinga\Web\View;
 use Icinga\Web\Widget\Tabextension\DashboardAction;
 use ipl\Stdlib\Str;
 use ipl\Web\Compat\CompatController;
@@ -19,9 +18,6 @@ use ipl\Web\Widget\Tabs;
 
 abstract class IdoController extends CompatController
 {
-    /** @var View This helps IDEs to understand that this is not ZF view */
-    public $view;
-
     /**
      * Return this controllers' cube
      *
@@ -95,7 +91,7 @@ abstract class IdoController extends CompatController
             && Module::exists('icingadb')
             && $this->hasIcingadbDimensionParams($vars)
         ) {
-            $this->transformicingadbDimensionParamsAndRedirect($vars);
+            $this->transformIcingadbDimensionParamsAndRedirect($vars);
         } elseif ($resolved) {
             $this->redirectNow(Url::fromRequest()->without('resolved'));
         }
