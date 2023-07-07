@@ -22,12 +22,6 @@ abstract class IdoController extends CompatController
     /** @var View This helps IDEs to understand that this is not ZF view */
     public $view;
 
-    /** @var IdoCube */
-    protected $cube;
-
-    /** @var bool Whether showSettings param is set */
-    protected $showSettings;
-
     /**
      * Return this controllers' cube
      *
@@ -35,47 +29,44 @@ abstract class IdoController extends CompatController
      */
     abstract protected function getCube(): IdoCube;
 
-    protected function moduleInit()
-    {
-        $this->cube = $this->getCube();
-        $this->cube->chooseFacts(array_keys($this->cube->getAvailableFactColumns()));
-
-        $this->showSettings = $this->params->shift('showSettings');
-        $this->prepareCube();
-    }
-
     public function detailsAction(): void
     {
+        $cube = $this->prepareCube();
+
         $this->getTabs()->add('details', [
             'label' => $this->translate('Cube details'),
             'url'   => $this->getRequest()->getUrl()
         ])->activate('details');
 
-        $this->view->title = $this->cube->getSlicesLabel();
+        $this->view->title = $cube->getSlicesLabel();
 
-        $this->view->links = ActionLinks::renderAll($this->cube, $this->view);
+        $this->view->links = ActionLinks::renderAll($cube, $this->view);
 
         $this->render('cube-details', null, true);
     }
 
     protected function renderCube(): void
     {
+        $showSettings = $this->params->shift('showSettings');
+
+        $cube = $this->prepareCube();
+
         $this->view->title = sprintf(
             $this->translate('Cube: %s'),
-            $this->cube->getPathLabel()
+            $cube->getPathLabel()
         );
 
-        if (count($this->cube->listDimensions()) > 0) {
-            $this->view->cube = $this->cube;
+        if (count($cube->listDimensions()) > 0) {
+            $this->view->cube = $cube;
         } else {
-            $this->showSettings = true;
+            $showSettings = true;
         }
 
         $this->view->url = Url::fromRequest();
-        if ($this->showSettings) {
+        if ($showSettings) {
             $form = (new DimensionsForm())
                 ->setUrl($this->view->url)
-                ->setCube($this->cube)
+                ->setCube($cube)
                 ->setUrl(Url::fromRequest())
                 ->on(DimensionsForm::ON_SUCCESS, function ($form) {
                     $this->redirectNow($form->getRedirectUrl());
@@ -90,30 +81,39 @@ abstract class IdoController extends CompatController
         $this->render('cube-index', null, true);
     }
 
-    private function prepareCube(): void
+    private function prepareCube(): IdoCube
     {
+        $cube = $this->getCube();
+        $cube->chooseFacts(array_keys($cube->getAvailableFactColumns()));
+
         $vars = DimensionParams::fromString($this->params->shift('dimensions', ''))->getDimensions();
 
+        $resolved = $this->params->shift('resolved', false);
+
         if (
-            ! $this->params->shift('resolved', false)
+            ! $resolved
             && Module::exists('icingadb')
             && $this->hasIcingadbDimensionParams($vars)
         ) {
             $this->transformicingadbDimensionParamsAndRedirect($vars);
+        } elseif ($resolved) {
+            $this->redirectNow(Url::fromRequest()->without('resolved'));
         }
 
         $wantNull = $this->params->shift('wantNull');
 
         foreach ($vars as $var) {
-            $this->cube->addDimensionByName($var);
+            $cube->addDimensionByName($var);
             if ($wantNull) {
-                $this->cube->getDimension($var)->wantNull();
+                $cube->getDimension($var)->wantNull();
             }
         }
 
         foreach ($this->params->toArray() as $param) {
-            $this->cube->slice(rawurldecode($param[0]), rawurldecode($param[1]));
+            $cube->slice(rawurldecode($param[0]), rawurldecode($param[1]));
         }
+
+        return $cube;
     }
 
     /**
