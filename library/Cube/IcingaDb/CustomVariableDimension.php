@@ -75,12 +75,6 @@ class CustomVariableDimension implements Dimension
         return $this->label ?: $this->getName();
     }
 
-    /**
-     * Set the label
-     *
-     * @param string $label
-     * @return $this
-     */
     public function setLabel($label)
     {
         $this->label = $label;
@@ -88,12 +82,6 @@ class CustomVariableDimension implements Dimension
         return $this;
     }
 
-    /**
-     * Add a label
-     *
-     * @param string $label
-     * @return $this
-     */
     public function addLabel($label)
     {
         if ($this->label === null) {

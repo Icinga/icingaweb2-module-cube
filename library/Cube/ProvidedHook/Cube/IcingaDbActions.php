@@ -4,7 +4,7 @@ namespace Icinga\Module\Cube\ProvidedHook\Cube;
 
 use Icinga\Module\Cube\Hook\IcingaDbActionsHook;
 use Icinga\Module\Cube\IcingaDb\IcingaDbCube;
-use Icinga\Module\Cube\Icingadb\IcingadbServiceStatusCube;
+use Icinga\Module\Cube\IcingaDb\IcingaDbServiceStatusCube;
 use ipl\Stdlib\Filter;
 use ipl\Web\Filter\QueryString;
 use ipl\Web\Url;
@@ -14,7 +14,7 @@ class IcingaDbActions extends IcingaDbActionsHook
     public function createActionLinks(IcingaDbCube $cube)
     {
         $type = 'host';
-        if ($cube instanceof IcingadbServiceStatusCube) {
+        if ($cube instanceof IcingaDbServiceStatusCube) {
             $type = 'service';
         }
 
