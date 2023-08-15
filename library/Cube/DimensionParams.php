@@ -5,6 +5,7 @@
 namespace Icinga\Module\Cube;
 
 use Icinga\Web\Url;
+use ipl\Stdlib\Str;
 
 class DimensionParams
 {
@@ -36,7 +37,7 @@ class DimensionParams
     // For the controller: DimensionsParam::fromArray($this->params->shift('dimensions'))
     public static function fromString($dimensions)
     {
-        return static::fromArray(explode(',', $dimensions));
+        return static::fromArray(Str::trimSplit($dimensions));
     }
 
 
