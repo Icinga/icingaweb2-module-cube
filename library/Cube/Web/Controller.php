@@ -90,6 +90,7 @@ abstract class Controller extends CompatController
             $cube->getPathLabel()
         ));
 
+        $this->params->shift('format');
         $showSettings = $this->params->shift('showSettings');
 
         $query = $cube->innerQuery();
