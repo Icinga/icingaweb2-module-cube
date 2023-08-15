@@ -19,7 +19,6 @@ class DimensionParams
      */
     protected $params;
 
-    // For the form: DimensionsParam::fromUrl($url)
     public static function fromUrl(Url $url)
     {
         return static::fromString($url->getParam('dimensions'));
@@ -34,12 +33,10 @@ class DimensionParams
         return $self;
     }
 
-    // For the controller: DimensionsParam::fromArray($this->params->shift('dimensions'))
     public static function fromString($dimensions)
     {
         return static::fromArray(Str::trimSplit($dimensions));
     }
-
 
     /**
      * @param $dimension
