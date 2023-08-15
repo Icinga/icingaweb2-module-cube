@@ -42,6 +42,7 @@ abstract class IdoController extends CompatController
 
     protected function renderCube(): void
     {
+        $this->params->shift('format');
         $showSettings = $this->params->shift('showSettings');
 
         $cube = $this->prepareCube();
