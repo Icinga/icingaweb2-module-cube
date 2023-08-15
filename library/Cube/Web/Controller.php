@@ -12,7 +12,6 @@ use Icinga\Module\Cube\IcingaDb\IcingaDbCube;
 use Icinga\Module\Icingadb\Common\Auth;
 use Icinga\Module\Icingadb\Common\Database;
 use Icinga\Module\Icingadb\Web\Control\ProblemToggle;
-use Icinga\Web\View;
 use Icinga\Web\Widget\Tabextension\DashboardAction;
 use ipl\Html\HtmlString;
 use ipl\Stdlib\Filter;
@@ -149,7 +148,7 @@ abstract class Controller extends CompatController
         $this->view->url = Url::fromRequest()->onlyWith($this->preserveParams);
         $viewUrlParams = $this->view->url->getParams()->toArray(false);
         $this->view->url->setQueryString(QueryString::render($searchBar->getFilter()))
-            ->addParams($viewUrlParams);
+            ->addParams(array_map('rawurldecode', $viewUrlParams));
 
         if ($showSettings) {
             $form = (new DimensionsForm())
