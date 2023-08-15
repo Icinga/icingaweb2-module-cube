@@ -12,8 +12,6 @@ use Icinga\Module\Cube\IcingaDb\IcingaDbCube;
 use Icinga\Module\Icingadb\Common\Auth;
 use Icinga\Module\Icingadb\Common\Database;
 use Icinga\Module\Icingadb\Web\Control\ProblemToggle;
-use Icinga\Web\View;
-use Icinga\Web\Widget\Tabextension\DashboardAction;
 use ipl\Html\FormElement\CheckboxElement;
 use ipl\Html\HtmlString;
 use ipl\Stdlib\Filter;
@@ -294,7 +292,6 @@ abstract class Controller extends CompatController
             ->add('cube/services', [
                 'label' => $this->translate('Services'),
                 'url'   => 'cube/services' . ($params === '' ? '' : '?' . $params)
-            ])
-            ->extend(new DashboardAction());
+            ]);
     }
 }
