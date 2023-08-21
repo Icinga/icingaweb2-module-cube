@@ -33,14 +33,14 @@ class HostStatusCubeRenderer extends CubeRenderer
         $severityClass = [];
         if ($sums->hosts_unhandled_down > 0) {
             $severityClass[] = 'critical';
-        } elseif ($sums->hosts_unhandled_unreachable > 0) {
+        } elseif (isset($sums->hosts_unhandled_unreachable) && $sums->hosts_unhandled_unreachable > 0) {
             $severityClass[] = 'unreachable';
         }
 
         if (empty($severityClass)) {
             if ($sums->hosts_down > 0) {
                 $severityClass = ['critical', 'handled'];
-            } elseif ($sums->hosts_unreachable > 0) {
+            } elseif (isset($sums->hosts_unreachable) && $sums->hosts_unreachable > 0) {
                 $severityClass = ['unreachable', 'handled'];
             } else {
                 $severityClass[] = 'ok';
@@ -59,7 +59,7 @@ class HostStatusCubeRenderer extends CubeRenderer
             $parts['critical'] = $facts->hosts_unhandled_down;
         }
 
-        if ($facts->hosts_unhandled_unreachable > 0) {
+        if (isset($facts->hosts_unhandled_unreachable) && $facts->hosts_unhandled_unreachable > 0) {
             $parts['unreachable'] = $facts->hosts_unhandled_unreachable;
         }
 
@@ -67,12 +67,25 @@ class HostStatusCubeRenderer extends CubeRenderer
             $parts['critical handled'] = $facts->hosts_down - $facts->hosts_unhandled_down;
         }
 
-        if ($facts->hosts_unreachable > 0 && $facts->hosts_unreachable > $facts->hosts_unhandled_unreachable) {
+        if (
+            isset($facts->hosts_unreachable, $facts->hosts_unhandled_unreachable)
+            && $facts->hosts_unreachable > 0
+            && $facts->hosts_unreachable >
+            $facts->hosts_unhandled_unreachable
+        ) {
             $parts['unreachable handled'] = $facts->hosts_unreachable - $facts->hosts_unhandled_unreachable;
         }
 
-        if ($facts->hosts_cnt > $facts->hosts_down && $facts->hosts_cnt > $facts->hosts_unreachable) {
-            $parts['ok'] = $facts->hosts_cnt - $facts->hosts_down - $facts->hosts_unreachable;
+        if (
+            $facts->hosts_cnt > $facts->hosts_down
+            && (! isset($facts->hosts_unreachable) || $facts->hosts_cnt > $facts->hosts_unreachable)
+        ) {
+            $ok = $facts->hosts_cnt - $facts->hosts_down;
+            if (isset($facts->hosts_unreachable)) {
+                $ok -= $facts->hosts_unreachable;
+            }
+
+            $parts['ok'] = $ok;
         }
 
         $main = '';

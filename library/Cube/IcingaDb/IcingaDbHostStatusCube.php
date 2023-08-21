@@ -23,8 +23,6 @@ class IcingaDbHostStatusCube extends IcingaDbCube
             'hosts_cnt' => 'hosts_total',
             'hosts_down' => 'hosts_down_handled + f.hosts_down_unhandled',
             'hosts_unhandled_down' => 'hosts_down_unhandled',
-            'hosts_unreachable' => 'hosts_unreachable',
-            'hosts_unhandled_unreachable' => 'hosts_unreachable_unhandled'
         ];
     }
 
