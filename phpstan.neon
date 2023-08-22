@@ -1,16 +1,31 @@
 parameters:
-    level: 1
+    level: max
+
     checkFunctionNameCase: true
-    checkMissingIterableValueType: true
     checkInternalClassCaseSensitivity: true
-    checkDynamicProperties: true
+    treatPhpDocTypesAsCertain: false
+
     paths:
         - application
         - library
+
     scanDirectories:
         - vendor
+
     ignoreErrors:
         - '#Unsafe usage of new static\(\)#'
+
+        - '#Call to an undefined method Icinga\\Module\\Cube\\Ido\\ZfSelectWrapper::joinLeft\(\)#'
+
+        - '#Call to an undefined method Icinga\\Data\\SimpleQuery::.*#'
+
+        - '#Call to an undefined method Icinga\\Data\\ConnectionInterface::getResource\(\)#'
+
+        - '#Call to an undefined method Icinga\\Module\\Cube\\Ido\\IdoCube::addDimensionByName\(\)#'
+
+        - '#Call to an undefined method Icinga\\Module\\Cube\\Cube::getSortBy\(\)#'
+        - '#Access to undefined constant Icinga\\Module\\Cube\\Cube::DIMENSION_SEVERITY_SORT_PARAM#'
+
     universalObjectCratesClasses:
         - Icinga\Web\View
         - ipl\Orm\Model
