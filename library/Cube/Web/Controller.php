@@ -14,6 +14,7 @@ use Icinga\Module\Icingadb\Common\Database;
 use Icinga\Module\Icingadb\Web\Control\ProblemToggle;
 use Icinga\Web\View;
 use Icinga\Web\Widget\Tabextension\DashboardAction;
+use ipl\Html\FormElement\CheckboxElement;
 use ipl\Html\HtmlString;
 use ipl\Stdlib\Filter;
 use ipl\Stdlib\Str;
@@ -96,7 +97,9 @@ abstract class Controller extends CompatController
         $problemToggle = (new ProblemToggle($problemsOnly ?: null))
             ->setIdProtector([$this->getRequest(), 'protectId'])
             ->on(ProblemToggle::ON_SUCCESS, function (ProblemToggle $form) {
-                if (! $form->getElement('problems')->isChecked()) {
+                /** @var CheckboxElement $problems */
+                $problems = $form->getElement('problems');
+                if (! $problems->isChecked()) {
                     $this->redirectNow(Url::fromRequest()->remove('problems'));
                 } else {
                     $this->redirectNow(Url::fromRequest()->setParam('problems'));
