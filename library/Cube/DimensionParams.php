@@ -59,11 +59,11 @@ class DimensionParams
      *
      * @param $dimensions
      *
-     * @return $this
+     * @return DimensionParams
      */
     public static function update($dimensions)
     {
-        $self =  new static();
+        $self = new static();
         $self->dimensions = $dimensions;
 
         return $self;
