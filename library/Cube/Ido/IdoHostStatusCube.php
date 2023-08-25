@@ -45,24 +45,6 @@ class IdoHostStatusCube extends IdoCube
     }
 
     /**
-     * Add a specific named dimension
-     *
-     * Right now this are just custom vars, we might support group memberships
-     * or other properties in future
-     *
-     * @param string $name
-     * @return $this
-     */
-    public function addDimensionByName($name)
-    {
-        if (count($this->filterProtectedCustomvars(array($name))) === 1) {
-            $this->addDimension($this->createDimension($name));
-        }
-
-        return $this;
-    }
-
-    /**
      * This returns a list of all available Dimensions
      *
      * @return array

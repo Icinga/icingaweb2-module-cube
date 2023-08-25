@@ -43,6 +43,25 @@ abstract class IdoCube extends DbCube
     public const IS_USING_ICINGADB = false;
 
     /**
+     * Add a specific named dimension
+     *
+     * Right now these are just custom vars, we might support group memberships
+     * or other properties in future
+     *
+     * @param string $name
+     *
+     * @return $this
+     */
+    public function addDimensionByName($name): self
+    {
+        if (count($this->filterProtectedCustomvars([$name])) === 1) {
+            $this->addDimension($this->createDimension($name));
+        }
+
+        return $this;
+    }
+
+    /**
      * We can steal the DB connection directly from a Monitoring backend
      *
      * @param MonitoringBackend $backend
