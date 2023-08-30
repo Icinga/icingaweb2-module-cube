@@ -1,0 +1,1041 @@
+parameters:
+	ignoreErrors:
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\Controllers\\\\IndexController\\:\\:indexAction\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: application/controllers/IndexController.php
+
+		-
+			message: "#^Cannot call method getName\\(\\) on ipl\\\\Html\\\\Contract\\\\FormSubmitElement\\|null\\.$#"
+			count: 1
+			path: application/forms/DimensionsForm.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\Forms\\\\DimensionsForm\\:\\:addDimensionButtons\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: application/forms/DimensionsForm.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\Forms\\\\DimensionsForm\\:\\:addDimensionButtons\\(\\) has parameter \\$pos with no type specified\\.$#"
+			count: 1
+			path: application/forms/DimensionsForm.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\Forms\\\\DimensionsForm\\:\\:addDimensionButtons\\(\\) has parameter \\$total with no type specified\\.$#"
+			count: 1
+			path: application/forms/DimensionsForm.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\Forms\\\\DimensionsForm\\:\\:addSlice\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: application/forms/DimensionsForm.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\Forms\\\\DimensionsForm\\:\\:addSlice\\(\\) has parameter \\$value with no type specified\\.$#"
+			count: 1
+			path: application/forms/DimensionsForm.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\Forms\\\\DimensionsForm\\:\\:assemble\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: application/forms/DimensionsForm.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\Forms\\\\DimensionsForm\\:\\:onSuccess\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: application/forms/DimensionsForm.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\Forms\\\\DimensionsForm\\:\\:setCube\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: application/forms/DimensionsForm.php
+
+		-
+			message: "#^Property Icinga\\\\Module\\\\Cube\\\\Forms\\\\DimensionsForm\\:\\:\\$defaultAttributes type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: application/forms/DimensionsForm.php
+
+		-
+			message: "#^Property Icinga\\\\Module\\\\Cube\\\\Forms\\\\DimensionsForm\\:\\:\\$url \\(ipl\\\\Web\\\\Url\\) does not accept mixed\\.$#"
+			count: 1
+			path: application/forms/DimensionsForm.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\Cube\\:\\:addDimension\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: library/Cube/Cube.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\Cube\\:\\:chooseFacts\\(\\) has parameter \\$facts with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: library/Cube/Cube.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\Cube\\:\\:fetchAll\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: library/Cube/Cube.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\Cube\\:\\:flipPositions\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: library/Cube/Cube.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\Cube\\:\\:flipPositions\\(\\) has parameter \\$array with no type specified\\.$#"
+			count: 1
+			path: library/Cube/Cube.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\Cube\\:\\:flipPositions\\(\\) has parameter \\$pos1 with no type specified\\.$#"
+			count: 1
+			path: library/Cube/Cube.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\Cube\\:\\:flipPositions\\(\\) has parameter \\$pos2 with no type specified\\.$#"
+			count: 1
+			path: library/Cube/Cube.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\Cube\\:\\:getDimension\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: library/Cube/Cube.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\Cube\\:\\:getDimension\\(\\) has parameter \\$name with no type specified\\.$#"
+			count: 1
+			path: library/Cube/Cube.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\Cube\\:\\:getDimensionAfter\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: library/Cube/Cube.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\Cube\\:\\:getDimensionAfter\\(\\) has parameter \\$name with no type specified\\.$#"
+			count: 1
+			path: library/Cube/Cube.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\Cube\\:\\:getDimensionsLabel\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: library/Cube/Cube.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\Cube\\:\\:getPathLabel\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: library/Cube/Cube.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\Cube\\:\\:getSlices\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: library/Cube/Cube.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\Cube\\:\\:getSlicesLabel\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: library/Cube/Cube.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\Cube\\:\\:hasDimension\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: library/Cube/Cube.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\Cube\\:\\:hasDimension\\(\\) has parameter \\$name with no type specified\\.$#"
+			count: 1
+			path: library/Cube/Cube.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\Cube\\:\\:hasFact\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: library/Cube/Cube.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\Cube\\:\\:hasFact\\(\\) has parameter \\$name with no type specified\\.$#"
+			count: 1
+			path: library/Cube/Cube.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\Cube\\:\\:hasSlice\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: library/Cube/Cube.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\Cube\\:\\:hasSlice\\(\\) has parameter \\$name with no type specified\\.$#"
+			count: 1
+			path: library/Cube/Cube.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\Cube\\:\\:listAdditionalDimensions\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: library/Cube/Cube.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\Cube\\:\\:listAvailableDimensions\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: library/Cube/Cube.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\Cube\\:\\:listColumns\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: library/Cube/Cube.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\Cube\\:\\:listDimensions\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: library/Cube/Cube.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\Cube\\:\\:listDimensionsUpTo\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: library/Cube/Cube.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\Cube\\:\\:listDimensionsUpTo\\(\\) has parameter \\$name with no type specified\\.$#"
+			count: 1
+			path: library/Cube/Cube.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\Cube\\:\\:listFacts\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: library/Cube/Cube.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\Cube\\:\\:listSlices\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: library/Cube/Cube.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\Cube\\:\\:moveDimensionDown\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: library/Cube/Cube.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\Cube\\:\\:moveDimensionDown\\(\\) has parameter \\$name with no type specified\\.$#"
+			count: 1
+			path: library/Cube/Cube.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\Cube\\:\\:moveDimensionUp\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: library/Cube/Cube.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\Cube\\:\\:moveDimensionUp\\(\\) has parameter \\$name with no type specified\\.$#"
+			count: 1
+			path: library/Cube/Cube.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\Cube\\:\\:reOrderDimensions\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: library/Cube/Cube.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\Cube\\:\\:reOrderDimensions\\(\\) has parameter \\$positions with no type specified\\.$#"
+			count: 1
+			path: library/Cube/Cube.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\Cube\\:\\:registerAvailableDimensions\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: library/Cube/Cube.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\Cube\\:\\:removeDimension\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: library/Cube/Cube.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\Cube\\:\\:removeDimension\\(\\) has parameter \\$name with no type specified\\.$#"
+			count: 1
+			path: library/Cube/Cube.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\Cube\\:\\:slice\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: library/Cube/Cube.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\Cube\\:\\:slice\\(\\) has parameter \\$key with no type specified\\.$#"
+			count: 1
+			path: library/Cube/Cube.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\Cube\\:\\:slice\\(\\) has parameter \\$value with no type specified\\.$#"
+			count: 1
+			path: library/Cube/Cube.php
+
+		-
+			message: "#^Property Icinga\\\\Module\\\\Cube\\\\Cube\\:\\:\\$availableDimensions \\(array\\<string, Icinga\\\\Module\\\\Cube\\\\Dimension\\>\\) does not accept array\\<int\\|string, Icinga\\\\Module\\\\Cube\\\\Dimension\\>\\.$#"
+			count: 1
+			path: library/Cube/Cube.php
+
+		-
+			message: "#^Property Icinga\\\\Module\\\\Cube\\\\Cube\\:\\:\\$chosenFacts type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: library/Cube/Cube.php
+
+		-
+			message: "#^Property Icinga\\\\Module\\\\Cube\\\\Cube\\:\\:\\$renderer has no type specified\\.$#"
+			count: 1
+			path: library/Cube/Cube.php
+
+		-
+			message: "#^Property Icinga\\\\Module\\\\Cube\\\\Cube\\:\\:\\$slices has no type specified\\.$#"
+			count: 1
+			path: library/Cube/Cube.php
+
+		-
+			message: "#^Access to undefined constant Icinga\\\\Module\\\\Cube\\\\Cube\\:\\:DIMENSION_SEVERITY_SORT_PARAM\\.$#"
+			count: 1
+			path: library/Cube/CubeRenderer.php
+
+		-
+			message: "#^Call to an undefined method Icinga\\\\Module\\\\Cube\\\\Cube\\:\\:getSortBy\\(\\)\\.$#"
+			count: 1
+			path: library/Cube/CubeRenderer.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\CubeRenderer\\:\\:beginDimension\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: library/Cube/CubeRenderer.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\CubeRenderer\\:\\:beginDimension\\(\\) has parameter \\$name with no type specified\\.$#"
+			count: 1
+			path: library/Cube/CubeRenderer.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\CubeRenderer\\:\\:beginDimension\\(\\) has parameter \\$row with no type specified\\.$#"
+			count: 1
+			path: library/Cube/CubeRenderer.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\CubeRenderer\\:\\:beginDimensionsForRow\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: library/Cube/CubeRenderer.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\CubeRenderer\\:\\:beginDimensionsForRow\\(\\) has parameter \\$row with no type specified\\.$#"
+			count: 1
+			path: library/Cube/CubeRenderer.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\CubeRenderer\\:\\:beginDimensionsUpFrom\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: library/Cube/CubeRenderer.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\CubeRenderer\\:\\:beginDimensionsUpFrom\\(\\) has parameter \\$dimension with no type specified\\.$#"
+			count: 1
+			path: library/Cube/CubeRenderer.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\CubeRenderer\\:\\:beginDimensionsUpFrom\\(\\) has parameter \\$row with no type specified\\.$#"
+			count: 1
+			path: library/Cube/CubeRenderer.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\CubeRenderer\\:\\:closeDimension\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: library/Cube/CubeRenderer.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\CubeRenderer\\:\\:closeDimension\\(\\) has parameter \\$name with no type specified\\.$#"
+			count: 1
+			path: library/Cube/CubeRenderer.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\CubeRenderer\\:\\:closeDimensions\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: library/Cube/CubeRenderer.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\CubeRenderer\\:\\:closeDimensionsDownTo\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: library/Cube/CubeRenderer.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\CubeRenderer\\:\\:closeDimensionsDownTo\\(\\) has parameter \\$name with no type specified\\.$#"
+			count: 1
+			path: library/Cube/CubeRenderer.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\CubeRenderer\\:\\:closeDimensionsForRow\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: library/Cube/CubeRenderer.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\CubeRenderer\\:\\:closeDimensionsForRow\\(\\) has parameter \\$row with no type specified\\.$#"
+			count: 1
+			path: library/Cube/CubeRenderer.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\CubeRenderer\\:\\:extractFacts\\(\\) has parameter \\$row with no type specified\\.$#"
+			count: 1
+			path: library/Cube/CubeRenderer.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\CubeRenderer\\:\\:getDetailsUrl\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: library/Cube/CubeRenderer.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\CubeRenderer\\:\\:getDetailsUrl\\(\\) has parameter \\$name with no type specified\\.$#"
+			count: 1
+			path: library/Cube/CubeRenderer.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\CubeRenderer\\:\\:getDetailsUrl\\(\\) has parameter \\$row with no type specified\\.$#"
+			count: 1
+			path: library/Cube/CubeRenderer.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\CubeRenderer\\:\\:getDimensionClassString\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: library/Cube/CubeRenderer.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\CubeRenderer\\:\\:getDimensionClassString\\(\\) has parameter \\$name with no type specified\\.$#"
+			count: 1
+			path: library/Cube/CubeRenderer.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\CubeRenderer\\:\\:getDimensionClassString\\(\\) has parameter \\$row with no type specified\\.$#"
+			count: 1
+			path: library/Cube/CubeRenderer.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\CubeRenderer\\:\\:getDimensionClasses\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: library/Cube/CubeRenderer.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\CubeRenderer\\:\\:getDimensionClasses\\(\\) has parameter \\$name with no type specified\\.$#"
+			count: 1
+			path: library/Cube/CubeRenderer.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\CubeRenderer\\:\\:getDimensionClasses\\(\\) has parameter \\$row with no type specified\\.$#"
+			count: 1
+			path: library/Cube/CubeRenderer.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\CubeRenderer\\:\\:getIndent\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: library/Cube/CubeRenderer.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\CubeRenderer\\:\\:getIndent\\(\\) has parameter \\$name with no type specified\\.$#"
+			count: 1
+			path: library/Cube/CubeRenderer.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\CubeRenderer\\:\\:getLevel\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: library/Cube/CubeRenderer.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\CubeRenderer\\:\\:getLevel\\(\\) has parameter \\$name with no type specified\\.$#"
+			count: 1
+			path: library/Cube/CubeRenderer.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\CubeRenderer\\:\\:getSliceUrl\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: library/Cube/CubeRenderer.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\CubeRenderer\\:\\:getSliceUrl\\(\\) has parameter \\$name with no type specified\\.$#"
+			count: 1
+			path: library/Cube/CubeRenderer.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\CubeRenderer\\:\\:getSliceUrl\\(\\) has parameter \\$row with no type specified\\.$#"
+			count: 1
+			path: library/Cube/CubeRenderer.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\CubeRenderer\\:\\:initialize\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: library/Cube/CubeRenderer.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\CubeRenderer\\:\\:isOuterDimension\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: library/Cube/CubeRenderer.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\CubeRenderer\\:\\:isOuterDimension\\(\\) has parameter \\$name with no type specified\\.$#"
+			count: 1
+			path: library/Cube/CubeRenderer.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\CubeRenderer\\:\\:render\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: library/Cube/CubeRenderer.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\CubeRenderer\\:\\:renderDimensionLabel\\(\\) has parameter \\$name with no type specified\\.$#"
+			count: 1
+			path: library/Cube/CubeRenderer.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\CubeRenderer\\:\\:renderDimensionLabel\\(\\) has parameter \\$row with no type specified\\.$#"
+			count: 1
+			path: library/Cube/CubeRenderer.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\CubeRenderer\\:\\:renderFacts\\(\\) has parameter \\$facts with no type specified\\.$#"
+			count: 1
+			path: library/Cube/CubeRenderer.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\CubeRenderer\\:\\:renderRow\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: library/Cube/CubeRenderer.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\CubeRenderer\\:\\:renderRow\\(\\) has parameter \\$row with no type specified\\.$#"
+			count: 1
+			path: library/Cube/CubeRenderer.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\CubeRenderer\\:\\:sortBySeverity\\(\\) has parameter \\$results with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: library/Cube/CubeRenderer.php
+
+		-
+			message: "#^Parameter \\#1 \\$rule of static method ipl\\\\Web\\\\Filter\\\\QueryString\\:\\:render\\(\\) expects ipl\\\\Stdlib\\\\Filter\\\\Rule, ipl\\\\Stdlib\\\\Filter\\\\Rule\\|null given\\.$#"
+			count: 1
+			path: library/Cube/CubeRenderer.php
+
+		-
+			message: "#^Property Icinga\\\\Module\\\\Cube\\\\CubeRenderer\\:\\:\\$dimensionLevels type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: library/Cube/CubeRenderer.php
+
+		-
+			message: "#^Property Icinga\\\\Module\\\\Cube\\\\CubeRenderer\\:\\:\\$dimensionOrder type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: library/Cube/CubeRenderer.php
+
+		-
+			message: "#^Property Icinga\\\\Module\\\\Cube\\\\CubeRenderer\\:\\:\\$dimensions type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: library/Cube/CubeRenderer.php
+
+		-
+			message: "#^Property Icinga\\\\Module\\\\Cube\\\\CubeRenderer\\:\\:\\$facts has no type specified\\.$#"
+			count: 1
+			path: library/Cube/CubeRenderer.php
+
+		-
+			message: "#^Property Icinga\\\\Module\\\\Cube\\\\CubeRenderer\\:\\:\\$reversedDimensions type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: library/Cube/CubeRenderer.php
+
+		-
+			message: "#^Property Icinga\\\\Module\\\\Cube\\\\CubeRenderer\\:\\:\\$started has no type specified\\.$#"
+			count: 1
+			path: library/Cube/CubeRenderer.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\CubeRenderer\\\\HostStatusCubeRenderer\\:\\:getDimensionClasses\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: library/Cube/CubeRenderer/HostStatusCubeRenderer.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\CubeRenderer\\\\HostStatusCubeRenderer\\:\\:getDimensionClasses\\(\\) has parameter \\$name with no type specified\\.$#"
+			count: 1
+			path: library/Cube/CubeRenderer/HostStatusCubeRenderer.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\CubeRenderer\\\\HostStatusCubeRenderer\\:\\:getDimensionClasses\\(\\) has parameter \\$row with no type specified\\.$#"
+			count: 1
+			path: library/Cube/CubeRenderer/HostStatusCubeRenderer.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\CubeRenderer\\\\HostStatusCubeRenderer\\:\\:makeBadgeHtml\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: library/Cube/CubeRenderer/HostStatusCubeRenderer.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\CubeRenderer\\\\HostStatusCubeRenderer\\:\\:makeBadgeHtml\\(\\) has parameter \\$class with no type specified\\.$#"
+			count: 1
+			path: library/Cube/CubeRenderer/HostStatusCubeRenderer.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\CubeRenderer\\\\HostStatusCubeRenderer\\:\\:makeBadgeHtml\\(\\) has parameter \\$count with no type specified\\.$#"
+			count: 1
+			path: library/Cube/CubeRenderer/HostStatusCubeRenderer.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\CubeRenderer\\\\HostStatusCubeRenderer\\:\\:renderDimensionLabel\\(\\) has parameter \\$name with no type specified\\.$#"
+			count: 1
+			path: library/Cube/CubeRenderer/HostStatusCubeRenderer.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\CubeRenderer\\\\HostStatusCubeRenderer\\:\\:renderDimensionLabel\\(\\) has parameter \\$row with no type specified\\.$#"
+			count: 1
+			path: library/Cube/CubeRenderer/HostStatusCubeRenderer.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\CubeRenderer\\\\HostStatusCubeRenderer\\:\\:renderFacts\\(\\) has parameter \\$facts with no type specified\\.$#"
+			count: 1
+			path: library/Cube/CubeRenderer/HostStatusCubeRenderer.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\CubeRenderer\\\\ServiceStatusCubeRenderer\\:\\:getDimensionClasses\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: library/Cube/CubeRenderer/ServiceStatusCubeRenderer.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\CubeRenderer\\\\ServiceStatusCubeRenderer\\:\\:getDimensionClasses\\(\\) has parameter \\$name with no type specified\\.$#"
+			count: 1
+			path: library/Cube/CubeRenderer/ServiceStatusCubeRenderer.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\CubeRenderer\\\\ServiceStatusCubeRenderer\\:\\:getDimensionClasses\\(\\) has parameter \\$row with no type specified\\.$#"
+			count: 1
+			path: library/Cube/CubeRenderer/ServiceStatusCubeRenderer.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\CubeRenderer\\\\ServiceStatusCubeRenderer\\:\\:makeBadgeHtml\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: library/Cube/CubeRenderer/ServiceStatusCubeRenderer.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\CubeRenderer\\\\ServiceStatusCubeRenderer\\:\\:makeBadgeHtml\\(\\) has parameter \\$class with no type specified\\.$#"
+			count: 1
+			path: library/Cube/CubeRenderer/ServiceStatusCubeRenderer.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\CubeRenderer\\\\ServiceStatusCubeRenderer\\:\\:makeBadgeHtml\\(\\) has parameter \\$count with no type specified\\.$#"
+			count: 1
+			path: library/Cube/CubeRenderer/ServiceStatusCubeRenderer.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\CubeRenderer\\\\ServiceStatusCubeRenderer\\:\\:renderDimensionLabel\\(\\) has parameter \\$name with no type specified\\.$#"
+			count: 1
+			path: library/Cube/CubeRenderer/ServiceStatusCubeRenderer.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\CubeRenderer\\\\ServiceStatusCubeRenderer\\:\\:renderDimensionLabel\\(\\) has parameter \\$row with no type specified\\.$#"
+			count: 1
+			path: library/Cube/CubeRenderer/ServiceStatusCubeRenderer.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\CubeRenderer\\\\ServiceStatusCubeRenderer\\:\\:renderFacts\\(\\) has parameter \\$facts with no type specified\\.$#"
+			count: 1
+			path: library/Cube/CubeRenderer/ServiceStatusCubeRenderer.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\DimensionParams\\:\\:add\\(\\) has parameter \\$dimension with no type specified\\.$#"
+			count: 1
+			path: library/Cube/DimensionParams.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\DimensionParams\\:\\:fromArray\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: library/Cube/DimensionParams.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\DimensionParams\\:\\:fromArray\\(\\) has parameter \\$dimensions with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: library/Cube/DimensionParams.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\DimensionParams\\:\\:fromString\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: library/Cube/DimensionParams.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\DimensionParams\\:\\:fromString\\(\\) has parameter \\$dimensions with no type specified\\.$#"
+			count: 1
+			path: library/Cube/DimensionParams.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\DimensionParams\\:\\:fromUrl\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: library/Cube/DimensionParams.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\DimensionParams\\:\\:getDimensions\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: library/Cube/DimensionParams.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\DimensionParams\\:\\:update\\(\\) has parameter \\$dimensions with no type specified\\.$#"
+			count: 1
+			path: library/Cube/DimensionParams.php
+
+		-
+			message: "#^Property Icinga\\\\Module\\\\Cube\\\\DimensionParams\\:\\:\\$dimensions type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: library/Cube/DimensionParams.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\Hook\\\\ActionsHook\\:\\:makeUrl\\(\\) has parameter \\$params with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: library/Cube/Hook/ActionsHook.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\Hook\\\\IcingaDbActionsHook\\:\\:makeUrl\\(\\) has parameter \\$params with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: library/Cube/Hook/IcingaDbActionsHook.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\IcingaDb\\\\CustomVariableDimension\\:\\:__construct\\(\\) has parameter \\$name with no type specified\\.$#"
+			count: 1
+			path: library/Cube/IcingaDb/CustomVariableDimension.php
+
+		-
+			message: "#^Property Icinga\\\\Module\\\\Cube\\\\IcingaDb\\\\CustomVariableDimension\\:\\:\\$label has no type specified\\.$#"
+			count: 1
+			path: library/Cube/IcingaDb/CustomVariableDimension.php
+
+		-
+			message: "#^Property Icinga\\\\Module\\\\Cube\\\\IcingaDb\\\\CustomVariableDimension\\:\\:\\$wantNull has no type specified\\.$#"
+			count: 1
+			path: library/Cube/IcingaDb/CustomVariableDimension.php
+
+		-
+			message: "#^Cannot access property \\$customvar_flat on mixed\\.$#"
+			count: 2
+			path: library/Cube/IcingaDb/IcingaDbCube.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\IcingaDb\\\\IcingaDbCube\\:\\:fetchAll\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: library/Cube/IcingaDb/IcingaDbCube.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\IcingaDb\\\\IcingaDbCube\\:\\:fetchHostVariableDimensions\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: library/Cube/IcingaDb/IcingaDbCube.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\IcingaDb\\\\IcingaDbCube\\:\\:fetchServiceVariableDimensions\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: library/Cube/IcingaDb/IcingaDbCube.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\IcingaDb\\\\IcingaDbCube\\:\\:getAvailableFactColumns\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: library/Cube/IcingaDb/IcingaDbCube.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\IcingaDb\\\\IcingaDbCube\\:\\:getObjectsFilter\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: library/Cube/IcingaDb/IcingaDbCube.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\IcingaDb\\\\IcingaDbCube\\:\\:getSortBy\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: library/Cube/IcingaDb/IcingaDbCube.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\IcingaDb\\\\IcingaDbCube\\:\\:prepareFullQuery\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: library/Cube/IcingaDb/IcingaDbCube.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\IcingaDb\\\\IcingaDbCube\\:\\:prepareRollupQuery\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: library/Cube/IcingaDb/IcingaDbCube.php
+
+		-
+			message: "#^Parameter \\#1 \\$filter of method ipl\\\\Orm\\\\Query\\:\\:filter\\(\\) expects ipl\\\\Stdlib\\\\Filter\\\\Rule, ipl\\\\Stdlib\\\\Filter\\\\Rule\\|null given\\.$#"
+			count: 1
+			path: library/Cube/IcingaDb/IcingaDbCube.php
+
+		-
+			message: "#^Property Icinga\\\\Module\\\\Cube\\\\IcingaDb\\\\IcingaDbCube\\:\\:\\$objectsFilter has no type specified\\.$#"
+			count: 1
+			path: library/Cube/IcingaDb/IcingaDbCube.php
+
+		-
+			message: "#^Property Icinga\\\\Module\\\\Cube\\\\IcingaDb\\\\IcingaDbCube\\:\\:\\$sortBy \\(array\\) does not accept mixed\\.$#"
+			count: 1
+			path: library/Cube/IcingaDb/IcingaDbCube.php
+
+		-
+			message: "#^Property Icinga\\\\Module\\\\Cube\\\\IcingaDb\\\\IcingaDbCube\\:\\:\\$sortBy type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: library/Cube/IcingaDb/IcingaDbCube.php
+
+		-
+			message: "#^Cannot access property \\$host on mixed\\.$#"
+			count: 1
+			path: library/Cube/IcingaDb/IcingaDbHostStatusCube.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\IcingaDb\\\\IcingaDbHostStatusCube\\:\\:getAvailableFactColumns\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: library/Cube/IcingaDb/IcingaDbHostStatusCube.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\IcingaDb\\\\IcingaDbHostStatusCube\\:\\:listAvailableDimensions\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: library/Cube/IcingaDb/IcingaDbHostStatusCube.php
+
+		-
+			message: "#^Cannot access property \\$host_name on mixed\\.$#"
+			count: 1
+			path: library/Cube/IcingaDb/IcingaDbServiceStatusCube.php
+
+		-
+			message: "#^Cannot access property \\$service_name on mixed\\.$#"
+			count: 1
+			path: library/Cube/IcingaDb/IcingaDbServiceStatusCube.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\IcingaDb\\\\IcingaDbServiceStatusCube\\:\\:getAvailableFactColumns\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: library/Cube/IcingaDb/IcingaDbServiceStatusCube.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\IcingaDb\\\\IcingaDbServiceStatusCube\\:\\:listAvailableDimensions\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: library/Cube/IcingaDb/IcingaDbServiceStatusCube.php
+
+		-
+			message: "#^Call to an undefined method Icinga\\\\Module\\\\Cube\\\\Ido\\\\ZfSelectWrapper\\:\\:joinLeft\\(\\)\\.$#"
+			count: 1
+			path: library/Cube/Ido/CustomVarDimension.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\Ido\\\\CustomVarDimension\\:\\:__construct\\(\\) has parameter \\$varName with no type specified\\.$#"
+			count: 1
+			path: library/Cube/Ido/CustomVarDimension.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\Ido\\\\CustomVarDimension\\:\\:safeVarname\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: library/Cube/Ido/CustomVarDimension.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\Ido\\\\CustomVarDimension\\:\\:safeVarname\\(\\) has parameter \\$name with no type specified\\.$#"
+			count: 1
+			path: library/Cube/Ido/CustomVarDimension.php
+
+		-
+			message: "#^Property Icinga\\\\Module\\\\Cube\\\\Ido\\\\CustomVarDimension\\:\\:\\$type \\(string\\) does not accept string\\|null\\.$#"
+			count: 1
+			path: library/Cube/Ido/CustomVarDimension.php
+
+		-
+			message: "#^Call to an undefined method Icinga\\\\Data\\\\ConnectionInterface\\:\\:getResource\\(\\)\\.$#"
+			count: 1
+			path: library/Cube/Ido/DataView/Hoststatus.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\Ido\\\\DataView\\\\Hoststatus\\:\\:__construct\\(\\) has parameter \\$columns with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: library/Cube/Ido/DataView/Hoststatus.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\Ido\\\\DbCube\\:\\:chooseFacts\\(\\) has parameter \\$facts with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: library/Cube/Ido/DbCube.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\Ido\\\\DbCube\\:\\:fetchAll\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: library/Cube/Ido/DbCube.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\Ido\\\\DbCube\\:\\:fetchAll\\(\\) should return array but returns array\\|null\\.$#"
+			count: 1
+			path: library/Cube/Ido/DbCube.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\Ido\\\\DbCube\\:\\:getAvailableFactColumns\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: library/Cube/Ido/DbCube.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\Ido\\\\DbCube\\:\\:setDbName\\(\\) has parameter \\$name with no type specified\\.$#"
+			count: 1
+			path: library/Cube/Ido/DbCube.php
+
+		-
+			message: "#^Property Icinga\\\\Module\\\\Cube\\\\Ido\\\\DbCube\\:\\:\\$factColumns type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: library/Cube/Ido/DbCube.php
+
+		-
+			message: "#^Argument of an invalid type array\\<int, string\\>\\|false supplied for foreach, only iterables are supported\\.$#"
+			count: 1
+			path: library/Cube/Ido/IdoCube.php
+
+		-
+			message: "#^Cannot access offset 'host'\\|'service' on array\\|stdClass\\.$#"
+			count: 1
+			path: library/Cube/Ido/IdoCube.php
+
+		-
+			message: "#^Cannot call method getDbAdapter\\(\\) on mixed\\.$#"
+			count: 1
+			path: library/Cube/Ido/IdoCube.php
+
+		-
+			message: "#^Cannot call method getRestrictions\\(\\) on Icinga\\\\User\\|null\\.$#"
+			count: 1
+			path: library/Cube/Ido/IdoCube.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\Ido\\\\IdoCube\\:\\:filterProtectedCustomvars\\(\\) should return array\\<string\\> but returns array\\|false\\.$#"
+			count: 1
+			path: library/Cube/Ido/IdoCube.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\Ido\\\\IdoCube\\:\\:getIdoVersion\\(\\) should return string but returns string\\|false\\|null\\.$#"
+			count: 1
+			path: library/Cube/Ido/IdoCube.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\Ido\\\\IdoCube\\:\\:getMonitoringRestriction\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: library/Cube/Ido/IdoCube.php
+
+		-
+			message: "#^Parameter \\#1 \\$connection of method Icinga\\\\Module\\\\Cube\\\\Ido\\\\DbCube\\:\\:setConnection\\(\\) expects Icinga\\\\Data\\\\Db\\\\DbConnection, mixed given\\.$#"
+			count: 1
+			path: library/Cube/Ido/IdoCube.php
+
+		-
+			message: "#^Parameter \\#2 \\$subject of function preg_split expects string, mixed given\\.$#"
+			count: 1
+			path: library/Cube/Ido/IdoCube.php
+
+		-
+			message: "#^Property Icinga\\\\Module\\\\Cube\\\\Ido\\\\IdoCube\\:\\:\\$availableFacts type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: library/Cube/Ido/IdoCube.php
+
+		-
+			message: "#^Property Icinga\\\\Module\\\\Cube\\\\Ido\\\\IdoCube\\:\\:\\$idoVersion \\(string\\) does not accept string\\|false\\|null\\.$#"
+			count: 1
+			path: library/Cube/Ido/IdoCube.php
+
+		-
+			message: "#^Call to an undefined method Icinga\\\\Data\\\\SimpleQuery\\:\\:getSelectQuery\\(\\)\\.$#"
+			count: 2
+			path: library/Cube/Ido/IdoHostStatusCube.php
+
+		-
+			message: "#^Call to an undefined method Icinga\\\\Data\\\\SimpleQuery\\:\\:requireColumn\\(\\)\\.$#"
+			count: 1
+			path: library/Cube/Ido/IdoHostStatusCube.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\Ido\\\\IdoHostStatusCube\\:\\:getAvailableFactColumns\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: library/Cube/Ido/IdoHostStatusCube.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\Ido\\\\IdoHostStatusCube\\:\\:listAvailableDimensions\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: library/Cube/Ido/IdoHostStatusCube.php
+
+		-
+			message: "#^Call to an undefined method Icinga\\\\Data\\\\SimpleQuery\\:\\:getSelectQuery\\(\\)\\.$#"
+			count: 2
+			path: library/Cube/Ido/IdoServiceStatusCube.php
+
+		-
+			message: "#^Call to an undefined method Icinga\\\\Data\\\\SimpleQuery\\:\\:requireColumn\\(\\)\\.$#"
+			count: 1
+			path: library/Cube/Ido/IdoServiceStatusCube.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\Ido\\\\IdoServiceStatusCube\\:\\:getAvailableFactColumns\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: library/Cube/Ido/IdoServiceStatusCube.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\Ido\\\\IdoServiceStatusCube\\:\\:listAvailableDimensions\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: library/Cube/Ido/IdoServiceStatusCube.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\Ido\\\\Query\\\\HoststatusQuery\\:\\:joinSubQuery\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: library/Cube/Ido/Query/HoststatusQuery.php
+
+		-
+			message: "#^Property Icinga\\\\Module\\\\Cube\\\\Ido\\\\Query\\\\HoststatusQuery\\:\\:\\$subQueryTargets type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: library/Cube/Ido/Query/HoststatusQuery.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\Ido\\\\ZfSelectWrapper\\:\\:__call\\(\\) has parameter \\$arguments with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: library/Cube/Ido/ZfSelectWrapper.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\Ido\\\\ZfSelectWrapper\\:\\:columns\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: library/Cube/Ido/ZfSelectWrapper.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\Ido\\\\ZfSelectWrapper\\:\\:columns\\(\\) has parameter \\$cols with no type specified\\.$#"
+			count: 1
+			path: library/Cube/Ido/ZfSelectWrapper.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\Ido\\\\ZfSelectWrapper\\:\\:columns\\(\\) has parameter \\$correlationName with no type specified\\.$#"
+			count: 1
+			path: library/Cube/Ido/ZfSelectWrapper.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\Ido\\\\ZfSelectWrapper\\:\\:reset\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: library/Cube/Ido/ZfSelectWrapper.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\Ido\\\\ZfSelectWrapper\\:\\:reset\\(\\) has parameter \\$part with no type specified\\.$#"
+			count: 1
+			path: library/Cube/Ido/ZfSelectWrapper.php
+
+		-
+			message: "#^Parameter \\#1 \\$callback of function call_user_func_array expects callable\\(\\)\\: mixed, array\\{Zend_Db_Select, string\\} given\\.$#"
+			count: 1
+			path: library/Cube/Ido/ZfSelectWrapper.php
+
+		-
+			message: "#^Parameter \\#1 \\$rule of method ipl\\\\Stdlib\\\\Filter\\\\Chain\\:\\:add\\(\\) expects ipl\\\\Stdlib\\\\Filter\\\\Rule, ipl\\\\Stdlib\\\\Filter\\\\Rule\\|null given\\.$#"
+			count: 1
+			path: library/Cube/ProvidedHook/Cube/IcingaDbActions.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\Web\\\\Controller\\:\\:hasLegacyDimensionParams\\(\\) has parameter \\$dimensions with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: library/Cube/Web/Controller.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\Web\\\\Controller\\:\\:transformLegacyDimensionParamsAndRedirect\\(\\) has parameter \\$legacyDimensions with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: library/Cube/Web/Controller.php
+
+		-
+			message: "#^Parameter \\#2 \\$default of method Icinga\\\\Web\\\\UrlParams\\:\\:shift\\(\\) expects string\\|null, false given\\.$#"
+			count: 1
+			path: library/Cube/Web/Controller.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\Web\\\\IdoController\\:\\:hasIcingadbDimensionParams\\(\\) has parameter \\$dimensions with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: library/Cube/Web/IdoController.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\Web\\\\IdoController\\:\\:transformIcingadbDimensionParamsAndRedirect\\(\\) has parameter \\$icingadbDimensions with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: library/Cube/Web/IdoController.php
+
+		-
+			message: "#^Parameter \\#2 \\$default of method Icinga\\\\Web\\\\UrlParams\\:\\:shift\\(\\) expects string\\|null, false given\\.$#"
+			count: 1
+			path: library/Cube/Web/IdoController.php
