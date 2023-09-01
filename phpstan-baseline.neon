@@ -51,11 +51,6 @@ parameters:
 			path: application/forms/DimensionsForm.php
 
 		-
-			message: "#^Property Icinga\\\\Module\\\\Cube\\\\Forms\\\\DimensionsForm\\:\\:\\$defaultAttributes type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: application/forms/DimensionsForm.php
-
-		-
 			message: "#^Property Icinga\\\\Module\\\\Cube\\\\Forms\\\\DimensionsForm\\:\\:\\$url \\(ipl\\\\Web\\\\Url\\) does not accept mixed\\.$#"
 			count: 1
 			path: application/forms/DimensionsForm.php
