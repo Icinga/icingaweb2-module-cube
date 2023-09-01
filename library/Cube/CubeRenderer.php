@@ -6,7 +6,7 @@ namespace Icinga\Module\Cube;
 
 use Icinga\Module\Cube\IcingaDb\IcingaDbCube;
 use Icinga\Web\View;
-use ipl\Web\Filter\QueryString;
+use ipl\Stdlib\Filter;
 use ipl\Web\Url;
 use Generator;
 use Icinga\Data\Tree\TreeNode;
@@ -439,7 +439,9 @@ abstract class CubeRenderer
         $url = Url::fromPath($this->getDetailsBaseUrl());
 
         if ($this->cube instanceof IcingaDbCube && $this->cube->hasBaseFilter()) {
-            $url->setQueryString(QueryString::render($this->cube->getBaseFilter()));
+            /** @var Filter\Rule $baseFilter */
+            $baseFilter = $this->cube->getBaseFilter();
+            $url->setFilter($baseFilter);
         }
 
         $urlParams = $url->getParams();

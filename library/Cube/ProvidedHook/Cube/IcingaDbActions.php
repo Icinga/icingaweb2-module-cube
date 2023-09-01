@@ -6,7 +6,6 @@ use Icinga\Module\Cube\Hook\IcingaDbActionsHook;
 use Icinga\Module\Cube\IcingaDb\IcingaDbCube;
 use Icinga\Module\Cube\IcingaDb\IcingaDbServiceStatusCube;
 use ipl\Stdlib\Filter;
-use ipl\Web\Filter\QueryString;
 use ipl\Web\Url;
 
 class IcingaDbActions extends IcingaDbActionsHook
@@ -28,7 +27,7 @@ class IcingaDbActions extends IcingaDbActionsHook
         }
 
         $url = Url::fromPath('icingadb/' . $type . 's');
-        $url->setQueryString(QueryString::render($filter));
+        $url->setFilter($filter);
 
         if ($type === 'host') {
             $this->addActionLink(

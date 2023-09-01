@@ -501,11 +501,6 @@ parameters:
 			path: library/Cube/CubeRenderer.php
 
 		-
-			message: "#^Parameter \\#1 \\$rule of static method ipl\\\\Web\\\\Filter\\\\QueryString\\:\\:render\\(\\) expects ipl\\\\Stdlib\\\\Filter\\\\Rule, ipl\\\\Stdlib\\\\Filter\\\\Rule\\|null given\\.$#"
-			count: 1
-			path: library/Cube/CubeRenderer.php
-
-		-
 			message: "#^Property Icinga\\\\Module\\\\Cube\\\\CubeRenderer\\:\\:\\$dimensionLevels type has no value type specified in iterable type array\\.$#"
 			count: 1
 			path: library/Cube/CubeRenderer.php
