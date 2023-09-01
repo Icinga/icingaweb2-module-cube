@@ -148,10 +148,9 @@ abstract class Controller extends CompatController
             $showSettings = true;
         }
 
-        $this->view->url = Url::fromRequest()->onlyWith($this->preserveParams);
-        $viewUrlParams = $this->view->url->getParams()->toArray(false);
-        $this->view->url->setQueryString(QueryString::render($searchBar->getFilter()))
-            ->addParams($viewUrlParams);
+        $this->view->url = Url::fromRequest()
+            ->onlyWith($this->preserveParams)
+            ->setFilter($searchBar->getFilter());
 
         if ($showSettings) {
             $form = (new DimensionsForm())
