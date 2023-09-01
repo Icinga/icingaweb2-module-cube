@@ -10,7 +10,6 @@ use Icinga\Module\Cube\Forms\DimensionsForm;
 use Icinga\Module\Cube\IcingaDb\CustomVariableDimension;
 use Icinga\Module\Cube\IcingaDb\IcingaDbCube;
 use Icinga\Module\Cube\Ido\IdoCube;
-use Icinga\Web\Widget\Tabextension\DashboardAction;
 use ipl\Stdlib\Str;
 use ipl\Web\Compat\CompatController;
 use ipl\Web\Url;
@@ -193,7 +192,6 @@ abstract class IdoController extends CompatController
             ->add('cube/services', [
                 'label' => $this->translate('Services'),
                 'url'   => 'cube/services' . ($params === '' ? '' : '?' . $params)
-            ])
-            ->extend(new DashboardAction());
+            ]);
     }
 }
