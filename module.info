@@ -1,7 +1,7 @@
 Name: Cube
-Version: 1.3.1
+Version: 1.3.2
 Requires:
-  Libraries: icinga-php-library (>=0.11.0)
+  Libraries: icinga-php-library (>=0.13.0)
   Modules: monitoring (>= 2.9.0), icingadb (>= 1.0.0)
 Description: Cube for Icinga Web
  The Cube allows you to analyze data across multiple dimensions in your
