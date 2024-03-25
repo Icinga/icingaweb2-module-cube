@@ -861,11 +861,6 @@ parameters:
 			path: library/Cube/Ido/IdoCube.php
 
 		-
-			message: "#^Cannot access offset 'host'\\|'service' on array\\|stdClass\\.$#"
-			count: 1
-			path: library/Cube/Ido/IdoCube.php
-
-		-
 			message: "#^Cannot call method getDbAdapter\\(\\) on mixed\\.$#"
 			count: 1
 			path: library/Cube/Ido/IdoCube.php
@@ -987,11 +982,6 @@ parameters:
 
 		-
 			message: "#^Method Icinga\\\\Module\\\\Cube\\\\Ido\\\\ZfSelectWrapper\\:\\:reset\\(\\) has parameter \\$part with no type specified\\.$#"
-			count: 1
-			path: library/Cube/Ido/ZfSelectWrapper.php
-
-		-
-			message: "#^Parameter \\#1 \\$callback of function call_user_func_array expects callable\\(\\)\\: mixed, array\\{Zend_Db_Select, string\\} given\\.$#"
 			count: 1
 			path: library/Cube/Ido/ZfSelectWrapper.php
 

@@ -1,0 +1,16 @@
+parameters:
+	ignoreErrors:
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\Ido\\\\IdoHostStatusCube\\:\\:listAvailableDimensions\\(\\) should return array but returns array\\<string, string\\>\\|false\\.$#"
+			count: 1
+			path: library/Cube/Ido/IdoHostStatusCube.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Cube\\\\Ido\\\\IdoServiceStatusCube\\:\\:listAvailableDimensions\\(\\) should return array but returns array\\<string, string\\>\\|false\\.$#"
+			count: 1
+			path: library/Cube/Ido/IdoServiceStatusCube.php
+
+		-
+			message: "#^Parameter \\#1 \\$function of function call_user_func_array expects callable\\(\\)\\: mixed, array\\{Zend_Db_Select, string\\} given\\.$#"
+			count: 1
+			path: library/Cube/Ido/ZfSelectWrapper.php

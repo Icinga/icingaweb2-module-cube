@@ -1,0 +1,6 @@
+parameters:
+	ignoreErrors:
+		-
+			message: "#^Parameter \\#1 \\$callback of function call_user_func_array expects callable\\(\\)\\: mixed, array\\{Zend_Db_Select, string\\} given\\.$#"
+			count: 1
+			path: library/Cube/Ido/ZfSelectWrapper.php
