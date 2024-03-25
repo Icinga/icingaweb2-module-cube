@@ -861,11 +861,6 @@ parameters:
 			path: library/Cube/Ido/IdoCube.php
 
 		-
-			message: "#^Cannot access offset 'host'\\|'service' on array\\|stdClass\\.$#"
-			count: 1
-			path: library/Cube/Ido/IdoCube.php
-
-		-
 			message: "#^Cannot call method getDbAdapter\\(\\) on mixed\\.$#"
 			count: 1
 			path: library/Cube/Ido/IdoCube.php
