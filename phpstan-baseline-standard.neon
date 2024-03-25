@@ -986,11 +986,6 @@ parameters:
 			path: library/Cube/Ido/ZfSelectWrapper.php
 
 		-
-			message: "#^Parameter \\#1 \\$callback of function call_user_func_array expects callable\\(\\)\\: mixed, array\\{Zend_Db_Select, string\\} given\\.$#"
-			count: 1
-			path: library/Cube/Ido/ZfSelectWrapper.php
-
-		-
 			message: "#^Parameter \\#1 \\$rule of method ipl\\\\Stdlib\\\\Filter\\\\Chain\\:\\:add\\(\\) expects ipl\\\\Stdlib\\\\Filter\\\\Rule, ipl\\\\Stdlib\\\\Filter\\\\Rule\\|null given\\.$#"
 			count: 1
 			path: library/Cube/ProvidedHook/Cube/IcingaDbActions.php
