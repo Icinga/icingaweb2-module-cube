@@ -131,13 +131,6 @@ class HostStatusCubeRenderer extends CubeRenderer
 
     protected function getSeveritySortColumns(): Generator
     {
-        $columns = ['down', 'unreachable'];
-        foreach ($columns as $column) {
-            yield "hosts_unhandled_$column";
-        }
-
-        foreach ($columns as $column) {
-            yield "hosts_$column";
-        }
+        yield from ['hosts_unhandled_down', 'hosts_down'];
     }
 }
