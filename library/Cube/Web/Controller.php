@@ -113,6 +113,7 @@ abstract class Controller extends CompatController
         ]);
 
         $this->params->shift($sortControl->getSortParam());
+        $sortControl->handleRequest($this->getServerRequest());
         $cube->sortBy($sortControl->getSort());
         $this->addControl($sortControl);
 
