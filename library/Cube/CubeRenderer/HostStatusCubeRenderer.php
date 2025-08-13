@@ -7,6 +7,10 @@ namespace Icinga\Module\Cube\CubeRenderer;
 
 use Generator;
 use Icinga\Module\Cube\CubeRenderer;
+use Icinga\Module\Icingadb\Widget\HostStateBadges;
+use ipl\Html\Attributes;
+use ipl\Html\HtmlElement;
+use stdClass;
 
 class HostStatusCubeRenderer extends CubeRenderer
 {
@@ -53,19 +57,24 @@ class HostStatusCubeRenderer extends CubeRenderer
 
     public function renderFacts($facts)
     {
-        $indent = str_repeat('    ', 3);
-        $parts = array();
+        $parts = [];
+        $partsObj = new stdClass();
 
         if ($facts->hosts_unhandled_down > 0) {
             $parts['critical'] = $facts->hosts_unhandled_down;
+            $partsObj->hosts_down_unhandled = $facts->hosts_unhandled_down;
         }
 
         if (isset($facts->hosts_unhandled_unreachable) && $facts->hosts_unhandled_unreachable > 0) {
             $parts['unreachable'] = $facts->hosts_unhandled_unreachable;
+            $partsObj->hosts_unreachable_unhandled = $facts->hosts_unhandled_unreachable;
         }
 
         if ($facts->hosts_down > 0 && $facts->hosts_down > $facts->hosts_unhandled_down) {
-            $parts['critical handled'] = $facts->hosts_down - $facts->hosts_unhandled_down;
+            $downHandled = $facts->hosts_down - $facts->hosts_unhandled_down;
+
+            $parts['critical handled'] = $downHandled;
+            $partsObj->hosts_down_handled = $downHandled;
         }
 
         if (
@@ -74,7 +83,10 @@ class HostStatusCubeRenderer extends CubeRenderer
             && $facts->hosts_unreachable >
             $facts->hosts_unhandled_unreachable
         ) {
-            $parts['unreachable handled'] = $facts->hosts_unreachable - $facts->hosts_unhandled_unreachable;
+            $unreachableHandled = $facts->hosts_unreachable - $facts->hosts_unhandled_unreachable;
+
+            $parts['unreachable handled'] = $unreachableHandled;
+            $partsObj->hosts_unreachable_handled = $unreachableHandled;
         }
 
         if (
@@ -87,42 +99,14 @@ class HostStatusCubeRenderer extends CubeRenderer
             }
 
             $parts['ok'] = $ok;
+            $partsObj->hosts_up = $ok;
         }
 
-        $main = '';
-        $sub = '';
-        foreach ($parts as $class => $count) {
-            if ($count === 0) {
-                continue;
-            }
-
-            if ($main === '') {
-                $main = $this->makeBadgeHtml($class, $count);
-            } else {
-                $sub .= $this->makeBadgeHtml($class, $count);
-            }
-        }
-        if ($sub !== '') {
-            $sub = $indent
-                . '<span class="others">'
-                . "\n    "
-                . $sub
-                . $indent
-                . "</span>\n";
+        if ($this->cube::isUsingIcingaDb()) {
+            return $this->renderIcingaDbCubeBadges($partsObj, $facts);
         }
 
-        return $main . $sub;
-    }
-
-    protected function makeBadgeHtml($class, $count)
-    {
-        $indent = str_repeat('    ', 3);
-        return sprintf(
-            '%s<span class="%s">%s</span>',
-            $indent,
-            $class,
-            $count
-        ) . "\n";
+        return $this->renderIdoCubeBadges($parts);
     }
 
     protected function getDetailsBaseUrl()
@@ -133,5 +117,25 @@ class HostStatusCubeRenderer extends CubeRenderer
     protected function getSeveritySortColumns(): Generator
     {
         yield from ['hosts_unhandled_down', 'hosts_down'];
+    }
+
+    protected function renderIcingaDbCubeBadges(stdClass $parts, object $facts): string
+    {
+        $filter = $this->getBadgeFilter($facts);
+        $mainBadge = $this->getMainBadge($parts);
+
+        $main = (new HostStateBadges($mainBadge))
+            ->setBaseFilter($filter)
+            ->addAttributes(new Attributes(['data-base-target' => '_next']));
+
+        $others = new HtmlElement(
+            'span',
+            new Attributes(['class' => 'others']),
+            (new HostStateBadges($parts))
+                ->setBaseFilter($filter)
+                ->addAttributes(new Attributes(['data-base-target' => '_next']))
+        );
+
+        return $main->render() . $others->render();
     }
 }

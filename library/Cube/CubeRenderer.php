@@ -5,12 +5,14 @@
 
 namespace Icinga\Module\Cube;
 
+use Generator;
+use Icinga\Data\Tree\TreeNode;
 use Icinga\Module\Cube\IcingaDb\IcingaDbCube;
 use Icinga\Web\View;
 use ipl\Stdlib\Filter;
+use ipl\Stdlib\Filter\Rule;
 use ipl\Web\Url;
-use Generator;
-use Icinga\Data\Tree\TreeNode;
+use stdClass;
 
 /**
  * CubeRenderer base class
@@ -91,6 +93,16 @@ abstract class CubeRenderer
      * @return Generator
      */
     abstract protected function getSeveritySortColumns(): Generator;
+
+    /**
+     * Render the badges for the Icinga DB cube.
+     *
+     * @param stdClass $parts An object of state class => count pairs
+     * @param object   $facts The facts object containing information about the current cube
+     *
+     * @return string
+     */
+    abstract protected function renderIcingaDbCubeBadges(stdClass $parts, object $facts): string;
 
     /**
      * Initialize all we need
@@ -501,6 +513,99 @@ abstract class CubeRenderer
     protected function endContainer()
     {
         return '</div>' . "\n";
+    }
+
+    /**
+     * Make a badge HTML snippet
+     *
+     * @param string $class The class to use for the badge
+     * @param int $count The count to display in the badge
+     *
+     * @return string
+     */
+    protected function makeBadgeHtml(string $class, int $count): string
+    {
+        $indent = str_repeat('    ', 3);
+        return sprintf(
+                '%s<span class="%s">%s</span>',
+                $indent,
+                $class,
+                $count
+            ) . "\n";
+    }
+
+    /**
+     * Render the badges for the IDO cube as HTML snippet
+     *
+     * @param array $parts An array of state class => count pairs
+     *
+     * @return string
+     */
+    protected function renderIdoCubeBadges(array $parts): string
+    {
+        $indent = str_repeat('    ', 3);
+        $main = '';
+        $sub = '';
+        foreach ($parts as $class => $count) {
+            if ($count === 0) {
+                continue;
+            }
+
+            if ($main === '') {
+                $main = $this->makeBadgeHtml($class, $count);
+            } else {
+                $sub .= $this->makeBadgeHtml($class, $count);
+            }
+        }
+        if ($sub !== '') {
+            $sub = $indent
+                . '<span class="others">'
+                . "\n    "
+                . $sub
+                . $indent
+                . "</span>\n";
+        }
+
+        return $main . $sub;
+    }
+
+    /**
+     * Get the filter for the badges
+     *
+     * @param object $facts The facts object containing information about the current cube
+     *
+     * @return Rule
+     */
+    protected function getBadgeFilter(object $facts): Rule
+    {
+        $filter = Filter::all();
+
+        if ($this->cube instanceof IcingaDbCube && $this->cube->hasBaseFilter()) {
+            $filter->add($this->cube->getBaseFilter());
+        }
+
+        foreach ($this->cube->listDimensions() as $dimensionName => $_) {
+            $filter->add(Filter::equal($dimensionName, $facts->$dimensionName));
+        }
+
+        return $filter;
+    }
+
+    /**
+     * Get the main badge and remove it from the parts
+     *
+     * @param stdClass $parts An object of state class => count pairs
+     *
+     * @return stdClass The main badge as an object with a single property
+     */
+    protected function getMainBadge(stdClass $parts): stdClass
+    {
+        $mainKey = array_key_first((array) $parts);
+        $mainBadge = new stdClass();
+        $mainBadge->$mainKey = $parts->$mainKey;
+        $parts->$mainKey = null;
+
+        return $mainBadge;
     }
 
     /**
