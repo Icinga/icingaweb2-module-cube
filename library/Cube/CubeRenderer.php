@@ -4,12 +4,14 @@
 
 namespace Icinga\Module\Cube;
 
+use Generator;
+use Icinga\Data\Tree\TreeNode;
 use Icinga\Module\Cube\IcingaDb\IcingaDbCube;
 use Icinga\Web\View;
 use ipl\Stdlib\Filter;
+use ipl\Stdlib\Filter\Rule;
 use ipl\Web\Url;
-use Generator;
-use Icinga\Data\Tree\TreeNode;
+use stdClass;
 
 /**
  * CubeRenderer base class
@@ -90,6 +92,16 @@ abstract class CubeRenderer
      * @return Generator
      */
     abstract protected function getSeveritySortColumns(): Generator;
+
+    /**
+     * Render the badges for the Icinga DB cube.
+     *
+     * @param stdClass $parts An object of state class => count pairs
+     * @param object   $facts The facts object containing information about the current cube
+     *
+     * @return string
+     */
+    abstract protected function renderIcingaDbCubeBadges(stdClass $parts, object $facts): string;
 
     /**
      * Initialize all we need
@@ -555,6 +567,46 @@ abstract class CubeRenderer
 
         return $main . $sub;
     }
+
+    /**
+     * Get the filter for the badges
+     *
+     * @param object $facts The facts object containing information about the current cube
+     *
+     * @return Rule
+     */
+    protected function getBadgeFilter(object $facts): Rule
+    {
+        $filter = Filter::all();
+
+        if ($this->cube instanceof IcingaDbCube && $this->cube->hasBaseFilter()) {
+            $filter->add($this->cube->getBaseFilter());
+        }
+
+        foreach ($this->cube->listDimensions() as $dimensionName => $_) {
+            $filter->add(Filter::equal($dimensionName, $facts->$dimensionName));
+        }
+
+        return $filter;
+    }
+
+    /**
+     * Get the main badge and remove it from the parts
+     *
+     * @param stdClass $parts An object of state class => count pairs
+     *
+     * @return stdClass The main badge as an object with a single property
+     */
+    protected function getMainBadge(stdClass $parts): stdClass
+    {
+        $mainKey = array_key_first((array) $parts);
+        $mainBadge = new stdClass();
+        $mainBadge->$mainKey = $parts->$mainKey;
+        $parts->$mainKey = null;
+
+        return $mainBadge;
+    }
+
     /**
      * Well... just to be on the safe side
      */
