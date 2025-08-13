@@ -113,17 +113,6 @@ class HostStatusCubeRenderer extends CubeRenderer
         return $main . $sub;
     }
 
-    protected function makeBadgeHtml($class, $count)
-    {
-        $indent = str_repeat('    ', 3);
-        return sprintf(
-            '%s<span class="%s">%s</span>',
-            $indent,
-            $class,
-            $count
-        ) . "\n";
-    }
-
     protected function getDetailsBaseUrl()
     {
         return 'cube/hosts/details';

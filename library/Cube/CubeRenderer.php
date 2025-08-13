@@ -503,6 +503,24 @@ abstract class CubeRenderer
     }
 
     /**
+     * Make a badge HTML snippet
+     *
+     * @param string $class The class to use for the badge
+     * @param int $count The count to display in the badge
+     *
+     * @return string
+     */
+    protected function makeBadgeHtml(string $class, int $count): string
+    {
+        $indent = str_repeat('    ', 3);
+        return sprintf(
+                '%s<span class="%s">%s</span>',
+                $indent,
+                $class,
+                $count
+            ) . "\n";
+    }
+    /**
      * Well... just to be on the safe side
      */
     public function __destruct()

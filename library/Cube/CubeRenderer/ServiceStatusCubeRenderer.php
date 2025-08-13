@@ -118,18 +118,6 @@ class ServiceStatusCubeRenderer extends CubeRenderer
         return array_merge($classes, $severityClass);
     }
 
-    protected function makeBadgeHtml($class, $count)
-    {
-        $indent = str_repeat('    ', 3);
-
-        return sprintf(
-            '%s<span class="%s">%s</span>',
-            $indent,
-            $class,
-            $count
-        ) . "\n";
-    }
-
     protected function getDetailsBaseUrl()
     {
         return 'cube/services/details';
