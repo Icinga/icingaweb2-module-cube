@@ -9,6 +9,8 @@ $this->provideHook('cube/IcingaDbActions', 'Cube/IcingaDbActions');
 
 $this->provideHook('icingadb/icingadbSupport');
 
+$this->provideCssFile('state-badges.less');
+
 if (! Cube::isUsingIcingaDb()) {
     $this->addRoute('cube/hosts', new Zend_Controller_Router_Route_Static(
         'cube/hosts',
