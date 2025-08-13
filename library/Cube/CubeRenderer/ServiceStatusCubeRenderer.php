@@ -11,7 +11,6 @@ class ServiceStatusCubeRenderer extends CubeRenderer
 {
     public function renderFacts($facts)
     {
-        $indent = str_repeat('    ', 3);
         $parts = [];
 
         if ($facts->services_unhandled_critical > 0) {
@@ -46,29 +45,7 @@ class ServiceStatusCubeRenderer extends CubeRenderer
                 $facts->services_unknown;
         }
 
-        $main = '';
-        $sub = '';
-        foreach ($parts as $class => $count) {
-            if ($count === 0) {
-                continue;
-            }
-
-            if ($main === '') {
-                $main = $this->makeBadgeHtml($class, $count);
-            } else {
-                $sub .= $this->makeBadgeHtml($class, $count);
-            }
-        }
-        if ($sub !== '') {
-            $sub = $indent
-                . '<span class="others">'
-                . "\n    "
-                . $sub
-                . $indent
-                . "</span>\n";
-        }
-
-        return $main . $sub;
+        return $this->renderIdoCubeBadges($parts);
     }
 
     /**

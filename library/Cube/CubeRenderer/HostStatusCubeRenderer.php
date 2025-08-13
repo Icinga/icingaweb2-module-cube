@@ -52,7 +52,6 @@ class HostStatusCubeRenderer extends CubeRenderer
 
     public function renderFacts($facts)
     {
-        $indent = str_repeat('    ', 3);
         $parts = array();
 
         if ($facts->hosts_unhandled_down > 0) {
@@ -88,29 +87,7 @@ class HostStatusCubeRenderer extends CubeRenderer
             $parts['ok'] = $ok;
         }
 
-        $main = '';
-        $sub = '';
-        foreach ($parts as $class => $count) {
-            if ($count === 0) {
-                continue;
-            }
-
-            if ($main === '') {
-                $main = $this->makeBadgeHtml($class, $count);
-            } else {
-                $sub .= $this->makeBadgeHtml($class, $count);
-            }
-        }
-        if ($sub !== '') {
-            $sub = $indent
-                . '<span class="others">'
-                . "\n    "
-                . $sub
-                . $indent
-                . "</span>\n";
-        }
-
-        return $main . $sub;
+        return $this->renderIdoCubeBadges($parts);
     }
 
     protected function getDetailsBaseUrl()
