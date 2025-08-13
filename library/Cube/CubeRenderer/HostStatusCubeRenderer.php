@@ -13,48 +13,7 @@ use stdClass;
 
 class HostStatusCubeRenderer extends CubeRenderer
 {
-    protected function renderDimensionLabel($name, $row)
-    {
-        $htm = parent::renderDimensionLabel($name, $row);
-
-        if (($next = $this->cube->getDimensionAfter($name)) && isset($this->summaries->{$next->getName()})) {
-            $htm .= ' <span class="sum">(' . $this->summaries->{$next->getName()}->hosts_cnt . ')</span>';
-        }
-
-        return $htm;
-    }
-
-    protected function getDimensionClasses($name, $row)
-    {
-        $classes = parent::getDimensionClasses($name, $row);
-        $sums = $row;
-
-        $next = $this->cube->getDimensionAfter($name);
-        if ($next && isset($this->summaries->{$next->getName()})) {
-            $sums = $this->summaries->{$next->getName()};
-        }
-
-        $severityClass = [];
-        if ($sums->hosts_unhandled_down > 0) {
-            $severityClass[] = 'critical';
-        } elseif (isset($sums->hosts_unhandled_unreachable) && $sums->hosts_unhandled_unreachable > 0) {
-            $severityClass[] = 'unreachable';
-        }
-
-        if (empty($severityClass)) {
-            if ($sums->hosts_down > 0) {
-                $severityClass = ['critical', 'handled'];
-            } elseif (isset($sums->hosts_unreachable) && $sums->hosts_unreachable > 0) {
-                $severityClass = ['unreachable', 'handled'];
-            } else {
-                $severityClass[] = 'ok';
-            }
-        }
-
-        return array_merge($classes, $severityClass);
-    }
-
-    public function renderFacts($facts)
+    public function renderFacts(object $facts): string
     {
         $parts = [];
         $partsObj = new stdClass();
@@ -108,6 +67,47 @@ class HostStatusCubeRenderer extends CubeRenderer
         return $this->renderIdoCubeBadges($parts);
     }
 
+    protected function renderDimensionLabel(string $name, object $row): string
+    {
+        $htm = parent::renderDimensionLabel($name, $row);
+
+        if (($next = $this->cube->getDimensionAfter($name)) && isset($this->summaries->{$next->getName()})) {
+            $htm .= ' <span class="sum">(' . $this->summaries->{$next->getName()}->hosts_cnt . ')</span>';
+        }
+
+        return $htm;
+    }
+
+    protected function getDimensionClasses(string $name, object $row): array
+    {
+        $classes = parent::getDimensionClasses($name, $row);
+        $sums = $row;
+
+        $next = $this->cube->getDimensionAfter($name);
+        if ($next && isset($this->summaries->{$next->getName()})) {
+            $sums = $this->summaries->{$next->getName()};
+        }
+
+        $severityClass = [];
+        if ($sums->hosts_unhandled_down > 0) {
+            $severityClass[] = 'critical';
+        } elseif (isset($sums->hosts_unhandled_unreachable) && $sums->hosts_unhandled_unreachable > 0) {
+            $severityClass[] = 'unreachable';
+        }
+
+        if (empty($severityClass)) {
+            if ($sums->hosts_down > 0) {
+                $severityClass = ['critical', 'handled'];
+            } elseif (isset($sums->hosts_unreachable) && $sums->hosts_unreachable > 0) {
+                $severityClass = ['unreachable', 'handled'];
+            } else {
+                $severityClass[] = 'ok';
+            }
+        }
+
+        return array_merge($classes, $severityClass);
+    }
+
     /**
      * If the cube is using Icinga DB, the URL leads to the Icinga DB host list.
      * If not, the URL leads to the details action of the IdoHostsController.
@@ -128,7 +128,7 @@ class HostStatusCubeRenderer extends CubeRenderer
         yield from ['hosts_unhandled_down', 'hosts_down'];
     }
 
-    protected function renderIcingaDbCubeBadges(stdClass $parts, object $facts): string
+    protected function renderIcingaDbCubeBadges(object $parts, object $facts): string
     {
         $filter = $this->getBadgeFilter($facts);
         $mainBadge = $this->getMainBadge($parts);

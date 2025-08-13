@@ -7,6 +7,7 @@ namespace Icinga\Module\Cube;
 use Generator;
 use Icinga\Data\Tree\TreeNode;
 use Icinga\Module\Cube\IcingaDb\IcingaDbCube;
+use Icinga\Web\Url as IcingaUrl;
 use Icinga\Web\View;
 use ipl\Stdlib\Filter;
 use ipl\Stdlib\Filter\Rule;
@@ -25,41 +26,39 @@ use stdClass;
  */
 abstract class CubeRenderer
 {
-    /** @var View */
-    protected $view;
+    protected View $view;
 
-    /** @var Cube */
-    protected $cube;
+    protected Cube $cube;
 
     /** @var array Our dimensions */
-    protected $dimensions;
+    protected array $dimensions;
 
     /** @var array Our dimensions in regular order */
-    protected $dimensionOrder;
+    protected array $dimensionOrder;
 
     /** @var array Our dimensions in reversed order as a quick lookup source */
-    protected $reversedDimensions;
+    protected array $reversedDimensions;
 
     /** @var array Level (deepness) for each dimension (0, 1, 2...) */
-    protected $dimensionLevels;
+    protected array $dimensionLevels;
 
-    protected $facts;
+    protected object|array $facts;
 
     /** @var object The row before the current one */
-    protected $lastRow;
+    protected object $lastRow;
 
     /**
      * Current summaries
      *
      * This is an object of objects, with dimension names being the keys and
      * a facts row containing current (rollup) summaries for that dimension
-     * being it's value
+     * being its value
      *
      * @var object
      */
-    protected $summaries;
+    protected object $summaries;
 
-    protected $started;
+    protected bool $started;
 
     /**
      * CubeRenderer constructor.
@@ -72,22 +71,23 @@ abstract class CubeRenderer
     }
 
     /**
-     * Render the given facts
+     * Render the given facts.
      *
-     * @param $facts
-     * @return string
-     */
-    abstract public function renderFacts($facts);
-
-    /**
-     * Returns the base url for the details action
+     * @param object $facts
      *
      * @return string
      */
-    abstract protected function getDetailsBaseUrl();
+    abstract public function renderFacts(object $facts): string;
 
     /**
-     * Get the severity sort columns
+     * Returns the base url for the details action.
+     *
+     * @return string
+     */
+    abstract protected function getDetailsBaseUrl(): string;
+
+    /**
+     * Get the severity sort columns.
      *
      * @return Generator
      */
@@ -96,17 +96,17 @@ abstract class CubeRenderer
     /**
      * Render the badges for the Icinga DB cube.
      *
-     * @param stdClass $parts An object of state class => count pairs
-     * @param object   $facts The facts object containing information about the current cube
+     * @param object $parts An object of state class => count pairs
+     * @param object $facts The facts object containing information about the current cube
      *
      * @return string
      */
-    abstract protected function renderIcingaDbCubeBadges(stdClass $parts, object $facts): string;
+    abstract protected function renderIcingaDbCubeBadges(object $parts, object $facts): string;
 
     /**
-     * Initialize all we need
+     * Initialize all.
      */
-    protected function initialize()
+    protected function initialize(): void
     {
         $this->started = false;
         $this->initializeDimensions()
@@ -116,9 +116,11 @@ abstract class CubeRenderer
     }
 
     /**
+     * Initialize the last row object.
+     *
      * @return $this
      */
-    protected function initializeLastRow()
+    protected function initializeLastRow(): static
     {
         $object = (object) array();
         foreach ($this->dimensions as $dimension) {
@@ -131,9 +133,11 @@ abstract class CubeRenderer
     }
 
     /**
+     * Initialize the dimensions order and reversed order and the levels.
+     *
      * @return $this
      */
-    protected function initializeDimensions()
+    protected function initializeDimensions(): static
     {
         $this->dimensions = $this->cube->listDimensions();
 
@@ -152,32 +156,43 @@ abstract class CubeRenderer
 
         $this->reversedDimensions = array_reverse($this->dimensionOrder);
         $this->dimensionLevels = array_flip($this->dimensionOrder);
+
         return $this;
     }
 
     /**
+     * Initialize the cube facts.
+     *
      * @return $this
      */
-    protected function initializeFacts()
+    protected function initializeFacts(): static
     {
         $this->facts = $this->cube->listFacts();
+
         return $this;
     }
 
     /**
+     * Initialize the summaries object.
+     *
      * @return $this
      */
-    protected function initializeSummaries()
+    protected function initializeSummaries(): static
     {
         $this->summaries = (object) array();
+
         return $this;
     }
 
     /**
+     * Get whether the given row starts a new dimension.
+     * If so store the values as summary for the new dimension.
+     *
      * @param object $row
+     *
      * @return bool
      */
-    protected function startsDimension($row)
+    protected function startsDimension(object $row): bool
     {
         foreach ($this->dimensionOrder as $name) {
             if ($row->$name === null) {
@@ -190,10 +205,13 @@ abstract class CubeRenderer
     }
 
     /**
-     * @param $row
+     * Extract the facts from a row object.
+     *
+     * @param object $row
+     *
      * @return object
      */
-    protected function extractFacts($row)
+    protected function extractFacts(object $row): object
     {
         $res = (object) array();
 
@@ -204,7 +222,7 @@ abstract class CubeRenderer
         return $res;
     }
 
-    public function render(View $view)
+    public function render(View $view): string
     {
         $this->view = $view;
         $this->initialize();
@@ -229,9 +247,9 @@ abstract class CubeRenderer
 
 
     /**
-     * Sort the results by severity
+     * Sort the results by severity.
      *
-     * @param $results array The fetched results
+     * @param $results       array The fetched results
      * @param $isSortDirDesc bool Whether the sort direction is descending
      *
      * @return Generator
@@ -307,10 +325,17 @@ abstract class CubeRenderer
         return $nodes($tree[1]);
     }
 
-    protected function renderRow($row)
+    /**
+     * Render a single row
+     *
+     * @param object $row
+     *
+     * @return string
+     */
+    protected function renderRow(object $row): string
     {
         $htm = '';
-        if ($dimension = $this->startsDimension($row)) {
+        if ($this->startsDimension($row)) {
             return $htm;
         }
 
@@ -318,10 +343,18 @@ abstract class CubeRenderer
         $htm .= $this->beginDimensionsForRow($row);
         $htm .= $this->renderFacts($row);
         $this->lastRow = $row;
+
         return $htm;
     }
 
-    protected function beginDimensionsForRow($row)
+    /**
+     * Begin the dimensions for a given row
+     *
+     * @param object $row
+     *
+     * @return string
+     */
+    protected function beginDimensionsForRow(object $row): string
     {
         $last = $this->lastRow;
         foreach ($this->dimensionOrder as $name) {
@@ -333,7 +366,15 @@ abstract class CubeRenderer
         return '';
     }
 
-    protected function beginDimensionsUpFrom($dimension, $row)
+    /**
+     * Begin the dimensions up from a given dimension
+     *
+     * @param string $dimension The dimension to begin from
+     * @param object $row       The current row
+     *
+     * @return string
+     */
+    protected function beginDimensionsUpFrom(string $dimension, object $row): string
     {
         $htm = '';
         $found = false;
@@ -351,7 +392,14 @@ abstract class CubeRenderer
         return $htm;
     }
 
-    protected function closeDimensionsForRow($row)
+    /**
+     * Close the dimensions for a given row
+     *
+     * @param object $row
+     *
+     * @return string
+     */
+    protected function closeDimensionsForRow(object $row): string
     {
         $last = $this->lastRow;
         foreach ($this->dimensionOrder as $name) {
@@ -363,7 +411,14 @@ abstract class CubeRenderer
         return '';
     }
 
-    protected function closeDimensionsDownTo($name)
+    /**
+     * Close the dimensions down to a given dimension
+     *
+     * @param string $name The dimension to close down to
+     *
+     * @return string
+     */
+    protected function closeDimensionsDownTo(string $name): string
     {
         $htm = '';
 
@@ -378,7 +433,12 @@ abstract class CubeRenderer
         return $htm;
     }
 
-    protected function closeDimensions()
+    /**
+     * Close all dimensions
+     *
+     * @return string
+     */
+    protected function closeDimensions(): string
     {
         $htm = '';
         foreach ($this->reversedDimensions as $name) {
@@ -388,7 +448,14 @@ abstract class CubeRenderer
         return $htm;
     }
 
-    protected function closeDimension($name)
+    /**
+     * Close a dimension
+     *
+     * @param string $name The name of the dimension to close
+     *
+     * @return string
+     */
+    protected function closeDimension(string $name): string
     {
         if (! $this->started) {
             return '';
@@ -398,12 +465,27 @@ abstract class CubeRenderer
         return $indent . '  </div>' . "\n" . $indent . "</div><!-- $name -->\n";
     }
 
-    protected function getIndent($name)
+    /**
+     * Get the indent for a given dimension name
+     *
+     * @param string $name The name of the dimension
+     *
+     * @return string
+     */
+    protected function getIndent(string $name): string
     {
         return str_repeat('    ', $this->getLevel($name));
     }
 
-    protected function beginDimension($name, $row)
+    /**
+     * Begin a dimension
+     *
+     * @param string $name The name of the dimension to begin
+     * @param object $row  The current row
+     *
+     * @return string
+     */
+    protected function beginDimension(string $name, object $row): string
     {
         $indent = $this->getIndent($name);
         if (! $this->started) {
@@ -432,11 +514,12 @@ abstract class CubeRenderer
      *
      * To have some context available, also
      *
-     * @param $name
-     * @param $row
+     * @param string $name
+     * @param object $row
+     *
      * @return string
      */
-    protected function renderDimensionLabel($name, $row)
+    protected function renderDimensionLabel(string $name, object $row): string
     {
         $caption = $row->$name;
         if (empty($caption)) {
@@ -476,53 +559,92 @@ abstract class CubeRenderer
         return $url;
     }
 
-    protected function getSliceUrl($name, $row)
+    /**
+     * Get the URL for a slice.
+     *
+     * This is used to create a link to slice the cube by a given dimension.
+     *
+     * @param string $name The name of the dimension
+     * @param object $row  The current row
+     *
+     * @return Url
+     */
+    protected function getSliceUrl(string $name, object $row): IcingaUrl
     {
         return $this->view->url()
             ->setParam($this->cube::SLICE_PREFIX . $name, $row->$name);
     }
 
-    protected function isOuterDimension($name)
-    {
-        return $this->reversedDimensions[0] !== $name;
-    }
-
-    protected function getDimensionClassString($name, $row)
+    /**
+     * Get the class string for a given dimension name and row.
+     *
+     * This is used to create the class attribute for the dimension container.
+     *
+     * @param string $name The name of the dimension
+     * @param object $row  The current row
+     *
+     * @return string
+     */
+    protected function getDimensionClassString(string $name, object $row): string
     {
         return implode(' ', $this->getDimensionClasses($name, $row));
     }
 
-    protected function getDimensionClasses($name, $row)
+    /**
+     * Get the classes for a given dimension name and row.
+     *
+     * This is used to create the class attribute for the dimension container.
+     *
+     * @param string $name The name of the dimension
+     * @param object $row  The current row
+     *
+     * @return array
+     */
+    protected function getDimensionClasses(string $name, object $row): array
     {
-        return array('cube-dimension' . $this->getLevel($name));
+        return ['cube-dimension' . $this->getLevel($name)];
     }
 
-    protected function getLevel($name)
+    /**
+     * Get the level (deepness) of a given dimension name.
+     *
+     * This is used to determine the indentation level for the dimension
+     * container.
+     *
+     * @param string $name The name of the dimension
+     *
+     * @return int
+     */
+    protected function getLevel(string $name): int
     {
         return $this->dimensionLevels[$name];
     }
 
     /**
+     * Begin the container for the cube
+     *
      * @return string
      */
-    protected function beginContainer()
+    protected function beginContainer(): string
     {
         return '<div class="cube">' . "\n";
     }
 
     /**
+     * End the container for the cube
+     *
      * @return string
      */
-    protected function endContainer()
+    protected function endContainer(): string
     {
         return '</div>' . "\n";
     }
 
     /**
-     * Make a badge HTML snippet
+     * Make a badge HTML snippet.
      *
      * @param string $class The class to use for the badge
-     * @param int $count The count to display in the badge
+     * @param int    $count The count to display in the badge
      *
      * @return string
      */
@@ -538,7 +660,7 @@ abstract class CubeRenderer
     }
 
     /**
-     * Render the badges for the IDO cube as HTML snippet
+     * Render the badges for the IDO cube as HTML snippet.
      *
      * @param array $parts An array of state class => count pairs
      *
@@ -573,7 +695,7 @@ abstract class CubeRenderer
     }
 
     /**
-     * Get the filter for the badges
+     * Get the filter for the badges.
      *
      * @param object $facts The facts object containing information about the current cube
      *
@@ -595,7 +717,7 @@ abstract class CubeRenderer
     }
 
     /**
-     * Get the main badge and remove it from the parts
+     * Get the main badge and remove it from the parts.
      *
      * @param stdClass $parts An object of state class => count pairs
      *
@@ -612,7 +734,7 @@ abstract class CubeRenderer
     }
 
     /**
-     * Well... just to be on the safe side
+     * Well... just to be on the safe side.
      */
     public function __destruct()
     {
