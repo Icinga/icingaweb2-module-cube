@@ -108,8 +108,18 @@ class HostStatusCubeRenderer extends CubeRenderer
         return $this->renderIdoCubeBadges($parts);
     }
 
-    protected function getDetailsBaseUrl()
+    /**
+     * If the cube is using Icinga DB, the URL leads to the Icinga DB host list.
+     * If not, the URL leads to the details action of the IdoHostsController.
+     *
+     * @return string
+     */
+    protected function getDetailsBaseUrl(): string
     {
+        if ($this->cube::isUsingIcingaDb()) {
+            return 'icingadb/hosts';
+        }
+
         return 'cube/hosts/details';
     }
 

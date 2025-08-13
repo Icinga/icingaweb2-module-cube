@@ -120,8 +120,18 @@ class ServiceStatusCubeRenderer extends CubeRenderer
         return array_merge($classes, $severityClass);
     }
 
-    protected function getDetailsBaseUrl()
+    /**
+     * If the cube is using Icinga DB, the URL leads to the Icinga DB service list.
+     * If not, the URL leads to the details action of the IdoServicesController.
+     *
+     * @return string
+     */
+    protected function getDetailsBaseUrl(): string
     {
+        if ($this->cube::isUsingIcingaDb()) {
+            return 'icingadb/services';
+        }
+
         return 'cube/services/details';
     }
 
