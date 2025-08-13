@@ -520,6 +520,41 @@ abstract class CubeRenderer
                 $count
             ) . "\n";
     }
+
+    /**
+     * Render the badges for the IDO cube as HTML snippet
+     *
+     * @param array $parts An array of state class => count pairs
+     *
+     * @return string
+     */
+    protected function renderIdoCubeBadges(array $parts): string
+    {
+        $indent = str_repeat('    ', 3);
+        $main = '';
+        $sub = '';
+        foreach ($parts as $class => $count) {
+            if ($count === 0) {
+                continue;
+            }
+
+            if ($main === '') {
+                $main = $this->makeBadgeHtml($class, $count);
+            } else {
+                $sub .= $this->makeBadgeHtml($class, $count);
+            }
+        }
+        if ($sub !== '') {
+            $sub = $indent
+                . '<span class="others">'
+                . "\n    "
+                . $sub
+                . $indent
+                . "</span>\n";
+        }
+
+        return $main . $sub;
+    }
     /**
      * Well... just to be on the safe side
      */
