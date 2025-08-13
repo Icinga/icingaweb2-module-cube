@@ -446,8 +446,9 @@ abstract class CubeRenderer
         return $this->view->escape($caption);
     }
 
-    protected function getDetailsUrl($name, $row)
+    protected function getDetailsUrl(string $name, object $row): Url
     {
+        $prefix = '';
         $url = Url::fromPath($this->getDetailsBaseUrl());
 
         if ($this->cube instanceof IcingaDbCube && $this->cube->hasBaseFilter()) {
@@ -458,15 +459,18 @@ abstract class CubeRenderer
 
         $urlParams = $url->getParams();
 
-        $dimensions = array_merge(array_keys($this->cube->listDimensions()), $this->cube->listSlices());
-        $urlParams->add('dimensions', DimensionParams::update($dimensions)->getParams());
+        if (! $this->cube::isUsingIcingaDb()) {
+            $dimensions = array_merge(array_keys($this->cube->listDimensions()), $this->cube->listSlices());
+            $urlParams->add('dimensions', DimensionParams::update($dimensions)->getParams());
+            $prefix = $this->cube::SLICE_PREFIX;
+        }
 
         foreach ($this->cube->listDimensionsUpTo($name) as $dimensionName) {
-            $urlParams->add($this->cube::SLICE_PREFIX . $dimensionName, $row->$dimensionName);
+            $urlParams->add($prefix . $dimensionName, $row->$dimensionName);
         }
 
         foreach ($this->cube->getSlices() as $key => $val) {
-            $urlParams->add($this->cube::SLICE_PREFIX . $key, $val);
+            $urlParams->add($prefix . $key, $val);
         }
 
         return $url;
