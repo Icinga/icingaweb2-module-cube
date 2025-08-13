@@ -213,6 +213,28 @@ div.cube {
     }
   }
 
+  .state-badge {
+    font-size: 2em;
+
+    &.handled {
+      &.state-down {
+        background-color: @color-down-handled;
+      }
+
+      &.state-critical {
+        background-color: @color-critical-handled;
+      }
+
+      &.state-warning {
+        background-color: @color-warning-handled;
+      }
+
+      &.state-unknown {
+        background-color: @color-unknown-handled;
+      }
+    }
+  }
+
   .others {
     display: flex;
     justify-content: center;
@@ -220,7 +242,9 @@ div.cube {
     span {
       margin-top: 0.8em;
       font-size: 1em;
-      margin-left: 0.2em;
+      & :not(.state-badge) {
+        margin-left: 0.2em;
+      }
     }
   }
 }
