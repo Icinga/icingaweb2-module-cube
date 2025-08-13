@@ -13,7 +13,7 @@ use stdClass;
 
 class ServiceStatusCubeRenderer extends CubeRenderer
 {
-    public function renderFacts($facts)
+    public function renderFacts(object $facts): string
     {
         $parts = [];
         $partsObj = new stdClass();
@@ -76,7 +76,7 @@ class ServiceStatusCubeRenderer extends CubeRenderer
     /**
      * @inheritdoc
      */
-    protected function renderDimensionLabel($name, $row)
+    protected function renderDimensionLabel(string $name, object $row): string
     {
         $htm = parent::renderDimensionLabel($name, $row);
 
@@ -87,7 +87,7 @@ class ServiceStatusCubeRenderer extends CubeRenderer
         return $htm;
     }
 
-    protected function getDimensionClasses($name, $row)
+    protected function getDimensionClasses(string $name, object $row): array
     {
         $classes = parent::getDimensionClasses($name, $row);
         $sums = $row;
@@ -147,7 +147,7 @@ class ServiceStatusCubeRenderer extends CubeRenderer
         }
     }
 
-    protected function renderIcingaDbCubeBadges(stdClass $parts, object $facts): string
+    protected function renderIcingaDbCubeBadges(object $parts, object $facts): string
     {
         $filter = $this->getBadgeFilter($facts);
         $mainBadge = $this->getMainBadge($parts);
