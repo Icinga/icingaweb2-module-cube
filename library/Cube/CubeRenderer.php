@@ -7,11 +7,14 @@ namespace Icinga\Module\Cube;
 use Generator;
 use Icinga\Data\Tree\TreeNode;
 use Icinga\Module\Cube\IcingaDb\IcingaDbCube;
-use Icinga\Web\Url as IcingaUrl;
+use Icinga\Module\Cube\Web\Widget\DimensionWidget;
 use Icinga\Web\View;
+use ipl\Html\Attributes;
+use ipl\Html\HtmlDocument;
+use ipl\Html\HtmlElement;
+use ipl\Html\Text;
 use ipl\Stdlib\Filter;
 use ipl\Stdlib\Filter\Rule;
-use ipl\Web\Url;
 use stdClass;
 
 /**
@@ -58,8 +61,6 @@ abstract class CubeRenderer
      */
     protected object $summaries;
 
-    protected bool $started;
-
     /**
      * CubeRenderer constructor.
      *
@@ -75,16 +76,9 @@ abstract class CubeRenderer
      *
      * @param object $facts
      *
-     * @return string
+     * @return HtmlDocument
      */
-    abstract public function renderFacts(object $facts): string;
-
-    /**
-     * Returns the base url for the details action.
-     *
-     * @return string
-     */
-    abstract protected function getDetailsBaseUrl(): string;
+    abstract public function createFacts(object $facts): HtmlDocument;
 
     /**
      * Get the severity sort columns.
@@ -99,16 +93,25 @@ abstract class CubeRenderer
      * @param object $parts An object of state class => count pairs
      * @param object $facts The facts object containing information about the current cube
      *
-     * @return string
+     * @return HtmlDocument
      */
-    abstract protected function renderIcingaDbCubeBadges(object $parts, object $facts): string;
+    abstract protected function createIcingaDbCubeBadges(object $parts, object $facts): HtmlDocument;
+
+    /**
+     * Create a dimension widget for the given dimension cache.
+     *
+     * @param array $dimensionCache
+     * @param View  $view
+     *
+     * @return DimensionWidget
+     */
+    abstract protected function createDimensionWidget(array $dimensionCache, View $view): DimensionWidget;
 
     /**
      * Initialize all.
      */
     protected function initialize(): void
     {
-        $this->started = false;
         $this->initializeDimensions()
             ->initializeFacts()
             ->initializeLastRow()
@@ -226,7 +229,33 @@ abstract class CubeRenderer
     {
         $this->view = $view;
         $this->initialize();
-        $htm = $this->beginContainer();
+        $lastRow = $this->lastRow;
+        $cubeContainer = new HtmlElement('div', new Attributes(['class' => 'cube']));
+
+        /**
+         * Cache dimension names, rows and summaries to add to the next lower dimension.
+         *
+         * - 'body'      => The body of the dimension container as a HtmlElement
+         * - 'name'      => The name of the dimension
+         * - 'row'       => The row object for the dimension
+         * - 'summaries' => The summaries object for the dimension
+         */
+        $dimensionCache = [];
+
+        // Initialize the previous level to -1, so that the first dimension level is never smaller.
+        $lastLevel = -1;
+
+        // Store the lowest dimension level to determine which dimension containers should
+        // be added directly to the cube container.
+        $lowestLevel = array_key_first($this->dimensionOrder);
+
+        // If dimension 2 is the only dimension, we use a container for flexbox layout.
+        if ($lowestLevel === 2) {
+            $dimension2Container = new HtmlElement(
+                'div',
+                new Attributes(['class' => 'dimension-2-container'])
+            );
+        }
 
         $results = $this->cube->fetchAll();
 
@@ -238,11 +267,134 @@ abstract class CubeRenderer
             }
         }
 
+        $isStartingRow = false;
+
         foreach ($results as $row) {
-            $htm .= $this->renderRow($row);
+            // The first row of each dimension contains the dimension summaries, so we skip it.
+            if ($this->startsDimension($row)) {
+                $isStartingRow = true;
+                continue;
+            }
+            foreach ($this->dimensionOrder as $level => $dimensionName) {
+                if (
+                    (! $isStartingRow || $level === array_key_first($this->dimensionOrder))
+                    && $lastRow->$dimensionName === $row->$dimensionName
+                ) {
+                    continue;
+                }
+
+                // If the current dimension level is lower than the previous one, add the previous dimension level
+                // container to the current dimension level container or to the cube container if the current level
+                // is the lowest level.
+                if ($level < $lastLevel) {
+                    if ($level === 0) {
+                        // Add last dimension 1 container to dimension 0 container body.
+                        $dimensionCache[0]['body']->addHtml(
+                            $this->createDimensionWidget($dimensionCache[1], $view)
+                        );
+
+                        // Add dimension 0 container to cube
+                        $cubeContainer->addHtml(
+                            $this->createDimensionWidget($dimensionCache[0], $view)
+                        );
+                    } elseif ($level === 1) {
+                        if ($lowestLevel === 0) {
+                            // Add dimension 1 container to dimension 0 container body.
+                            $dimensionCache[0]['body']->addHtml(
+                                $this->createDimensionWidget($dimensionCache[1], $view)
+                            );
+                        } else {
+                            // Add dimension 1 container directly to cube if dimension 1 is the lowest level.
+                            $cubeContainer->addHtml(
+                                $this->createDimensionWidget($dimensionCache[1], $view)
+                            );
+                        }
+                    }
+                }
+
+                if ($level < 2) {
+                    // Initialize the dimension body cache for the current level.
+                    $dimensionCache[$level]['body'] = new HtmlDocument();
+
+                    // Store the dimension name, row, and summaries for the current level.
+                    $dimensionCache[$level]['name'] = $dimensionName;
+                    $dimensionCache[$level]['row'] = clone $row;
+                    $dimensionCache[$level]['summaries'] = clone $this->summaries;
+                } elseif ($level === 2) {
+                    if ($lowestLevel < 2) {
+                        // Add dimension 2 rect to dimension 1 container body.
+                        $dimensionCache[1]['body']->addHtml(
+                            $this->createDimensionWidget(
+                                [
+                                    'body'      => $this->createFacts($row),
+                                    'name'      => $dimensionName,
+                                    'row'       => $row,
+                                    'summaries' => $this->summaries
+                                ],
+                                $view
+                            )
+                        );
+                    } else {
+                        // Initialize the dimension 2 container if it does not exist yet.
+                        if (! isset($dimensionCache[2]['body'])) {
+                            $dimensionCache[2]['body'] = new HtmlDocument();
+                        }
+
+                        // Add dimension 2 rect to dimension 2 container.
+                        $dimension2Container->addHtml(
+                            $this->createDimensionWidget(
+                                [
+                                    'body'      => $this->createFacts($row),
+                                    'name'      => $dimensionName,
+                                    'row'       => $row,
+                                    'summaries' => $this->summaries
+                                ],
+                                $view
+                            )
+                        );
+                    }
+                }
+
+                // Store the current dimension level as last level to compare with the next row.
+                $lastLevel = $level;
+            }
+
+            $isStartingRow = false;
+
+            // Store the current row as the last row to compare with the next row.
+            $lastRow = $row;
         }
 
-        return $htm . $this->closeDimensions() . $this->endContainer();
+        switch ($lowestLevel) {
+            case 0:
+                if (isset($dimensionCache[0]['body'])) {
+                    // Add last dimension 1 container to dimension 0 container body.
+                    $dimensionCache[0]['body']->addHtml(
+                        $this->createDimensionWidget($dimensionCache[1], $view)
+                    );
+                    // Add dimension 0 container to cube.
+                    $cubeContainer->addHtml(
+                        $this->createDimensionWidget($dimensionCache[0], $view)
+                    );
+                }
+                break;
+            case 1:
+                if (isset($dimensionCache[1]['body'])) {
+                    // Add dimension 1 container directly to cube if no dimension 1 is the lowest level.
+                    $cubeContainer->addHtml(
+                        $this->createDimensionWidget($dimensionCache[1], $view)
+                    );
+                }
+                break;
+            case 2:
+                if (isset($dimensionCache[2]['body'])) {
+                    // Add dimension 2 container directly to cube if dimension 2 is the lowest level.
+                    $cubeContainer->addHtml($dimension2Container);
+                }
+                break;
+        }
+
+        return $cubeContainer->render();
     }
 
 
@@ -326,286 +478,6 @@ abstract class CubeRenderer
     }
 
     /**
-     * Render a single row
-     *
-     * @param object $row
-     *
-     * @return string
-     */
-    protected function renderRow(object $row): string
-    {
-        $htm = '';
-        if ($this->startsDimension($row)) {
-            return $htm;
-        }
-
-        $htm .= $this->closeDimensionsForRow($row);
-        $htm .= $this->beginDimensionsForRow($row);
-        $htm .= $this->renderFacts($row);
-        $this->lastRow = $row;
-
-        return $htm;
-    }
-
-    /**
-     * Begin the dimensions for a given row
-     *
-     * @param object $row
-     *
-     * @return string
-     */
-    protected function beginDimensionsForRow(object $row): string
-    {
-        $last = $this->lastRow;
-        foreach ($this->dimensionOrder as $name) {
-            if ($last->$name !== $row->$name) {
-                return $this->beginDimensionsUpFrom($name, $row);
-            }
-        }
-
-        return '';
-    }
-
-    /**
-     * Begin the dimensions up from a given dimension
-     *
-     * @param string $dimension The dimension to begin from
-     * @param object $row       The current row
-     *
-     * @return string
-     */
-    protected function beginDimensionsUpFrom(string $dimension, object $row): string
-    {
-        $htm = '';
-        $found = false;
-
-        foreach ($this->dimensionOrder as $name) {
-            if ($name === $dimension) {
-                $found = true;
-            }
-
-            if ($found) {
-                $htm .= $this->beginDimension($name, $row);
-            }
-        }
-
-        return $htm;
-    }
-
-    /**
-     * Close the dimensions for a given row
-     *
-     * @param object $row
-     *
-     * @return string
-     */
-    protected function closeDimensionsForRow(object $row): string
-    {
-        $last = $this->lastRow;
-        foreach ($this->dimensionOrder as $name) {
-            if ($last->$name !== $row->$name) {
-                return $this->closeDimensionsDownTo($name);
-            }
-        }
-
-        return '';
-    }
-
-    /**
-     * Close the dimensions down to a given dimension
-     *
-     * @param string $name The dimension to close down to
-     *
-     * @return string
-     */
-    protected function closeDimensionsDownTo(string $name): string
-    {
-        $htm = '';
-
-        foreach ($this->reversedDimensions as $dimension) {
-            $htm .= $this->closeDimension($dimension);
-
-            if ($name === $dimension) {
-                break;
-            }
-        }
-
-        return $htm;
-    }
-
-    /**
-     * Close all dimensions
-     *
-     * @return string
-     */
-    protected function closeDimensions(): string
-    {
-        $htm = '';
-        foreach ($this->reversedDimensions as $name) {
-            $htm .= $this->closeDimension($name);
-        }
-
-        return $htm;
-    }
-
-    /**
-     * Close a dimension
-     *
-     * @param string $name The name of the dimension to close
-     *
-     * @return string
-     */
-    protected function closeDimension(string $name): string
-    {
-        if (! $this->started) {
-            return '';
-        }
-
-        $indent = $this->getIndent($name);
-        return $indent . '  </div>' . "\n" . $indent . "</div><!-- $name -->\n";
-    }
-
-    /**
-     * Get the indent for a given dimension name
-     *
-     * @param string $name The name of the dimension
-     *
-     * @return string
-     */
-    protected function getIndent(string $name): string
-    {
-        return str_repeat('    ', $this->getLevel($name));
-    }
-
-    /**
-     * Begin a dimension
-     *
-     * @param string $name The name of the dimension to begin
-     * @param object $row  The current row
-     *
-     * @return string
-     */
-    protected function beginDimension(string $name, object $row): string
-    {
-        $indent = $this->getIndent($name);
-        if (! $this->started) {
-            $this->started = true;
-        }
-        $view = $this->view;
-        $dimension = $this->cube->getDimension($name);
-
-        return
-            $indent . '<div class="'
-            . $this->getDimensionClassString($name, $row)
-            . '">' . "\n"
-            . $indent . '  <div class="header"><a href="'
-            . $this->getDetailsUrl($name, $row)
-            . '" title="' . $view->escape(sprintf('Show details for %s: %s', $dimension->getLabel(), $row->$name)) . '"'
-            . ' data-base-target="_next">'
-            . $this->renderDimensionLabel($name, $row)
-            . '</a><a class="icon-filter" href="'
-            . $this->getSliceUrl($name, $row)
-            . '" title="' . $view->escape('Slice this cube') . '"></a></div>' . "\n"
-            . $indent . '  <div class="body">' . "\n";
-    }
-
-    /**
-     * Render the label for a given dimension name
-     *
-     * To have some context available, also
-     *
-     * @param string $name
-     * @param object $row
-     *
-     * @return string
-     */
-    protected function renderDimensionLabel(string $name, object $row): string
-    {
-        $caption = $row->$name;
-        if (empty($caption)) {
-            $caption = '_';
-        }
-
-        return $this->view->escape($caption);
-    }
-
-    protected function getDetailsUrl(string $name, object $row): Url
-    {
-        $prefix = '';
-        $url = Url::fromPath($this->getDetailsBaseUrl());
-
-        if ($this->cube instanceof IcingaDbCube && $this->cube->hasBaseFilter()) {
-            /** @var Filter\Rule $baseFilter */
-            $baseFilter = $this->cube->getBaseFilter();
-            $url->setFilter($baseFilter);
-        }
-
-        $urlParams = $url->getParams();
-
-        if (! $this->cube::isUsingIcingaDb()) {
-            $dimensions = array_merge(array_keys($this->cube->listDimensions()), $this->cube->listSlices());
-            $urlParams->add('dimensions', DimensionParams::update($dimensions)->getParams());
-            $prefix = $this->cube::SLICE_PREFIX;
-        }
-
-        foreach ($this->cube->listDimensionsUpTo($name) as $dimensionName) {
-            $urlParams->add($prefix . $dimensionName, $row->$dimensionName);
-        }
-
-        foreach ($this->cube->getSlices() as $key => $val) {
-            $urlParams->add($prefix . $key, $val);
-        }
-
-        return $url;
-    }
-
-    /**
-     * Get the URL for a slice.
-     *
-     * This is used to create a link to slice the cube by a given dimension.
-     *
-     * @param string $name The name of the dimension
-     * @param object $row  The current row
-     *
-     * @return Url
-     */
-    protected function getSliceUrl(string $name, object $row): IcingaUrl
-    {
-        return $this->view->url()
-            ->setParam($this->cube::SLICE_PREFIX . $name, $row->$name);
-    }
-
-    /**
-     * Get the class string for a given dimension name and row.
-     *
-     * This is used to create the class attribute for the dimension container.
-     *
-     * @param string $name The name of the dimension
-     * @param object $row  The current row
-     *
-     * @return string
-     */
-    protected function getDimensionClassString(string $name, object $row): string
-    {
-        return implode(' ', $this->getDimensionClasses($name, $row));
-    }
-
-    /**
-     * Get the classes for a given dimension name and row.
-     *
-     * This is used to create the class attribute for the dimension container.
-     *
-     * @param string $name The name of the dimension
-     * @param object $row  The current row
-     *
-     * @return array
-     */
-    protected function getDimensionClasses(string $name, object $row): array
-    {
-        return ['cube-dimension' . $this->getLevel($name)];
-    }
-
-    /**
      * Get the level (deepness) of a given dimension name.
      *
      * This is used to determine the indentation level for the dimension
@@ -621,77 +493,34 @@ abstract class CubeRenderer
     }
 
     /**
-     * Begin the container for the cube
-     *
-     * @return string
-     */
-    protected function beginContainer(): string
-    {
-        return '<div class="cube">' . "\n";
-    }
-
-    /**
-     * End the container for the cube
-     *
-     * @return string
-     */
-    protected function endContainer(): string
-    {
-        return '</div>' . "\n";
-    }
-
-    /**
-     * Make a badge HTML snippet.
-     *
-     * @param string $class The class to use for the badge
-     * @param int    $count The count to display in the badge
-     *
-     * @return string
-     */
-    protected function makeBadgeHtml(string $class, int $count): string
-    {
-        $indent = str_repeat('    ', 3);
-        return sprintf(
-                '%s<span class="%s">%s</span>',
-                $indent,
-                $class,
-                $count
-            ) . "\n";
-    }
-
-    /**
-     * Render the badges for the IDO cube as HTML snippet.
+     * Create the badges for the IDO cube.
      *
      * @param array $parts An array of state class => count pairs
      *
-     * @return string
+     * @return HtmlDocument
      */
-    protected function renderIdoCubeBadges(array $parts): string
+    protected function createIdoCubeBadges(array $parts): HtmlDocument
     {
-        $indent = str_repeat('    ', 3);
-        $main = '';
-        $sub = '';
+        $badges = new HtmlDocument();
+        $others = new HtmlElement('span', new Attributes(['class' => 'others']));
+        $mainDone = false;
+
         foreach ($parts as $class => $count) {
             if ($count === 0) {
                 continue;
             }
 
-            if ($main === '') {
-                $main = $this->makeBadgeHtml($class, $count);
+            if (! $mainDone) {
+                $badges->addHtml(new HtmlElement('span', new Attributes(['class' => $class]), new Text($count)));
+                $mainDone = true;
             } else {
-                $sub .= $this->makeBadgeHtml($class, $count);
+                $others->addHtml(new HtmlElement('span', new Attributes(['class' => $class]), new Text($count)));
             }
         }
-        if ($sub !== '') {
-            $sub = $indent
-                . '<span class="others">'
-                . "\n    "
-                . $sub
-                . $indent
-                . "</span>\n";
-        }
 
-        return $main . $sub;
+        $badges->addHtml($others);
+
+        return $badges;
     }
 
     /**

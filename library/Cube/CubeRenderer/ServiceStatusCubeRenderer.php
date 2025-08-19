@@ -6,14 +6,17 @@ namespace Icinga\Module\Cube\CubeRenderer;
 
 use Generator;
 use Icinga\Module\Cube\CubeRenderer;
+use Icinga\Module\Cube\Web\Widget\ServiceDimensionWidget;
 use Icinga\Module\Icingadb\Widget\ServiceStateBadges;
+use Icinga\Web\View;
 use ipl\Html\Attributes;
+use ipl\Html\HtmlDocument;
 use ipl\Html\HtmlElement;
 use stdClass;
 
 class ServiceStatusCubeRenderer extends CubeRenderer
 {
-    public function renderFacts(object $facts): string
+    public function createFacts(object $facts): HtmlDocument
     {
         $parts = [];
         $partsObj = new stdClass();
@@ -67,72 +70,10 @@ class ServiceStatusCubeRenderer extends CubeRenderer
         }
 
         if ($this->cube::isUsingIcingaDb()) {
-            return $this->renderIcingaDbCubeBadges($partsObj, $facts);
+            return $this->createIcingaDbCubeBadges($partsObj, $facts);
         }
 
-        return $this->renderIdoCubeBadges($parts);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    protected function renderDimensionLabel(string $name, object $row): string
-    {
-        $htm = parent::renderDimensionLabel($name, $row);
-
-        if (($next = $this->cube->getDimensionAfter($name)) && isset($this->summaries->{$next->getName()})) {
-            $htm .= ' <span class="sum">(' . $this->summaries->{$next->getName()}->services_cnt . ')</span>';
-        }
-
-        return $htm;
-    }
-
-    protected function getDimensionClasses(string $name, object $row): array
-    {
-        $classes = parent::getDimensionClasses($name, $row);
-        $sums = $row;
-
-        $next = $this->cube->getDimensionAfter($name);
-        if ($next && isset($this->summaries->{$next->getName()})) {
-            $sums = $this->summaries->{$next->getName()};
-        }
-
-        if ($sums->services_unhandled_critical > 0) {
-            $severityClass[] = 'critical';
-        } elseif ($sums->services_unhandled_unknown > 0) {
-            $severityClass[] = 'unknown';
-        } elseif ($sums->services_unhandled_warning > 0) {
-            $severityClass[] = 'warning';
-        }
-
-        if (empty($severityClass)) {
-            if ($sums->services_critical > 0) {
-                $severityClass = ['critical', 'handled'];
-            } elseif ($sums->services_unknown > 0) {
-                $severityClass = ['unknown', 'handled'];
-            } elseif ($sums->services_warning > 0) {
-                $severityClass = ['warning', 'handled'];
-            } else {
-                $severityClass[] = 'ok';
-            }
-        }
-
-        return array_merge($classes, $severityClass);
-    }
-
-    /**
-     * If the cube is using Icinga DB, the URL leads to the Icinga DB service list.
-     * If not, the URL leads to the details action of the IdoServicesController.
-     *
-     * @return string
-     */
-    protected function getDetailsBaseUrl(): string
-    {
-        if ($this->cube::isUsingIcingaDb()) {
-            return 'icingadb/services';
-        }
-
-        return 'cube/services/details';
+        return $this->createIdoCubeBadges($parts);
     }
 
     protected function getSeveritySortColumns(): Generator
@@ -147,7 +88,7 @@ class ServiceStatusCubeRenderer extends CubeRenderer
         }
     }
 
-    protected function renderIcingaDbCubeBadges(object $parts, object $facts): string
+    protected function createIcingaDbCubeBadges(object $parts, object $facts): HtmlDocument
     {
         $filter = $this->getBadgeFilter($facts);
         $mainBadge = $this->getMainBadge($parts);
@@ -164,6 +105,16 @@ class ServiceStatusCubeRenderer extends CubeRenderer
                 ->addAttributes(new Attributes(['data-base-target' => '_next']))
         );
 
-        return $main->render() . $others->render();
+        return (new HtmlDocument())->addHtml($main, $others);
+    }
+
+    protected function createDimensionWidget(array $dimensionCache, View $view): ServiceDimensionWidget
+    {
+        return new ServiceDimensionWidget(
+            $dimensionCache,
+            $this->cube,
+            $view,
+            $this->getLevel($dimensionCache['name'])
+        );
     }
 }
