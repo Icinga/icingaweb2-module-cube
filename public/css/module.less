@@ -39,21 +39,23 @@ div.cube {
 
   div.cube-dimension1 > .header,
   div.cube-dimension2 {
-    display: inline-block;
     width: 10em;
-    height: 10em;
     padding: 0.2em;
     margin: 0.3em 0 0;
     overflow: hidden;
   }
 
   div.cube-dimension1 {
-    clear: both;
+    display: flex;
     border-left: 0.5em solid transparent;
+
+    &:not(:last-child) {
+      padding-bottom: .2em;
+    }
 
     > .header {
       display: flex;
-      float: left;
+      flex: 0 0 10em;
       font-weight: bold;
       text-align: center;
       padding-left: 0;
@@ -63,6 +65,12 @@ div.cube {
         max-width: 8em;
         word-wrap: break-word;
       }
+    }
+
+    > .body {
+      display: flex;
+      column-gap: .3em;
+      flex-wrap: wrap;
     }
 
     &.critical {
@@ -104,6 +112,7 @@ div.cube {
 
   div.cube-dimension2 {
     background: @color-ok;
+    height: 10em;
 
     > .header {
       display: flex;
@@ -165,6 +174,12 @@ div.cube {
     > .body {
       text-align: center;
     }
+  }
+
+  div.dimension-2-container {
+    display: flex;
+    column-gap: .3em;
+    flex-wrap: wrap;
   }
 
   span {

@@ -6,14 +6,17 @@ namespace Icinga\Module\Cube\CubeRenderer;
 
 use Generator;
 use Icinga\Module\Cube\CubeRenderer;
+use Icinga\Module\Cube\Web\Widget\HostDimensionWidget;
 use Icinga\Module\Icingadb\Widget\HostStateBadges;
+use Icinga\Web\View;
 use ipl\Html\Attributes;
+use ipl\Html\HtmlDocument;
 use ipl\Html\HtmlElement;
 use stdClass;
 
 class HostStatusCubeRenderer extends CubeRenderer
 {
-    public function renderFacts(object $facts): string
+    public function createFacts(object $facts): HtmlDocument
     {
         $parts = [];
         $partsObj = new stdClass();
@@ -61,66 +64,10 @@ class HostStatusCubeRenderer extends CubeRenderer
         }
 
         if ($this->cube::isUsingIcingaDb()) {
-            return $this->renderIcingaDbCubeBadges($partsObj, $facts);
+            return $this->createIcingaDbCubeBadges($partsObj, $facts);
         }
 
-        return $this->renderIdoCubeBadges($parts);
-    }
-
-    protected function renderDimensionLabel(string $name, object $row): string
-    {
-        $htm = parent::renderDimensionLabel($name, $row);
-
-        if (($next = $this->cube->getDimensionAfter($name)) && isset($this->summaries->{$next->getName()})) {
-            $htm .= ' <span class="sum">(' . $this->summaries->{$next->getName()}->hosts_cnt . ')</span>';
-        }
-
-        return $htm;
-    }
-
-    protected function getDimensionClasses(string $name, object $row): array
-    {
-        $classes = parent::getDimensionClasses($name, $row);
-        $sums = $row;
-
-        $next = $this->cube->getDimensionAfter($name);
-        if ($next && isset($this->summaries->{$next->getName()})) {
-            $sums = $this->summaries->{$next->getName()};
-        }
-
-        $severityClass = [];
-        if ($sums->hosts_unhandled_down > 0) {
-            $severityClass[] = 'critical';
-        } elseif (isset($sums->hosts_unhandled_unreachable) && $sums->hosts_unhandled_unreachable > 0) {
-            $severityClass[] = 'unreachable';
-        }
-
-        if (empty($severityClass)) {
-            if ($sums->hosts_down > 0) {
-                $severityClass = ['critical', 'handled'];
-            } elseif (isset($sums->hosts_unreachable) && $sums->hosts_unreachable > 0) {
-                $severityClass = ['unreachable', 'handled'];
-            } else {
-                $severityClass[] = 'ok';
-            }
-        }
-
-        return array_merge($classes, $severityClass);
-    }
-
-    /**
-     * If the cube is using Icinga DB, the URL leads to the Icinga DB host list.
-     * If not, the URL leads to the details action of the IdoHostsController.
-     *
-     * @return string
-     */
-    protected function getDetailsBaseUrl(): string
-    {
-        if ($this->cube::isUsingIcingaDb()) {
-            return 'icingadb/hosts';
-        }
-
-        return 'cube/hosts/details';
+        return $this->createIdoCubeBadges($parts);
     }
 
     protected function getSeveritySortColumns(): Generator
@@ -128,7 +75,7 @@ class HostStatusCubeRenderer extends CubeRenderer
         yield from ['hosts_unhandled_down', 'hosts_down'];
     }
 
-    protected function renderIcingaDbCubeBadges(object $parts, object $facts): string
+    protected function createIcingaDbCubeBadges(object $parts, object $facts): HtmlDocument
     {
         $filter = $this->getBadgeFilter($facts);
         $mainBadge = $this->getMainBadge($parts);
@@ -145,6 +92,11 @@ class HostStatusCubeRenderer extends CubeRenderer
                 ->addAttributes(new Attributes(['data-base-target' => '_next']))
         );
 
-        return $main->render() . $others->render();
+        return (new HtmlDocument())->addHtml($main, $others);
+    }
+
+    protected function createDimensionWidget(array $dimensionCache, View $view): HostDimensionWidget
+    {
+        return new HostDimensionWidget($dimensionCache, $this->cube, $view, $this->getLevel($dimensionCache['name']));
     }
 }
