@@ -16,24 +16,59 @@ div.cube {
       border-bottom: 1px solid @text-color;
     }
 
-    &.critical > .header {
-      color: @color-critical;
-      border-color: @color-critical;
+    &.critical {
+      > .header {
+        color: @color-critical;
+        border-color: @color-critical;
+      }
+
+      &.handled > .header {
+        color: @color-critical-handled;
+        border-color: @color-critical-handled;
+      }
     }
 
-    &.warning > .header {
-      color: @color-warning;
-      border-color: @color-warning;
+    &.warning {
+      > .header {
+        color: @color-warning;
+        border-color: @color-warning;
+      }
+
+      &.handled > .header {
+        color: @color-warning-handled;
+        border-color: @color-warning-handled;
+      }
     }
 
-    &.unknown > .header {
-      color: @color-unknown;
-      border-color: @color-unknown;
+    &.unknown {
+      > .header {
+        color: @color-unknown;
+        border-color: @color-unknown;
+      }
+
+      &.handled > .header {
+        color: @color-unknown-handled;
+        border-color: @color-unknown-handled;
+      }
     }
 
-    &.unreachable > .header {
-      color: @color-unreachable;
-      border-color: @color-unreachable;
+    &.unreachable {
+      > .header {
+        color: @color-unreachable;
+        border-color: @color-unreachable;
+      }
+
+      &.handled > .header {
+        color: @color-unreachable-handled;
+        border-color: @color-unreachable-handled;
+      }
+    }
+
+    &.ok {
+      > .header {
+          color: @color-ok;
+          border-color: @color-ok;
+      }
     }
   }
 
