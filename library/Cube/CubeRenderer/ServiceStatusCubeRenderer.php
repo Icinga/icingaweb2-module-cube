@@ -103,6 +103,20 @@ class ServiceStatusCubeRenderer extends CubeRenderer
         $filter = $this->getBadgeFilter($facts);
         $mainBadge = $this->getMainBadge($parts);
 
+        $partsBottom = new stdClass();
+        $bottomKeys = [
+            'services_unknown_unhandled',
+            'services_unknown_handled',
+            'services_pending'
+        ];
+
+        foreach ($bottomKeys as $key) {
+            if (property_exists($parts, $key)) {
+                $partsBottom->$key = $parts->$key;
+                unset($parts->$key);
+            }
+        }
+
         $main = (new ServiceStateBadges($mainBadge))
             ->setBaseFilter($filter)
             ->addAttributes(new Attributes(['data-base-target' => '_next']));
@@ -111,6 +125,9 @@ class ServiceStatusCubeRenderer extends CubeRenderer
             'span',
             new Attributes(['class' => 'others']),
             (new ServiceStateBadges($parts))
+                ->setBaseFilter($filter)
+                ->addAttributes(new Attributes(['data-base-target' => '_next'])),
+            (new ServiceStateBadges($partsBottom))
                 ->setBaseFilter($filter)
                 ->addAttributes(new Attributes(['data-base-target' => '_next']))
         );
