@@ -6,65 +6,41 @@ namespace Icinga\Module\Cube\CubeRenderer;
 
 use Generator;
 use Icinga\Module\Cube\CubeRenderer;
+use Icinga\Module\Cube\Web\Widget\HostDimensionWidget;
+use Icinga\Module\Icingadb\Widget\HostStateBadges;
+use Icinga\Web\View;
+use ipl\Html\Attributes;
+use ipl\Html\HtmlDocument;
+use ipl\Html\HtmlElement;
+use stdClass;
 
 class HostStatusCubeRenderer extends CubeRenderer
 {
-    protected function renderDimensionLabel($name, $row)
+    public function createFacts(object $facts): HtmlDocument
     {
-        $htm = parent::renderDimensionLabel($name, $row);
-
-        if (($next = $this->cube->getDimensionAfter($name)) && isset($this->summaries->{$next->getName()})) {
-            $htm .= ' <span class="sum">(' . $this->summaries->{$next->getName()}->hosts_cnt . ')</span>';
-        }
-
-        return $htm;
-    }
-
-    protected function getDimensionClasses($name, $row)
-    {
-        $classes = parent::getDimensionClasses($name, $row);
-        $sums = $row;
-
-        $next = $this->cube->getDimensionAfter($name);
-        if ($next && isset($this->summaries->{$next->getName()})) {
-            $sums = $this->summaries->{$next->getName()};
-        }
-
-        $severityClass = [];
-        if ($sums->hosts_unhandled_down > 0) {
-            $severityClass[] = 'critical';
-        } elseif (isset($sums->hosts_unhandled_unreachable) && $sums->hosts_unhandled_unreachable > 0) {
-            $severityClass[] = 'unreachable';
-        }
-
-        if (empty($severityClass)) {
-            if ($sums->hosts_down > 0) {
-                $severityClass = ['critical', 'handled'];
-            } elseif (isset($sums->hosts_unreachable) && $sums->hosts_unreachable > 0) {
-                $severityClass = ['unreachable', 'handled'];
-            } else {
-                $severityClass[] = 'ok';
-            }
-        }
-
-        return array_merge($classes, $severityClass);
-    }
-
-    public function renderFacts($facts)
-    {
-        $indent = str_repeat('    ', 3);
-        $parts = array();
+        $parts = [];
+        $partsObj = new stdClass();
 
         if ($facts->hosts_unhandled_down > 0) {
             $parts['critical'] = $facts->hosts_unhandled_down;
+            $partsObj->hosts_down_unhandled = $facts->hosts_unhandled_down;
         }
 
         if (isset($facts->hosts_unhandled_unreachable) && $facts->hosts_unhandled_unreachable > 0) {
             $parts['unreachable'] = $facts->hosts_unhandled_unreachable;
+            $partsObj->hosts_unreachable_unhandled = $facts->hosts_unhandled_unreachable;
+        }
+
+        if (isset($facts->hosts_pending) && $facts->hosts_pending > 0) {
+            $parts['pending'] = $facts->hosts_pending;
+            $partsObj->hosts_pending = $facts->hosts_pending;
         }
 
         if ($facts->hosts_down > 0 && $facts->hosts_down > $facts->hosts_unhandled_down) {
-            $parts['critical handled'] = $facts->hosts_down - $facts->hosts_unhandled_down;
+            $downHandled = $facts->hosts_down - $facts->hosts_unhandled_down;
+
+            $parts['critical handled'] = $downHandled;
+            $partsObj->hosts_down_handled = $downHandled;
         }
 
         if (
@@ -73,64 +49,81 @@ class HostStatusCubeRenderer extends CubeRenderer
             && $facts->hosts_unreachable >
             $facts->hosts_unhandled_unreachable
         ) {
-            $parts['unreachable handled'] = $facts->hosts_unreachable - $facts->hosts_unhandled_unreachable;
+            $unreachableHandled = $facts->hosts_unreachable - $facts->hosts_unhandled_unreachable;
+
+            $parts['unreachable handled'] = $unreachableHandled;
+            $partsObj->hosts_unreachable_handled = $unreachableHandled;
         }
 
         if (
             $facts->hosts_cnt > $facts->hosts_down
             && (! isset($facts->hosts_unreachable) || $facts->hosts_cnt > $facts->hosts_unreachable)
+            && (! isset($facts->hosts_pending) || $facts->hosts_cnt > $facts->hosts_pending)
         ) {
             $ok = $facts->hosts_cnt - $facts->hosts_down;
             if (isset($facts->hosts_unreachable)) {
                 $ok -= $facts->hosts_unreachable;
             }
 
+            if (isset($facts->hosts_pending)) {
+                $ok -= $facts->hosts_pending;
+            }
+
             $parts['ok'] = $ok;
+            $partsObj->hosts_up = $ok;
         }
 
-        $main = '';
-        $sub = '';
-        foreach ($parts as $class => $count) {
-            if ($count === 0) {
-                continue;
-            }
-
-            if ($main === '') {
-                $main = $this->makeBadgeHtml($class, $count);
-            } else {
-                $sub .= $this->makeBadgeHtml($class, $count);
-            }
-        }
-        if ($sub !== '') {
-            $sub = $indent
-                . '<span class="others">'
-                . "\n    "
-                . $sub
-                . $indent
-                . "</span>\n";
+        if ($this->cube::isUsingIcingaDb()) {
+            return $this->createIcingaDbCubeBadges($partsObj, $facts);
         }
 
-        return $main . $sub;
-    }
-
-    protected function makeBadgeHtml($class, $count)
-    {
-        $indent = str_repeat('    ', 3);
-        return sprintf(
-            '%s<span class="%s">%s</span>',
-            $indent,
-            $class,
-            $count
-        ) . "\n";
-    }
-
-    protected function getDetailsBaseUrl()
-    {
-        return 'cube/hosts/details';
+        return $this->createIdoCubeBadges($parts);
     }
 
     protected function getSeveritySortColumns(): Generator
     {
         yield from ['hosts_unhandled_down', 'hosts_down'];
+    }
+
+    protected function createIcingaDbCubeBadges(object $parts, object $facts): HtmlDocument
+    {
+        $filter = $this->getBadgeFilter($facts);
+        $mainBadge = $this->getMainBadge($parts);
+
+        $partsBottom = new stdClass();
+        $bottomKeys = [
+            'hosts_unreachable_unhandled',
+            'hosts_unreachable_handled',
+            'hosts_pending'
+        ];
+
+        foreach ($bottomKeys as $key) {
+            if (property_exists($parts, $key)) {
+                $partsBottom->$key = $parts->$key;
+                unset($parts->$key);
+            }
+        }
+
+        $main = (new HostStateBadges($mainBadge))
+            ->setBaseFilter($filter)
+            ->addAttributes(new Attributes(['data-base-target' => '_next']));
+
+        $others = new HtmlElement(
+            'span',
+            new Attributes(['class' => 'others']),
+            (new HostStateBadges($parts))
+                ->setBaseFilter($filter)
+                ->addAttributes(new Attributes(['data-base-target' => '_next'])),
+            (new HostStateBadges($partsBottom))
+                ->setBaseFilter($filter)
+                ->addAttributes(new Attributes(['data-base-target' => '_next']))
+        );
+
+        return (new HtmlDocument())->addHtml($main, $others);
+    }
+
+    protected function createDimensionWidget(array $dimensionCache, View $view): HostDimensionWidget
+    {
+        return new HostDimensionWidget($dimensionCache, $this->cube, $view, $this->getLevel($dimensionCache['name']));
     }
 }
