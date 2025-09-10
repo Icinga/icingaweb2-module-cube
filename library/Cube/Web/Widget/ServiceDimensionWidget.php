@@ -42,6 +42,8 @@ class ServiceDimensionWidget extends DimensionWidget
             $severityClass = ['unknown'];
         } elseif ($sums->services_unhandled_warning > 0) {
             $severityClass = ['warning'];
+        } elseif (isset($sums->services_pending) && $sums->services_pending > 0) {
+            $severityClass = ['pending'];
         } elseif ($sums->services_critical > 0) {
             $severityClass = ['critical', 'handled'];
         } elseif ($sums->services_unknown > 0) {

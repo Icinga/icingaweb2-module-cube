@@ -40,6 +40,8 @@ class HostDimensionWidget extends DimensionWidget
             $severityClass = ['critical'];
         } elseif (isset($sums->hosts_unhandled_unreachable) && $sums->hosts_unhandled_unreachable > 0) {
             $severityClass = ['unreachable'];
+        } elseif (isset($sums->hosts_pending) && $sums->hosts_pending > 0) {
+            $severityClass = ['pending'];
         } elseif ($sums->hosts_down > 0) {
             $severityClass = ['critical', 'handled'];
         } elseif (isset($sums->hosts_unreachable) && $sums->hosts_unreachable > 0) {

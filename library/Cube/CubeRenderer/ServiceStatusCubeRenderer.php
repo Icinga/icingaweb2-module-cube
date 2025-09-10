@@ -36,6 +36,10 @@ class ServiceStatusCubeRenderer extends CubeRenderer
             $partsObj->services_warning_unhandled = $facts->services_unhandled_warning;
         }
 
+        if (isset($facts->services_pending) && $facts->services_pending > 0) {
+            $partsObj->services_pending = $facts->services_pending;
+        }
+
         if ($facts->services_critical > 0 && $facts->services_critical > $facts->services_unhandled_critical) {
             $criticalHandled = $facts->services_critical - $facts->services_unhandled_critical;
 
@@ -61,9 +65,14 @@ class ServiceStatusCubeRenderer extends CubeRenderer
             $facts->services_cnt > $facts->services_critical
             && $facts->services_cnt > $facts->services_warning
             && $facts->services_cnt > $facts->services_unknown
+            && (! isset($facts->services_pending) || $facts->services_cnt > $facts->services_pending)
         ) {
             $ok = $facts->services_cnt - $facts->services_critical - $facts->services_warning -
                 $facts->services_unknown;
+
+            if (isset($facts->services_pending)) {
+                $ok -= $facts->services_pending;
+            }
 
             $parts['ok'] = $ok;
             $partsObj->services_ok = $ok;
