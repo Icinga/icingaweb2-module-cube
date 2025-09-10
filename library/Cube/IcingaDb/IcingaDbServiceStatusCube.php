@@ -8,7 +8,6 @@ use Icinga\Module\Cube\CubeRenderer\ServiceStatusCubeRenderer;
 use Icinga\Module\Icingadb\Model\Service;
 use Icinga\Module\Icingadb\Model\ServicestateSummary;
 use ipl\Stdlib\Filter;
-use ipl\Stdlib\Str;
 
 class IcingaDbServiceStatusCube extends IcingaDbCube
 {
@@ -38,6 +37,7 @@ class IcingaDbServiceStatusCube extends IcingaDbCube
             'services_unhandled_warning' => 'services_warning_unhandled',
             'services_unknown' => 'services_unknown_handled + f.services_unknown_unhandled',
             'services_unhandled_unknown' => 'services_unknown_unhandled',
+            'services_pending' => 'services_pending'
         ];
     }
 

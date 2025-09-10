@@ -31,6 +31,11 @@ class HostStatusCubeRenderer extends CubeRenderer
             $partsObj->hosts_unreachable_unhandled = $facts->hosts_unhandled_unreachable;
         }
 
+        if (isset($facts->hosts_pending) && $facts->hosts_pending > 0) {
+            $parts['pending'] = $facts->hosts_pending;
+            $partsObj->hosts_pending = $facts->hosts_pending;
+        }
+
         if ($facts->hosts_down > 0 && $facts->hosts_down > $facts->hosts_unhandled_down) {
             $downHandled = $facts->hosts_down - $facts->hosts_unhandled_down;
 
@@ -53,10 +58,15 @@ class HostStatusCubeRenderer extends CubeRenderer
         if (
             $facts->hosts_cnt > $facts->hosts_down
             && (! isset($facts->hosts_unreachable) || $facts->hosts_cnt > $facts->hosts_unreachable)
+            && (! isset($facts->hosts_pending) || $facts->hosts_cnt > $facts->hosts_pending)
         ) {
             $ok = $facts->hosts_cnt - $facts->hosts_down;
             if (isset($facts->hosts_unreachable)) {
                 $ok -= $facts->hosts_unreachable;
+            }
+
+            if (isset($facts->hosts_pending)) {
+                $ok -= $facts->hosts_pending;
             }
 
             $parts['ok'] = $ok;
