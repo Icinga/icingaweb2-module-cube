@@ -65,6 +65,13 @@ div.cube {
       }
     }
 
+    &.pending {
+      > .header {
+          color: @color-pending;
+          border-color: @color-pending;
+      }
+    }
+
     &.ok {
       > .header {
           color: @color-ok;
@@ -141,6 +148,10 @@ div.cube {
       }
     }
 
+    &.pending {
+      border-left-color: @color-pending;
+    }
+
     &.ok {
       border-left-color: @color-ok;
     }
@@ -203,6 +214,10 @@ div.cube {
       }
     }
 
+    &.pending {
+      background: @color-pending;
+    }
+
     &.ok {
       background: @color-ok;
     }
@@ -219,7 +234,7 @@ div.cube {
   }
 
   span {
-    &.critical, &.warning, &.unknown, &.unreachable, &.ok {
+    &.critical, &.warning, &.unknown, &.unreachable, &.pending, &.ok {
       display: inline;
       border-radius: 0.1em;
       padding: 0.05em 0.2em;
@@ -257,6 +272,10 @@ div.cube {
       &.handled {
         background: @color-unreachable-handled;
       }
+    }
+
+    &.pending {
+      background: @color-pending;
     }
 
     &.ok {
