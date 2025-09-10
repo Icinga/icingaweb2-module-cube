@@ -90,6 +90,20 @@ class HostStatusCubeRenderer extends CubeRenderer
         $filter = $this->getBadgeFilter($facts);
         $mainBadge = $this->getMainBadge($parts);
 
+        $partsBottom = new stdClass();
+        $bottomKeys = [
+            'hosts_unreachable_unhandled',
+            'hosts_unreachable_handled',
+            'hosts_pending'
+        ];
+
+        foreach ($bottomKeys as $key) {
+            if (property_exists($parts, $key)) {
+                $partsBottom->$key = $parts->$key;
+                unset($parts->$key);
+            }
+        }
+
         $main = (new HostStateBadges($mainBadge))
             ->setBaseFilter($filter)
             ->addAttributes(new Attributes(['data-base-target' => '_next']));
@@ -98,6 +112,9 @@ class HostStatusCubeRenderer extends CubeRenderer
             'span',
             new Attributes(['class' => 'others']),
             (new HostStateBadges($parts))
+                ->setBaseFilter($filter)
+                ->addAttributes(new Attributes(['data-base-target' => '_next'])),
+            (new HostStateBadges($partsBottom))
                 ->setBaseFilter($filter)
                 ->addAttributes(new Attributes(['data-base-target' => '_next']))
         );

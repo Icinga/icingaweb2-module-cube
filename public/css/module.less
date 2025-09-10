@@ -164,7 +164,7 @@ div.cube {
       display: flex;
       text-align: center;
       color: @text-color-on-icinga-blue;
-      margin-bottom: 1em;
+      margin-bottom: 0.5em;
 
       > a:first-child {
         flex: 1;
@@ -283,7 +283,7 @@ div.cube {
   }
 
   .state-badge {
-    font-size: 2em;
+    font-size: 1.6em;
 
     &.handled {
       &.state-down {
@@ -307,10 +307,11 @@ div.cube {
   .others {
     display: flex;
     justify-content: center;
+    align-items: center;
+    flex-direction: column;
 
     span {
-      margin-top: 0.8em;
-      font-size: 1em;
+      font-size: 0.9em;
       & :not(.state-badge) {
         margin-left: 0.2em;
       }
