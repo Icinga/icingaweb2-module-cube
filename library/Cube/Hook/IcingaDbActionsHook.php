@@ -71,10 +71,10 @@ abstract class IcingaDbActionsHook
      * Helper method instantiating an Url object
      *
      * @param string $path
-     * @param array $params
+     * @param ?array $params
      * @return Url
      */
-    final protected function makeUrl(string $path, array $params = null): Url
+    final protected function makeUrl(string $path, ?array $params = null): Url
     {
         $url = Url::fromPath($path);
         if ($params !== null) {
