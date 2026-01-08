@@ -9,7 +9,7 @@ use Icinga\Module\Cube\Ido\Query\HoststatusQuery;
 
 class Hoststatus extends \Icinga\Module\Monitoring\DataView\Hoststatus
 {
-    public function __construct(ConnectionInterface $connection, array $columns = null)
+    public function __construct(ConnectionInterface $connection, ?array $columns = null)
     {
         $this->connection = $connection;
         $this->query = new HoststatusQuery($connection->getResource(), $columns);

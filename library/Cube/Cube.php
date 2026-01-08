@@ -327,10 +327,10 @@ abstract class Cube
 
     /**
      * @param View $view
-     * @param CubeRenderer $renderer
+     * @param ?CubeRenderer $renderer
      * @return string
      */
-    public function render(View $view, CubeRenderer $renderer = null)
+    public function render(View $view, ?CubeRenderer $renderer = null)
     {
         if ($renderer === null) {
             $renderer = $this->getRenderer();

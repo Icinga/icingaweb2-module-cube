@@ -79,7 +79,7 @@ class DimensionsForm extends Form
             $allDimensions = $this->cube->listAdditionalDimensions();
 
             $this->addElement('select', 'addDimension', [
-                'options' => [null => $this->translate('+ Add a dimension')] + $allDimensions,
+                'options' => ['' => $this->translate('+ Add a dimension')] + $allDimensions,
                 'class'   => 'autosubmit'
             ]);
         }
