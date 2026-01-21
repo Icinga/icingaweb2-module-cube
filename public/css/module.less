@@ -9,48 +9,162 @@
 }
 
 div.cube {
-  div.cube-dimension0 > .header {
-    font-size: 1.2em;
-    font-weight: bold;
-    border-bottom: 1px solid @text-color;
-  }
+  div.cube-dimension0 {
+    > .header {
+      font-size: 1.2em;
+      font-weight: bold;
+      border-bottom: 1px solid @text-color;
+    }
 
-  div.cube-dimension1 {
-    clear: both;
-    border-left: 0.5em solid transparent;
+    &.critical {
+      > .header {
+        color: @color-critical;
+        border-color: @color-critical;
+      }
+
+      &.handled > .header {
+        color: @color-critical-handled;
+        border-color: @color-critical-handled;
+      }
+    }
+
+    &.warning {
+      > .header {
+        color: @color-warning;
+        border-color: @color-warning;
+      }
+
+      &.handled > .header {
+        color: @color-warning-handled;
+        border-color: @color-warning-handled;
+      }
+    }
+
+    &.unknown {
+      > .header {
+        color: @color-unknown;
+        border-color: @color-unknown;
+      }
+
+      &.handled > .header {
+        color: @color-unknown-handled;
+        border-color: @color-unknown-handled;
+      }
+    }
+
+    &.unreachable {
+      > .header {
+        color: @color-unreachable;
+        border-color: @color-unreachable;
+      }
+
+      &.handled > .header {
+        color: @color-unreachable-handled;
+        border-color: @color-unreachable-handled;
+      }
+    }
+
+    &.pending {
+      > .header {
+          color: @color-pending;
+          border-color: @color-pending;
+      }
+    }
+
+    &.ok {
+      > .header {
+          color: @color-ok;
+          border-color: @color-ok;
+      }
+    }
   }
 
   div.cube-dimension1 > .header,
   div.cube-dimension2 {
-    display: inline-block;
     width: 10em;
-    height: 10em;
-    margin: 0;
     padding: 0.2em;
-    margin-top: 0.3em;
+    margin: 0.3em 0 0;
     overflow: hidden;
   }
 
-  div.cube-dimension1 > .header {
+  div.cube-dimension1 {
     display: flex;
-    float: left;
-    font-weight: bold;
-    text-align: center;
-    padding-left: 0;
+    border-left: 0.5em solid transparent;
 
-    > a:first-child {
-      flex: 1;
-      max-width: 8em;
-      word-wrap: break-word;
+    &:not(:last-child) {
+      padding-bottom: .2em;
+    }
+
+    > .header {
+      display: flex;
+      flex: 0 0 10em;
+      font-weight: bold;
+      text-align: center;
+      padding-left: 0;
+
+      > a:first-child {
+        flex: 1;
+        max-width: 8em;
+        word-wrap: break-word;
+      }
+    }
+
+    > .body {
+      display: flex;
+      column-gap: .3em;
+      flex-wrap: wrap;
+    }
+
+    &.critical {
+      border-left-color: @color-critical;
+
+      &.handled {
+        border-left-color: @color-critical-handled;
+      }
+    }
+
+    &.warning {
+      border-left-color: @color-warning;
+
+      &.handled {
+        border-left-color: @color-warning-handled;
+      }
+    }
+
+    &.unknown {
+      border-left-color: @color-unknown;
+
+      &.handled {
+        border-left-color: @color-unknown-handled;
+      }
+    }
+
+    &.unreachable {
+      border-left-color: @color-unreachable;
+
+      &.handled {
+        border-left-color: @color-unreachable-handled;
+      }
+    }
+
+    &.pending {
+      border-left-color: @color-pending;
+    }
+
+    &.ok {
+      border-left-color: @color-ok;
     }
   }
 
   div.cube-dimension2 {
+    background: @color-ok;
+    height: 10em;
+
     > .header {
       display: flex;
       text-align: center;
       color: @text-color-on-icinga-blue;
-      margin-bottom: 1em;
+      margin-bottom: 0.5em;
 
       > a:first-child {
         flex: 1;
@@ -61,22 +175,46 @@ div.cube {
       }
     }
 
-    background: @color-ok;
+    &.critical, &.warning, &.unknown, &.unreachable {
+      span.sum {
+        font-size: 1em;
+      }
+    }
 
     &.critical {
       background: @color-critical;
+
+      &.handled {
+        background: @color-critical-handled;
+      }
     }
 
     &.warning {
       background: @color-warning;
+
+      &.handled {
+        background: @color-warning-handled;
+      }
     }
 
     &.unknown {
       background: @color-unknown;
+
+      &.handled {
+        background: @color-unknown-handled;
+      }
     }
 
     &.unreachable {
       background: @color-unreachable;
+
+      &.handled {
+        background: @color-unreachable-handled;
+      }
+    }
+
+    &.pending {
+      background: @color-pending;
     }
 
     &.ok {
@@ -88,134 +226,96 @@ div.cube {
     }
   }
 
-  span.critical, span.warning, span.unknown, span.unreachable, span.ok {
-    display: inline;
-    border-radius: 0.1em;
-    padding: 0.05em 0.2em;
-    color: @text-color-on-icinga-blue;
-    font-size: 3em;
+  div.dimension-2-container {
+    display: flex;
+    column-gap: .3em;
+    flex-wrap: wrap;
   }
 
-  span.ok {
-    background: @color-ok;
+  span {
+    &.critical, &.warning, &.unknown, &.unreachable, &.pending, &.ok {
+      display: inline;
+      border-radius: 0.1em;
+      padding: 0.05em 0.2em;
+      color: @text-color-on-icinga-blue;
+      font-size: 3em;
+    }
+
+    &.critical {
+      background: @color-critical;
+
+      &.handled {
+        background: @color-critical-handled;
+      }
+    }
+
+    &.warning {
+      background: @color-warning;
+
+      &.handled {
+        background: @color-warning-handled;
+      }
+    }
+
+    &.unknown {
+      background: @color-unknown;
+
+      &.handled {
+        background: @color-unknown-handled;
+      }
+    }
+
+    &.unreachable {
+      background: @color-unreachable;
+
+      &.handled {
+        background: @color-unreachable-handled;
+      }
+    }
+
+    &.pending {
+      background: @color-pending;
+    }
+
+    &.ok {
+      background: @color-ok;
+    }
+  }
+
+  .state-badge {
+    font-size: 1.6em;
+
+    &.handled {
+      &.state-down {
+        background-color: @color-down-handled;
+      }
+
+      &.state-critical {
+        background-color: @color-critical-handled;
+      }
+
+      &.state-warning {
+        background-color: @color-warning-handled;
+      }
+
+      &.state-unknown {
+        background-color: @color-unknown-handled;
+      }
+    }
   }
 
   .others {
     display: flex;
     justify-content: center;
+    align-items: center;
+    flex-direction: column;
+
     span {
-      margin-left: 0.2em;
-      margin-top: 0.8em;
-      font-size: 1em;
+      font-size: 0.9em;
+      & :not(.state-badge) {
+        margin-left: 0.2em;
+      }
     }
-  }
-
-  span.critical {
-    background: @color-critical;
-  }
-
-  span.critical.handled {
-    background: @color-critical-handled;
-  }
-
-  div.cube-dimension0.critical > .header {
-    color: @color-critical;
-    border-color: @color-critical;
-  }
-
-  div.cube-dimension1.critical {
-    border-left-color: @color-critical;
-
-    &.handled {
-      border-left-color: @color-critical-handled;
-    }
-  }
-
-  div.cube-dimension2.critical {
-    span.sum {
-      font-size: 1em;
-    }
-  }
-
-  span.warning {
-    background: @color-warning;
-  }
-
-  span.warning.handled {
-    background: @color-warning-handled;
-  }
-
-  div.cube-dimension0.warning > .header {
-    color: @color-warning;
-    border-color: @color-warning;
-  }
-
-  div.cube-dimension1.warning {
-    border-left-color: @color-warning;
-
-    &.handled {
-      border-left-color: @color-warning-handled;
-    }
-  }
-
-  div.cube-dimension2.warning {
-    span.sum {
-      font-size: 1em;
-    }
-  }
-
-  span.unknown{
-    background: @color-unknown;
-  }
-
-  span.unknown.handled {
-    background: @color-unknown-handled;
-  }
-
-  div.cube-dimension0.unknown > .header {
-    color: @color-unknown;
-    border-color: @color-unknown;
-  }
-
-  div.cube-dimension1.unknown {
-    border-left-color: @color-unknown;
-
-    &.handled {
-      border-left-color: @color-unknown-handled;
-    }
-  }
-
-  div.cube-dimension2.unknown {
-    span.sum {
-      font-size: 1em;
-    }
-  }
-}
-
-span.unreachable{
-  background: @color-unreachable;
-}
-
-span.unreachable.handled {
-  background: @color-unreachable-handled;
-}
-
-div.cube-dimension0.unreachable > .header {
-  color: @color-unreachable;
-  border-color: @color-unreachable;
-}
-
-div.cube-dimension1.unreachable {
-  border-left-color: @color-unreachable;
-
-  &.handled {
-    border-left-color: @color-unreachable-handled;
-  }
-}
-
-div.cube-dimension2.unreachable {
-  span.sum {
-    font-size: 1em;
   }
 }
 
@@ -327,6 +427,7 @@ ul.action-links {
       font-size: 3em;
       display: inline-block;
     }
+
     &:hover {
       background: @tr-hover-color;
       text-decoration: none;

@@ -6,133 +6,83 @@ namespace Icinga\Module\Cube\CubeRenderer;
 
 use Generator;
 use Icinga\Module\Cube\CubeRenderer;
+use Icinga\Module\Cube\Web\Widget\ServiceDimensionWidget;
+use Icinga\Module\Icingadb\Widget\ServiceStateBadges;
+use Icinga\Web\View;
+use ipl\Html\Attributes;
+use ipl\Html\HtmlDocument;
+use ipl\Html\HtmlElement;
+use stdClass;
 
 class ServiceStatusCubeRenderer extends CubeRenderer
 {
-    public function renderFacts($facts)
+    public function createFacts(object $facts): HtmlDocument
     {
-        $indent = str_repeat('    ', 3);
         $parts = [];
+        $partsObj = new stdClass();
 
         if ($facts->services_unhandled_critical > 0) {
             $parts['critical'] = $facts->services_unhandled_critical;
+            $partsObj->services_critical_unhandled = $facts->services_unhandled_critical;
         }
 
         if ($facts->services_unhandled_unknown > 0) {
             $parts['unknown'] = $facts->services_unhandled_unknown;
+            $partsObj->services_unknown_unhandled = $facts->services_unhandled_unknown;
         }
 
         if ($facts->services_unhandled_warning > 0) {
             $parts['warning'] = $facts->services_unhandled_warning;
+            $partsObj->services_warning_unhandled = $facts->services_unhandled_warning;
+        }
+
+        if (isset($facts->services_pending) && $facts->services_pending > 0) {
+            $partsObj->services_pending = $facts->services_pending;
         }
 
         if ($facts->services_critical > 0 && $facts->services_critical > $facts->services_unhandled_critical) {
-            $parts['critical handled'] = $facts->services_critical - $facts->services_unhandled_critical;
+            $criticalHandled = $facts->services_critical - $facts->services_unhandled_critical;
+
+            $parts['critical handled'] = $criticalHandled;
+            $partsObj->services_critical_handled = $criticalHandled;
         }
 
         if ($facts->services_unknown > 0 && $facts->services_unknown > $facts->services_unhandled_unknown) {
-            $parts['unknown handled'] = $facts->services_unknown - $facts->services_unhandled_unknown;
+            $unknownHandled = $facts->services_unknown - $facts->services_unhandled_unknown;
+
+            $parts['unknown handled'] = $unknownHandled;
+            $partsObj->services_unknown_handled = $unknownHandled;
         }
 
         if ($facts->services_warning > 0 && $facts->services_warning > $facts->services_unhandled_warning) {
-            $parts['warning handled'] = $facts->services_warning - $facts->services_unhandled_warning;
+            $warningHandled = $facts->services_warning - $facts->services_unhandled_warning;
+
+            $parts['warning handled'] = $warningHandled;
+            $partsObj->services_warning_handled = $warningHandled;
         }
 
         if (
-            $facts->services_cnt > $facts->services_critical && $facts->services_cnt > $facts->services_warning
+            $facts->services_cnt > $facts->services_critical
+            && $facts->services_cnt > $facts->services_warning
             && $facts->services_cnt > $facts->services_unknown
+            && (! isset($facts->services_pending) || $facts->services_cnt > $facts->services_pending)
         ) {
-            $parts['ok'] = $facts->services_cnt - $facts->services_critical - $facts->services_warning -
+            $ok = $facts->services_cnt - $facts->services_critical - $facts->services_warning -
                 $facts->services_unknown;
-        }
 
-        $main = '';
-        $sub = '';
-        foreach ($parts as $class => $count) {
-            if ($count === 0) {
-                continue;
+            if (isset($facts->services_pending)) {
+                $ok -= $facts->services_pending;
             }
 
-            if ($main === '') {
-                $main = $this->makeBadgeHtml($class, $count);
-            } else {
-                $sub .= $this->makeBadgeHtml($class, $count);
-            }
-        }
-        if ($sub !== '') {
-            $sub = $indent
-                . '<span class="others">'
-                . "\n    "
-                . $sub
-                . $indent
-                . "</span>\n";
+            $parts['ok'] = $ok;
+            $partsObj->services_ok = $ok;
         }
 
-        return $main . $sub;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    protected function renderDimensionLabel($name, $row)
-    {
-        $htm = parent::renderDimensionLabel($name, $row);
-
-        if (($next = $this->cube->getDimensionAfter($name)) && isset($this->summaries->{$next->getName()})) {
-            $htm .= ' <span class="sum">(' . $this->summaries->{$next->getName()}->services_cnt . ')</span>';
+        if ($this->cube::isUsingIcingaDb()) {
+            return $this->createIcingaDbCubeBadges($partsObj, $facts);
         }
 
-        return $htm;
-    }
-
-    protected function getDimensionClasses($name, $row)
-    {
-        $classes = parent::getDimensionClasses($name, $row);
-        $sums = $row;
-
-        $next = $this->cube->getDimensionAfter($name);
-        if ($next && isset($this->summaries->{$next->getName()})) {
-            $sums = $this->summaries->{$next->getName()};
-        }
-
-        if ($sums->services_unhandled_critical > 0) {
-            $severityClass[] = 'critical';
-        } elseif ($sums->services_unhandled_unknown > 0) {
-            $severityClass[] = 'unknown';
-        } elseif ($sums->services_unhandled_warning > 0) {
-            $severityClass[] = 'warning';
-        }
-
-        if (empty($severityClass)) {
-            if ($sums->services_critical > 0) {
-                $severityClass = ['critical', 'handled'];
-            } elseif ($sums->services_unknown > 0) {
-                $severityClass = ['unknown', 'handled'];
-            } elseif ($sums->services_warning > 0) {
-                $severityClass = ['warning', 'handled'];
-            } else {
-                $severityClass[] = 'ok';
-            }
-        }
-
-        return array_merge($classes, $severityClass);
-    }
-
-    protected function makeBadgeHtml($class, $count)
-    {
-        $indent = str_repeat('    ', 3);
-
-        return sprintf(
-            '%s<span class="%s">%s</span>',
-            $indent,
-            $class,
-            $count
-        ) . "\n";
-    }
-
-    protected function getDetailsBaseUrl()
-    {
-        return 'cube/services/details';
+        return $this->createIdoCubeBadges($parts);
     }
 
     protected function getSeveritySortColumns(): Generator
@@ -145,5 +95,52 @@ class ServiceStatusCubeRenderer extends CubeRenderer
         foreach ($columns as $column) {
             yield "services_$column";
         }
+    }
+
+    protected function createIcingaDbCubeBadges(object $parts, object $facts): HtmlDocument
+    {
+        $filter = $this->getBadgeFilter($facts);
+        $mainBadge = $this->getMainBadge($parts);
+
+        $partsBottom = new stdClass();
+        $bottomKeys = [
+            'services_unknown_unhandled',
+            'services_unknown_handled',
+            'services_pending'
+        ];
+
+        foreach ($bottomKeys as $key) {
+            if (property_exists($parts, $key)) {
+                $partsBottom->$key = $parts->$key;
+                unset($parts->$key);
+            }
+        }
+
+        $main = (new ServiceStateBadges($mainBadge))
+            ->setBaseFilter($filter)
+            ->addAttributes(new Attributes(['data-base-target' => '_next']));
+
+        $others = new HtmlElement(
+            'span',
+            new Attributes(['class' => 'others']),
+            (new ServiceStateBadges($parts))
+                ->setBaseFilter($filter)
+                ->addAttributes(new Attributes(['data-base-target' => '_next'])),
+            (new ServiceStateBadges($partsBottom))
+                ->setBaseFilter($filter)
+                ->addAttributes(new Attributes(['data-base-target' => '_next']))
+        );
+
+        return (new HtmlDocument())->addHtml($main, $others);
+    }
+
+    protected function createDimensionWidget(array $dimensionCache, View $view): ServiceDimensionWidget
+    {
+        return new ServiceDimensionWidget(
+            $dimensionCache,
+            $this->cube,
+            $view,
+            $this->getLevel($dimensionCache['name'])
+        );
     }
 }

@@ -8,7 +8,6 @@ use Icinga\Module\Cube\CubeRenderer\HostStatusCubeRenderer;
 use Icinga\Module\Icingadb\Model\Host;
 use Icinga\Module\Icingadb\Model\HoststateSummary;
 use ipl\Stdlib\Filter;
-use ipl\Stdlib\Str;
 
 class IcingaDbHostStatusCube extends IcingaDbCube
 {
@@ -23,6 +22,7 @@ class IcingaDbHostStatusCube extends IcingaDbCube
             'hosts_cnt' => 'hosts_total',
             'hosts_down' => 'hosts_down_handled + f.hosts_down_unhandled',
             'hosts_unhandled_down' => 'hosts_down_unhandled',
+            'hosts_pending' => 'hosts_pending',
         ];
     }
 
