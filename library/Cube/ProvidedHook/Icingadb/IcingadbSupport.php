@@ -1,6 +1,7 @@
 <?php
 
-// Icinga Web 2 Cube Module | (c) 2022 Icinga GmbH | GPLv2
+// SPDX-FileCopyrightText: 2022 Icinga GmbH <https://icinga.com>
+// SPDX-License-Identifier: GPL-3.0-or-later
 
 namespace Icinga\Module\Cube\ProvidedHook\Icingadb;
 
