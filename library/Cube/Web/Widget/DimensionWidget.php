@@ -177,8 +177,9 @@ abstract class DimensionWidget extends BaseHtmlElement
     protected function getDimensionLabel(): HtmlDocument
     {
         $label = new HtmlDocument();
+        $value = $this->dimension['row']->{$this->dimension['name']};
         $label->addHtml(
-            new Text($this->dimension['row']->{$this->dimension['name']} ?: '_')
+            new Text($value === null || $value === '' || $value === false ? '_' : $value)
         );
 
         // If there is a next dimension and it has a summary, append the sum to the label

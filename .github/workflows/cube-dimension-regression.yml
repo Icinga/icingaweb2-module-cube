@@ -1,0 +1,103 @@
+name: Cube dimension regression
+
+on:
+  push:
+    branches:
+      - fix/172-preserve-zero-dimension-labels
+  pull_request:
+
+jobs:
+  regression:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          coverage: none
+      - name: Validate PHP syntax
+        run: php -l library/Cube/Web/Widget/DimensionWidget.php
+      - name: Reproduce original bug and verify actual renderer
+        run: |
+          php <<'PHP'
+          <?php
+          namespace Icinga\Module\Cube {
+              class Cube
+              {
+                  public function getDimensionAfter($name) { return null; }
+              }
+              interface Dimension {}
+          }
+          namespace Icinga\Web {
+              class View {}
+          }
+          namespace ipl\Html {
+              class BaseHtmlElement {}
+              class HtmlDocument
+              {
+                  public array $items = [];
+                  public function addHtml($item) { $this->items[] = $item; }
+              }
+              class Text
+              {
+                  public function __construct(public $value) {}
+              }
+          }
+          namespace ipl\I18n {
+              trait Translation {}
+          }
+          namespace {
+              require 'library/Cube/Web/Widget/DimensionWidget.php';
+
+              class TestDimensionWidget extends \Icinga\Module\Cube\Web\Widget\DimensionWidget
+              {
+                  public function __construct($value)
+                  {
+                      $this->dimension = [
+                          'name' => 'test',
+                          'row' => (object) ['test' => $value],
+                          'summaries' => (object) []
+                      ];
+                      $this->cube = new \Icinga\Module\Cube\Cube();
+                  }
+
+                  protected function getDetailsBaseUrl(): string { return ''; }
+                  protected function getDimensionClasses(): array { return []; }
+                  protected function getDimensionSum(\Icinga\Module\Cube\Dimension $next): int { return 0; }
+
+                  public function displayedValue()
+                  {
+                      return $this->getDimensionLabel()->items[0]->value;
+                  }
+              }
+
+              // The original shorthand ternary incorrectly replaces both zero variants.
+              foreach ([0, '0'] as $zero) {
+                  if (($zero ?: '_') !== '_') {
+                      throw new \RuntimeException('Original regression was not reproduced');
+                  }
+              }
+
+              $cases = [
+                  ['integer zero', 0, 0],
+                  ['string zero', '0', '0'],
+                  ['floating-point zero', 0.0, 0.0],
+                  ['null', null, '_'],
+                  ['empty string', '', '_'],
+                  ['boolean false', false, '_'],
+                  ['nonzero integer', 42, 42],
+                  ['ordinary string', 'production', 'production'],
+              ];
+
+              foreach ($cases as [$name, $input, $expected]) {
+                  $actual = (new TestDimensionWidget($input))->displayedValue();
+                  if ($actual !== $expected) {
+                      throw new \RuntimeException(
+                          "$name failed: expected " . var_export($expected, true)
+                          . ', got ' . var_export($actual, true)
+                      );
+                  }
+                  echo "PASS: $name\n";
+              }
+          }
+          PHP
