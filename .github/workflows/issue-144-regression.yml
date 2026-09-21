@@ -1,0 +1,30 @@
+name: Issue 144 severity sort regression
+
+on:
+  push:
+    branches:
+      - fix/144-sort-cube-details-by-severity
+  pull_request:
+
+jobs:
+  regression:
+    name: PHP ${{ matrix.php }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php: ['8.3', '8.4']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          coverage: none
+      - name: Validate PHP syntax
+        run: |
+          php -l library/Cube/Web/Widget/DimensionWidget.php
+          php -l library/Cube/Web/Widget/ServiceDimensionWidget.php
+          php -l library/Cube/Web/Widget/HostDimensionWidget.php
+          php -l tests/issue-144-service-detail-sort.php
+      - name: Test actual widget details URLs
+        run: php tests/issue-144-service-detail-sort.php

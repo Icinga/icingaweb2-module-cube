@@ -6,9 +6,26 @@
 namespace Icinga\Module\Cube\Web\Widget;
 
 use Icinga\Module\Cube\Dimension;
+use ipl\Web\Url;
 
 class ServiceDimensionWidget extends DimensionWidget
 {
+    /**
+     * Show problem services first when opening an Icinga DB service cube tile.
+     *
+     * @return Url
+     */
+    protected function getDetailsUrl(): Url
+    {
+        $url = parent::getDetailsUrl();
+
+        if ($this->cube::isUsingIcingaDb()) {
+            $url->getParams()->add('sort', 'service.state.severity desc');
+        }
+
+        return $url;
+    }
+
     /**
      * If the cube is using Icinga DB, the URL leads to the Icinga DB service list.
      * If not, the URL leads to the details action of the IdoServicesController.
