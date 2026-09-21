@@ -1,0 +1,42 @@
+name: Issue 166 duplicate custom var regression
+
+on:
+  push:
+    branches:
+      - fix/166-avoid-duplicate-custom-var-filters
+  pull_request:
+
+jobs:
+  regression:
+    name: PHP ${{ matrix.php }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php: ['8.3', '8.4']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          coverage: none
+      - name: Validate PHP syntax
+        run: |
+          php -l library/Cube/IcingaDb/FilterUtil.php
+          php -l library/Cube/Web/Widget/DimensionWidget.php
+          php -l library/Cube/Web/Widget/HostDimensionWidget.php
+          php -l library/Cube/Web/Widget/ServiceDimensionWidget.php
+          php -l library/Cube/ProvidedHook/Cube/IcingaDbActions.php
+          php -l tests/issue-166-duplicate-custom-var-filter.php
+      - name: Reproduce and validate actual cube URL construction
+        run: php tests/issue-166-duplicate-custom-var-filter.php
+
+  project-ci:
+    name: Upstream PHP checks
+    uses: Icinga/github-actions/.github/workflows/php.yml@main
+    with:
+      php-versions: '["8.3", "8.4"]'
+      dependencies: |
+        {
+          "./vendor/icingaweb2-modules/icingadb" : "https://github.com/Icinga/icingadb-web.git"
+        }

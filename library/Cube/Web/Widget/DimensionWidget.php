@@ -10,6 +10,7 @@ use Icinga\Module\Cube\Cube;
 use Icinga\Module\Cube\Dimension;
 use Icinga\Module\Cube\DimensionParams;
 use Icinga\Module\Cube\IcingaDb\IcingaDbCube;
+use Icinga\Module\Cube\IcingaDb\FilterUtil;
 use Icinga\Web\Url as IcingaUrl;
 use Icinga\Web\View;
 use ipl\Html\Attributes;
@@ -121,10 +122,27 @@ abstract class DimensionWidget extends BaseHtmlElement
         }
 
         foreach ($this->cube->listDimensionsUpTo($this->dimension['name']) as $dimensionName) {
-            $urlParams->add($prefix . $dimensionName, $this->dimension['row']->$dimensionName);
+            $value = $this->dimension['row']->$dimensionName;
+            if (
+                $this->cube instanceof IcingaDbCube
+                && $this->cube->hasBaseFilter()
+                && FilterUtil::containsEqual($this->cube->getBaseFilter(), $dimensionName, $value)
+            ) {
+                continue;
+            }
+
+            $urlParams->add($prefix . $dimensionName, $value);
         }
 
         foreach ($this->cube->getSlices() as $key => $val) {
+            if (
+                $this->cube instanceof IcingaDbCube
+                && $this->cube->hasBaseFilter()
+                && FilterUtil::containsEqual($this->cube->getBaseFilter(), $key, $val)
+            ) {
+                continue;
+            }
+
             $urlParams->add($prefix . $key, $val);
         }
 

@@ -6,6 +6,7 @@
 namespace Icinga\Module\Cube\ProvidedHook\Cube;
 
 use Icinga\Module\Cube\Hook\IcingaDbActionsHook;
+use Icinga\Module\Cube\IcingaDb\FilterUtil;
 use Icinga\Module\Cube\IcingaDb\IcingaDbCube;
 use Icinga\Module\Cube\IcingaDb\IcingaDbServiceStatusCube;
 use ipl\Stdlib\Filter;
@@ -26,6 +27,13 @@ class IcingaDbActions extends IcingaDbActionsHook
         }
 
         foreach ($cube->getSlices() as $dimension => $slice) {
+            if (
+                $cube->hasBaseFilter()
+                && FilterUtil::containsEqual($cube->getBaseFilter(), $dimension, $slice)
+            ) {
+                continue;
+            }
+
             $filter->add(Filter::equal($dimension, $slice));
         }
 
