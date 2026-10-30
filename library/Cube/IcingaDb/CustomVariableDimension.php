@@ -126,7 +126,14 @@ class CustomVariableDimension implements Dimension
     {
         /** @var IcingaDbCube $cube */
         $innerQuery = $cube->innerQuery();
-        $sourceTable = $this->getSourceName() ?? $innerQuery->getModel()->getTableName();
+        if ($this->getSourceName() === null) {
+            $sourceTable = $innerQuery->getModel()->getTableAlias();
+        } else {
+            $sourceTable = $innerQuery->getResolver()->qualifyPath(
+                $this->getSourceName(),
+                $innerQuery->getModel()->getTableAlias()
+            );
+        }
 
         $subQuery = $innerQuery->createSubQuery(new CustomvarFlat(), $sourceTable . '.vars');
         $subQuery->getSelectBase()->resetWhere(); // The link to the outer query is the ON condition
@@ -147,7 +154,7 @@ class CustomVariableDimension implements Dimension
         $innerQuery->getSelectBase()->groupBy($subQueryAlias . '.flatvalue');
 
         $sourceIdPath = '.id';
-        if ($innerQuery->getModel() instanceof Service && $sourceTable === 'host') {
+        if ($innerQuery->getModel() instanceof Service && $sourceTable === 'service.host') {
             $sourceIdPath = '.host_id';
         }
 
